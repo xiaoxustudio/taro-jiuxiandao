@@ -1,23 +1,28 @@
 import { Button, ButtonProps } from 'antd-mobile';
+import classNames from 'classnames';
 import { PropsWithChildren } from 'react';
 import styles from './index.module.less';
-import classNames from 'classnames';
 
-export interface JSXButtonProps extends ButtonProps {
-	gap?: number;
-	className?: string;
+export interface JXButtonProps extends ButtonProps {
+  width: number;
+  className: string;
 }
 
-function JSXButton({
-	gap,
-	children,
-	className,
-	...props
-}: PropsWithChildren<JSXButtonProps>) {
-	return (
-		<Button className={classNames(styles.JSXButton, className)} {...props}>
-			{children}
-		</Button>
-	);
+function JXButton({
+  width,
+  children,
+  style,
+  className,
+  ...props
+}: PropsWithChildren<Partial<JXButtonProps>>) {
+  return (
+    <Button
+      className={classNames(styles.JXButton, className)}
+      style={{ ...style, width: width && `${width}px` }}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
 }
-export default JSXButton;
+export default JXButton;
