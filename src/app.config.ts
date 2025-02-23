@@ -1,8 +1,12 @@
 export default defineAppConfig({
-	pages: ['pages/index/index', 'pages/create-actor/index'],
-	window: {
-		backgroundTextStyle: 'light',
-		navigationBarTitleText: 'JiuXianDao',
-		navigationBarTextStyle: 'black',
-	},
+  pages: [
+    'pages/index/index',
+    'pages/Home/pages/create-actor/index',
+    'pages/Home/pages/actor-list/index',
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarTitleText: 'JiuXianDao',
+    navigationBarTextStyle: 'black',
+  },
 });

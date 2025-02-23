@@ -1,6 +1,7 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { BaseType, CWType } from '@/types';
+import { getActor } from './actor';
 // 角色储物
 
 export interface AddProps extends BaseType {
@@ -23,23 +24,12 @@ function TR(type: CWType) {
 }
 
 /**
- * @description: 获取当前角色数据
- * @return {*}
- */
-function getTarget() {
-  const { current } = useStore.getState();
-  const actor = useActorStore.getState();
-  const acData = actor[current];
-  return acData;
-}
-
-/**
  * @description: 是否有该物品
  * @param {object} param1
  * @return {*}
  */
 function Has({ name, type = CWType.WP }: { name: string; type: CWType }) {
-  const acData = getTarget();
+  const acData = getActor();
   const cw = acData.cw[TR(type)];
   let index = -1;
   cw.some((v: BaseType, ind) => {
@@ -80,4 +70,4 @@ function Add({ name, type = CWType.WP, num = 1, isPile = false }: AddProps) {
   return;
 }
 
-export default { Add, Has, getTarget, TR };
+export default { Add, Has, getActor, TR };

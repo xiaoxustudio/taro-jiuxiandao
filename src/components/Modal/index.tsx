@@ -1,4 +1,10 @@
-import { Modal, ModalProps } from 'antd-mobile';
+import {
+  Modal,
+  ModalAlertProps,
+  ModalConfirmProps,
+  ModalProps,
+  ModalShowProps,
+} from 'antd-mobile';
 import classNames from 'classnames';
 import { PropsWithChildren } from 'react';
 import styles from './index.module.less';
@@ -47,4 +53,36 @@ function JXModal({
     />
   );
 }
+
+JXModal.show = (props: ModalShowProps & JXModalProps) => {
+  return Modal.show({
+    ...props,
+    closeOnMaskClick: true,
+    actions: [
+      {
+        key: 'confirm',
+        text: props.okText || '确认',
+        disabled: false,
+        className: styles.MadalConfirm,
+        onClick: props.onOk || (() => {}),
+      },
+      {
+        key: 'cancle',
+        text: props.cancleText || '取消',
+        disabled: false,
+        className: styles.MadalCancle,
+        onClick: props.onCancle || (() => {}),
+      },
+    ],
+  });
+};
+
+JXModal.confirm = (props: ModalConfirmProps) => {
+  return Modal.confirm({ ...props, closeOnMaskClick: true });
+};
+
+JXModal.alert = (props: ModalAlertProps) => {
+  return Modal.alert({ ...props, closeOnMaskClick: true });
+};
+
 export default JXModal;

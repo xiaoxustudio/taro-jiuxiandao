@@ -19,10 +19,16 @@ function Home() {
           direction='vertical'
           justify='center'
         >
-          <JXButton>进入游戏</JXButton>
           <JXButton
             onClick={() => {
-              navigateTo('create-actor/index');
+              navigateTo('Home/pages/actor-list/index');
+            }}
+          >
+            进入游戏
+          </JXButton>
+          <JXButton
+            onClick={() => {
+              navigateTo('Home/pages/create-actor/index');
             }}
           >
             创建角色

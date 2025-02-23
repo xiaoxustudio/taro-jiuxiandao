@@ -3,8 +3,10 @@ import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { CWType } from '@/types';
 import { generateUUID } from '@/utils';
+import { HasActor } from '@/utils/actor';
 import chuwu from '@/utils/chuwu';
 import { View } from '@tarojs/components';
+import Taro from '@tarojs/taro';
 import { Selector } from 'antd-mobile';
 import { useCallback, useState } from 'react';
 import styles from './index.module.less';
@@ -134,10 +136,17 @@ function Index() {
       JXToast('请输入你的道号').show();
       return;
     }
+    if (HasActor(actor.daohao)) {
+      JXToast('已有该道号的角色').show();
+      return;
+    }
     setStore(actor.daohao);
     setActorStore(actor.daohao, actor);
     chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: 30000 });
     JXToast('创建角色成功').show();
+    setTimeout(() => {
+      Taro.navigateBack({ delta: 1 });
+    }, 1000);
   }, [actor, setActorStore, setStore]);
 
   return (

@@ -1,49 +1,49 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { ActorDataConfig } from '@/types';
+import { cloneDeep } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
 
-export interface ActorControllerProps {
-	storeName: string; // 存档名称
-}
+/**
+ * @description: 当前角色控制器
+ * @return {*}
+ */
+function useActorController() {
+  const { current } = useStore();
+  const { set: setActor, ...store } = useActorStore();
+  const actor = useMemo(() => store[current], [current, store]);
 
-function useActorController({ storeName }: ActorControllerProps) {
-	const { set: setActor, ...store } = useActorStore();
-	const { current, set: setStore } = useStore();
+  if (!actor) {
+    throw new Error('无法读取存档');
+  } else if (current === 'set') {
+    throw new Error('无法读取存档(set)');
+  }
 
-	if (store[current]) {
-		throw new Error('无法读取存档');
-	} else if (current === 'set') {
-		throw new Error('无法读取存档(set)');
-	}
+  /**
+   * @description: 获取属性
+   * @return {*}
+   */
+  const get = useCallback(
+    (name: keyof ActorDataConfig) => {
+      return actor[name];
+    },
+    [actor]
+  );
 
-	setStore(storeName); // 设置当前存档
+  /**
+   * @description: 设置属性
+   * @return {*}
+   */
+  const set = useCallback(
+    (key: keyof ActorDataConfig, val: any) => {
+      const newActor = cloneDeep(actor) as ActorDataConfig;
+      newActor[key as any] = val;
+      setActor(current, actor);
+    },
+    [actor, current, setActor]
+  );
 
-	/**
-	 * @description: 获取存档属性
-	 * @return {*}
-	 */
-	const get = useCallback(
-		(name: string) => {
-			return store[name] as ActorDataConfig;
-		},
-		[store]
-	);
-
-	/**
-	 * @description: 设置存档属性
-	 * @return {*}
-	 */
-	const set = useCallback(
-		(key: string, val: string) => {
-			const actor = get(current);
-			actor[key] = val;
-			setActor(current, actor);
-		},
-		[current, get, setActor]
-	);
-
-	const obj = useMemo(() => ({ get, set }), [get, set]);
-	return obj;
+  const obj = useMemo(() => ({ get, set }), [get, set]);
+  return obj;
 }
 export default useActorController;
