@@ -1,15 +1,15 @@
 {
-	"miniprogramRoot": "./dist",
-	"projectname": "taro-jiuxiandao",
-	"description": "九仙道重构版",
-	"appid": "touristappid",
-	"setting": {
-		"urlCheck": true,
-		"es6": false,
-		"enhance": false,
-		"compileHotReLoad": false,
-		"postcss": false,
-		"minified": false
-	},
-	"compileType": "miniprogram"
+  "miniprogramRoot": "./dist",
+  "projectname": "taro-jiuxiandao",
+  "description": "九仙道重构版",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": false,
+    "compileHotReLoad": true,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
 }

@@ -1,7 +1,12 @@
-import { JXButton, JXInput, JXSpace, Text } from '@/components';
+import { JXButton, JXInput, JXSpace, JXToast, Text } from '@/components';
+import useActorStore from '@/store/actor';
+import useStore from '@/store/store';
+import { CWType } from '@/types';
+import { generateUUID } from '@/utils';
+import chuwu from '@/utils/chuwu';
 import { View } from '@tarojs/components';
 import { Selector } from 'antd-mobile';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import styles from './index.module.less';
 
 const options = [
@@ -91,11 +96,49 @@ const races = [
 ];
 
 function Index() {
+  const { set: setStore } = useStore();
+  const { set: setActorStore } = useActorStore();
   const [actor, setActor] = useState({
+    uuid: generateUUID(),
     daohao: '',
     linggen: '金',
     zhongzu: '人',
+    lv: 1,
+    xiuwei: 1, // 修为
+    max_xiuwei: 500,
+    xuanyuan: 10, // 仙缘
+    jingjie: '练气',
+    max_jingjie: '一层',
+    fashu: 0,
+    xiulianbeilv: 10, // 修炼倍率
+    qixue: 1200, // 气血
+    gongji: 80, // 攻击
+    fangyu: 40, // 防御
+    baoji: 2, // 暴击
+    sudu: 20, // 速度
+    shouyuan: 13, // 寿元
+    max_shouyuan: 100,
+    shenshi: 100, // 神识
+    max_shenshi: 100,
+    cw: {
+      wp: [],
+      cl: [],
+      dj: [],
+      max: 30, // 容量
+    },
+    time1: Date.now(), // 时间1
   });
+
+  const handleRegister = useCallback(() => {
+    if (actor.daohao.length === 0) {
+      JXToast('请输入你的道号').show();
+      return;
+    }
+    setStore(actor.daohao);
+    setActorStore(actor.daohao, actor);
+    chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: 30000 });
+    JXToast('创建角色成功').show();
+  }, [actor, setActorStore, setStore]);
 
   return (
     <View className={styles.Container}>
@@ -144,7 +187,9 @@ function Index() {
           </JXSpace>
         </JXSpace>
         <JXSpace className={styles.Bottom} gap={20}>
-          <JXButton width={200}>创建角色</JXButton>
+          <JXButton width={200} onClick={handleRegister}>
+            创建角色
+          </JXButton>
         </JXSpace>
       </JXSpace>
     </View>
