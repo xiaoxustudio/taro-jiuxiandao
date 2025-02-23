@@ -25,7 +25,7 @@ function useActorController() {
    */
   const get = useCallback(
     (name: keyof ActorDataConfig) => {
-      return actor[name];
+      return actor[name] as any;
     },
     [actor]
   );

@@ -3,6 +3,7 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/Home/pages/create-actor/index',
     'pages/Home/pages/actor-list/index',
+    'pages/Main/index',
   ],
   window: {
     backgroundTextStyle: 'light',

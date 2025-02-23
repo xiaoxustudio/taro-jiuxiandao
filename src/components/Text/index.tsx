@@ -12,6 +12,7 @@ export interface TextProps {
   verticalText: boolean; // 垂直排列
   space: number; // 文字间距
   inline: boolean; // 行
+  textShadow: boolean; // 文字阴影
   style: CSSProperties;
 }
 
@@ -25,6 +26,7 @@ function Text({
   center,
   className,
   inline,
+  textShadow,
   verticalText,
   ...props
 }: PropsWithChildren<Partial<TextProps>>) {
@@ -41,6 +43,7 @@ function Text({
         color: color ? color : '',
         letterSpacing: space ? `${space}px` : '',
         display: inline ? `inline-block` : '',
+        textShadow: textShadow ? `2px 2px 2px grey` : '',
       }}
       {...props}
     >

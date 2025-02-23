@@ -1,6 +1,8 @@
 import { JXModal, JXSpace } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import useActorStore from '@/store/actor';
+import useStore from '@/store/store';
+import { navigateTo } from '@/utils';
 import { View } from '@tarojs/components';
 import { List } from 'antd-mobile';
 import { omit } from 'lodash-es';
@@ -9,6 +11,7 @@ import './index.less';
 
 export default function ActorList() {
   const actor = useActorStore();
+  const { set: setStore } = useStore();
   const actorController = useActorController();
   const list = useMemo(() => omit(actor, 'set'), [actor]);
   return (
@@ -18,9 +21,14 @@ export default function ActorList() {
           <List.Item
             key={v}
             onClick={() => {
-              JXModal.show({
+              const c = JXModal.show({
                 content: <>选择角色：{v}，是否进入游戏？</>,
                 okText: '进入',
+                onOk() {
+                  setStore(v);
+                  navigateTo('Main/index');
+                  c.close();
+                },
               });
             }}
           >
