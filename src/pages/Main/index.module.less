@@ -4,7 +4,6 @@
 
 .Title {
   width: 100%;
-  height: 60px;
   background-color: #b5b5b5;
   display: flex;
   justify-content: center;
@@ -14,6 +13,12 @@
 .Attr {
   width: 100%;
   background-color: white;
+  padding: 12px 0;
+  :global {
+    .adm-space-item {
+      padding: 0 12px;
+    }
+  }
   &Title {
     color: orange;
   }
@@ -21,6 +26,19 @@
 
 .XiuLianBox {
   width: 100%;
-  height: 60px;
+  height: 80px;
+  background-color: #b5b5b5;
+}
+
+.ContentBox {
+  width: 100%;
+  padding: 12px 0;
+  margin-top: 24px;
+  background-color: white;
+}
+.BottomBox {
+  width: 100%;
+  padding: 12px 0;
+  margin-top: 24px;
   background-color: #b5b5b5;
 }

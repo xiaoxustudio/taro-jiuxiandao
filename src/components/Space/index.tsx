@@ -6,6 +6,7 @@ import styles from './index.module.less';
 export interface JXSpaceProps extends SpaceProps {
   gap?: number;
   center?: boolean;
+  between?: boolean;
 }
 
 function JXSpace({
@@ -14,18 +15,27 @@ function JXSpace({
   children,
   className,
   style,
+  between,
   ...props
 }: PropsWithChildren<JXSpaceProps>) {
   const gapStyle = useMemo(
     () =>
-      ({ '--gap': gap ? `${gap}px` : undefined }) as CSSProperties & {
+      ({
+        '--gap': gap ? `${gap}px` : undefined,
+      }) as CSSProperties & {
         [k: string]: string;
       },
     [gap]
   );
+
   return (
     <Space
-      className={classNames(className, center && styles.FlexCenter)}
+      className={classNames(
+        className,
+        styles.Space,
+        center && styles.FlexCenter,
+        between && styles.FlexBetween
+      )}
       style={{ ...style, ...gapStyle }}
       {...props}
     >

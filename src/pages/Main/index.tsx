@@ -1,17 +1,20 @@
 import title from '@/assets/logo.png';
-import { JXButton, JXSpace, Text } from '@/components';
+import { JXButton, JXSpace, Paragraph, Text } from '@/components';
+import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
 import { View } from '@tarojs/components';
-import { Image } from 'antd-mobile';
+import { Grid, Image } from 'antd-mobile';
+import { operaterOptions, operaterOptions2 } from './consts';
 import styles from './index.module.less';
 
 function Main() {
   const actor = useActorController();
+
   return (
     <View>
       <JXSpace className={styles.MainBox} direction='vertical'>
         <JXSpace className={styles.Title}>
-          <Image width={60} src={title} />
+          <Image width={120} src={title} />
         </JXSpace>
         {/* 属性 */}
         <JXSpace className={styles.Attr} direction='vertical'>
@@ -54,6 +57,56 @@ function Main() {
           </JXButton>
           <Text> 未开始修炼</Text>
         </JXSpace>
+        {/* 操作 */}
+        <JXGrid className={styles.ContentBox} columns={4} gap={12}>
+          {operaterOptions.map((v) => (
+            <JXGrid.Item key={v.name} align='center'>
+              <JXButton size='mini' transparent onClick={v.click}>
+                <Text textShadow>{v.name}</Text>
+              </JXButton>
+            </JXGrid.Item>
+          ))}
+        </JXGrid>
+        {/* 动态 */}
+        <JXSpace className={styles.ContentBox} direction='vertical'>
+          <Text color='orange' bold>
+            动态
+          </Text>
+          <Paragraph>测试</Paragraph>
+        </JXSpace>
+        {/* 操作2 */}
+        <JXGrid className={styles.ContentBox} columns={4} gap={12}>
+          {operaterOptions2.map((v) => (
+            <JXGrid.Item key={v.name} align='center'>
+              <JXButton size='mini' transparent onClick={v.click}>
+                <Text textShadow>{v.name}</Text>
+              </JXButton>
+            </JXGrid.Item>
+          ))}
+        </JXGrid>
+        {/* 修炼 */}
+        <JXGrid className={styles.BottomBox} columns={4}>
+          <JXGrid.Item align='center'>
+            <JXButton size='mini' transparent>
+              <Text textShadow>角色</Text>
+            </JXButton>
+          </JXGrid.Item>
+          <JXGrid.Item align='center'>
+            <JXButton size='mini' transparent>
+              <Text textShadow>社区</Text>
+            </JXButton>
+          </JXGrid.Item>
+          <JXGrid.Item align='center'>
+            <JXButton size='mini' transparent>
+              <Text textShadow>CDK</Text>
+            </JXButton>
+          </JXGrid.Item>
+          <JXGrid.Item align='center'>
+            <JXButton size='mini' transparent>
+              <Text textShadow>签到</Text>
+            </JXButton>
+          </JXGrid.Item>
+        </JXGrid>
       </JXSpace>
     </View>
   );
