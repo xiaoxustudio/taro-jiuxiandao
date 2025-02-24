@@ -1,14 +1,26 @@
 import title from '@/assets/logo.png';
-import { JXButton, JXSpace, Paragraph, Text } from '@/components';
+import { JXButton, JXSpace, JXToast, Paragraph, Text } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
+import { ZhouTian } from '@/utils';
 import { View } from '@tarojs/components';
-import { Grid, Image } from 'antd-mobile';
+import { Image } from 'antd-mobile';
+import { useCallback, useMemo } from 'react';
 import { operaterOptions, operaterOptions2 } from './consts';
 import styles from './index.module.less';
 
 function Main() {
-  const actor = useActorController();
+  const { get, set } = useActorController();
+  const xiulian = useMemo(() => get('xiulian') as any, [get]);
+
+  // 开始修炼
+  const handleXiuLian = useCallback(() => {
+    if (xiulian) return;
+    set('xiulian', { time: Date.now() });
+    set('shenshi', get('shenshi') - 10);
+    console.log(get('shenshi'));
+    JXToast('开始修炼！').show();
+  }, [get, set, xiulian]);
 
   return (
     <View>
@@ -22,40 +34,45 @@ function Main() {
             <Text className={styles.AttrTitle} bold inline>
               道号：
             </Text>
-            {actor.get('daohao')}
+            {get('daohao')}
           </Text>
           <Text space={2}>
             <Text className={styles.AttrTitle} bold inline>
               修为：
             </Text>
-            {actor.get('xiuwei')}/{actor.get('max_xiuwei')}
+            {get('xiuwei')}/{get('max_xiuwei')}
           </Text>
           <Text space={2}>
             <Text className={styles.AttrTitle} bold inline>
               神识：
             </Text>
-            {actor.get('shenshi')}/{actor.get('max_shenshi')}
+            {get('shenshi')}/{get('max_shenshi')}
           </Text>
           <Text space={2}>
             <Text className={styles.AttrTitle} bold inline>
               寿元：
             </Text>
-            {actor.get('shouyuan')}/{actor.get('max_shouyuan')}
+            {get('shouyuan')}/{get('max_shouyuan')}
           </Text>
           <Text space={2}>
             <Text className={styles.AttrTitle} bold inline>
               境界：
             </Text>
-            {actor.get('jingjie')}
-            {actor.get('max_jingjie')}
+            {get('jingjie')}
+            {get('max_jingjie')}
           </Text>
         </JXSpace>
         {/* 修炼 */}
         <JXSpace className={styles.XiuLianBox} center>
-          <JXButton size='mini' transparent>
-            <Text textShadow>修炼：</Text>
-          </JXButton>
-          <Text> 未开始修炼</Text>
+          {!xiulian && (
+            <JXButton size='mini' transparent onClick={handleXiuLian}>
+              <Text textShadow>修炼：</Text>
+            </JXButton>
+          )}
+          {!xiulian && <Text> 未开始修炼</Text>}
+          {xiulian && (
+            <Text>已修炼 {ZhouTian(xiulian.time).toFixed(2)} 个小周天</Text>
+          )}
         </JXSpace>
         {/* 操作 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>

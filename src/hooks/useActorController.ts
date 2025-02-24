@@ -11,7 +11,7 @@ import { useCallback, useMemo } from 'react';
 function useActorController() {
   const { current } = useStore();
   const { set: setActor, ...store } = useActorStore();
-  const actor = useMemo(() => store[current], [current, store]);
+  const actor = store[current];
 
   if (!actor) {
     throw new Error('无法读取存档');
@@ -25,7 +25,11 @@ function useActorController() {
    */
   const get = useCallback(
     (name: keyof ActorDataConfig) => {
-      return actor[name] as any;
+      try {
+        return actor[name] as any;
+      } catch {
+        return null;
+      }
     },
     [actor]
   );
@@ -34,16 +38,16 @@ function useActorController() {
    * @description: 设置属性
    * @return {*}
    */
-  const set = useCallback(
-    (key: keyof ActorDataConfig, val: any) => {
-      const newActor = cloneDeep(actor) as ActorDataConfig;
-      newActor[key as any] = val;
-      setActor(current, actor);
-    },
-    [actor, current, setActor]
-  );
+  const set = useCallback((key: keyof ActorDataConfig, val: any) => {
+    const { current: curr } = useStore.getState();
+    const storeData = useActorStore.getState();
+    const newActor = cloneDeep(storeData[curr]) as ActorDataConfig;
+    newActor[key as any] = val;
+    useActorStore.setState({ [curr]: newActor });
+  }, []);
 
   const obj = useMemo(() => ({ get, set }), [get, set]);
+
   return obj;
 }
 export default useActorController;
