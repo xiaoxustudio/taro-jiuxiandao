@@ -53,7 +53,7 @@ function Main() {
       </>
     );
     const c = JXModal.show({
-      title: '测试',
+      title: '修炼',
       content,
       disableCancle: true,
       onOk() {
