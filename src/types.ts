@@ -53,7 +53,11 @@ export interface ActorDataConfig {
   sudu: number; // 速度
   cw: CuWuType;
   time1: number; // 时间1
-  xiulian: {
+  xiulian: null | {
     time: number;
-  };
+  }; //修炼
+  dongfu: null | {
+    lv: number;
+    lingchi: number; // 灵池
+  }; // 洞府
 }

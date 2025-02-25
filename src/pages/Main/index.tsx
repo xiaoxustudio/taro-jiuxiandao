@@ -1,8 +1,20 @@
 import title from '@/assets/logo.png';
-import { JXButton, JXSpace, JXToast, Paragraph, Text } from '@/components';
+import {
+  JXButton,
+  JXModal,
+  JXSpace,
+  JXToast,
+  Paragraph,
+  Text,
+} from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
 import { ZhouTian } from '@/utils';
+import {
+  getLingQiForJingJie,
+  getLingQiForRate,
+  getLingQiToNumber,
+} from '@/utils/actor';
 import { View } from '@tarojs/components';
 import { Image } from 'antd-mobile';
 import { useCallback, useMemo } from 'react';
@@ -18,9 +30,37 @@ function Main() {
     if (xiulian) return;
     set('xiulian', { time: Date.now() });
     set('shenshi', get('shenshi') - 10);
-    console.log(get('shenshi'));
     JXToast('开始修炼！').show();
   }, [get, set, xiulian]);
+
+  // 打开修炼弹窗
+  const handleOpenXiuLian = () => {
+    const _add = get('lv') + getLingQiForJingJie();
+    const cwcalc = Math.round(
+      getLingQiForRate() * ZhouTian(xiulian.time) + _add
+    );
+    const content = (
+      <>
+        阶段增益：{get('lv') / 10}
+        <br />
+        境界增益：{getLingQiToNumber() / 10}
+        <br />
+        洞府增益：{get('dongfu') ? get('dongfu').lingchi : 0}
+        <br />
+        总修炼小周天合计：{ZhouTian(xiulian.time).toFixed(2)}
+        <br />
+        总获取修为合计：{cwcalc}
+      </>
+    );
+    const c = JXModal.show({
+      title: '测试',
+      content,
+      disableCancle: true,
+      onOk() {
+        c.close();
+      },
+    });
+  };
 
   return (
     <View>
@@ -71,7 +111,9 @@ function Main() {
           )}
           {!xiulian && <Text> 未开始修炼</Text>}
           {xiulian && (
-            <Text>已修炼 {ZhouTian(xiulian.time).toFixed(2)} 个小周天</Text>
+            <JXButton size='small' transparent onClick={handleOpenXiuLian}>
+              已修炼 {ZhouTian(xiulian.time).toFixed(2)} 个小周天
+            </JXButton>
           )}
         </JXSpace>
         {/* 操作 */}

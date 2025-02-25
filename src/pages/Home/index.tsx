@@ -49,7 +49,7 @@ function Home() {
         </JXSpace>
       </JXSpace>
       <View className={styles.team}>九仙团队™</View>
-      <View className={styles.copyRight}>CopyRight&nbsp;®&nbsp;2025</View>
+      <View className={styles.copyRight}>CopyRight&emsp;® 2018-&nbsp;2025</View>
       <JXModal
         title='关于我们'
         visible={showAbout}

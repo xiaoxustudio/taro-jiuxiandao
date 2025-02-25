@@ -129,6 +129,8 @@ function Index() {
       max: 30, // 容量
     },
     time1: Date.now(), // 时间1
+    xiulian: null,
+    dongfu: null,
   });
 
   const handleRegister = useCallback(() => {
