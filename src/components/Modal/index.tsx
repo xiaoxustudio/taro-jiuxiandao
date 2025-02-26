@@ -57,15 +57,7 @@ function JXModal({
         },
       ]);
     }
-  }, [
-    action,
-    cancleText,
-    disableCancle,
-    disableConfirm,
-    okText,
-    onCancle,
-    onOk,
-  ]);
+  }, [cancleText, disableCancle, disableConfirm, okText]); //eslint-disable-line
   return (
     <Modal
       className={classNames(styles.JSXButton, className)}
