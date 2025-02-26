@@ -89,10 +89,10 @@ function getLingQiForJingJie() {
       xw = 1600;
       break;
     case '合体':
-      xw = 2200;
+      xw = 1800;
       break;
     case '大乘':
-      xw = 2600;
+      xw = 1800;
       break;
     default:
       xw = 1000;
