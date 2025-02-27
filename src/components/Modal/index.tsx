@@ -92,7 +92,6 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
       onClick: props.onCancle,
     });
   }
-  console.log(actions);
   return Modal.show({
     ...props,
     closeOnMaskClick: true,

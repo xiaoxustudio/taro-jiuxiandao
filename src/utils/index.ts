@@ -127,8 +127,9 @@ export function generateActorAttributes(ratios: {
 /**
  * @description: 小周天计算
  * @param {number} n
+ * @param {*} limit 限制最大
  * @return {*}
  */
-export function ZhouTian(n: number): number {
-  return (Date.now() - n) / 3600000;
+export function ZhouTian(n: number, limit = 12): number {
+  return Math.min((Date.now() - n) / 3600000, limit);
 }

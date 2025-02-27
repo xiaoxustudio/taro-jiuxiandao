@@ -14,16 +14,109 @@ import {
   getLingQiForJingJie,
   getLingQiForRate,
   getLingQiToNumber,
+  JingJie1Transform,
+  JingJieTransform,
 } from '@/utils/actor';
 import { View } from '@tarojs/components';
 import { Image } from 'antd-mobile';
 import { useCallback, useMemo } from 'react';
-import { operaterOptions, operaterOptions2 } from './consts';
 import styles from './index.module.less';
 
 function Main() {
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
   const xiulian = useMemo(() => get('xiulian') as any, [get]);
+  const canRed = useMemo(
+    () => get('xiuwei') >= get('max_xiuwei'),
+    [get, actor] //eslint-disable-line
+  );
+
+  const operaterOptions = [
+    {
+      name: '试炼',
+      click() {},
+    },
+    {
+      name: '炼丹',
+      click() {},
+    },
+    {
+      name: '炼器',
+      click() {},
+    },
+    {
+      name: '法宝',
+      click() {},
+    },
+    {
+      name: '升阶',
+      click() {
+        if (get('xiuwei') < get('max_xiuwei')) {
+          JXToast('修为不足，无法突破！');
+          return;
+        }
+        // 计算
+        const calc = Math.ceil(
+          getLingQiForJingJie() * get('lv') +
+            (getLingQiToNumber() + 1) * get('max_xiuwei') * 0.7
+        );
+        set('lv', get('lv') + 1);
+        set('xiuwei', Math.ceil(get('xiuwei') - get('max_xiuwei')));
+        set('max_xiuwei', calc);
+        if (get('max_jingjie') === '九阶') {
+          set('jingjie', JingJieTransform(get('jingjie')));
+          set('max_jingjie', JingJie1Transform(get('max_jingjie')));
+        } else {
+          set('max_jingjie', JingJie1Transform(get('max_jingjie')));
+        }
+      },
+    },
+    {
+      name: '功法',
+      click() {},
+    },
+    {
+      name: '突破',
+      click() {},
+    },
+    {
+      name: '法术',
+      click() {},
+    },
+  ];
+  const operaterOptions2 = [
+    {
+      name: '坊市',
+      click() {},
+    },
+    {
+      name: '储物',
+      click() {},
+    },
+    {
+      name: '灵兽',
+      click() {},
+    },
+    {
+      name: '门派',
+      click() {},
+    },
+    {
+      name: '药园',
+      click() {},
+    },
+    {
+      name: '洞府',
+      click() {},
+    },
+    {
+      name: '成就',
+      click() {},
+    },
+    {
+      name: '赌场',
+      click() {},
+    },
+  ];
 
   // 开始修炼
   const handleXiuLian = useCallback(() => {
@@ -56,8 +149,11 @@ function Main() {
       title: '修炼',
       content,
       disableCancle: true,
+      okText: '收功',
       onOk() {
         c.close();
+        set('xiuwei', get('xiuwei') + cwcalc);
+        set('xiulian', null);
       },
     });
   };
@@ -121,7 +217,12 @@ function Main() {
           {operaterOptions.map((v) => (
             <JXGrid.Item key={v.name} align='center'>
               <JXButton size='mini' transparent onClick={v.click}>
-                <Text textShadow>{v.name}</Text>
+                <Text
+                  color={canRed && v.name === '升阶' ? 'red' : undefined}
+                  textShadow
+                >
+                  {v.name}
+                </Text>
               </JXButton>
             </JXGrid.Item>
           ))}
@@ -135,8 +236,8 @@ function Main() {
         </JXSpace>
         {/* 操作2 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
-          {operaterOptions2.map((v) => (
-            <JXGrid.Item key={v.name} align='center'>
+          {operaterOptions2.map((v, index) => (
+            <JXGrid.Item key={v.name + index} align='center'>
               <JXButton size='mini' transparent onClick={v.click}>
                 <Text textShadow>{v.name}</Text>
               </JXButton>

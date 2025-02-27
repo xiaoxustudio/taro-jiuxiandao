@@ -106,11 +106,11 @@ function Index() {
     linggen: '金',
     zhongzu: '人',
     lv: 1,
-    xiuwei: 1, // 修为
+    xiuwei: 999999, // 修为
     max_xiuwei: 500,
     xuanyuan: 10, // 仙缘
     jingjie: '练气',
-    max_jingjie: '一层',
+    max_jingjie: '一阶',
     fashu: 0,
     xiulianbeilv: 10, // 修炼倍率
     qixue: 1200, // 气血

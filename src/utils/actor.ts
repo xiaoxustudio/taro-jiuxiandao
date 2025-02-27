@@ -140,11 +140,56 @@ function getLingQiForRate() {
   return xw;
 }
 
+const JingJie1Transform = (j: string) => {
+  switch (j) {
+    case '一阶':
+      return '二阶';
+    case '二阶':
+      return '三阶';
+    case '三阶':
+      return '四阶';
+    case '四阶':
+      return '五阶';
+    case '五阶':
+      return '六阶';
+    case '六阶':
+      return '七阶';
+    case '七阶':
+      return '八阶';
+    case '八阶':
+      return '九阶';
+    case '九阶':
+      return '一阶';
+  }
+};
+const JingJieTransform = (j: string) => {
+  switch (j) {
+    case '练气':
+      return '筑基';
+    case '筑基':
+      return '结丹';
+    case '结丹':
+      return '元婴';
+    case '元婴':
+      return '化神';
+    case '化神':
+      return '返虚';
+    case '返虚':
+      return '合体';
+    case '合体':
+      return '大乘';
+    case '大乘':
+      return '';
+  }
+};
+
 export {
   getActor,
   getLingQiForJingJie,
   getLingQiForRate,
   getLingQiToNumber,
-  HasActor
+  HasActor,
+  JingJie1Transform,
+  JingJieTransform
 };
 

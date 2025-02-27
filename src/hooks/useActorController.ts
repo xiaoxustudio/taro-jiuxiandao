@@ -46,7 +46,7 @@ function useActorController() {
     useActorStore.setState({ [curr]: newActor });
   }, []);
 
-  const obj = useMemo(() => ({ get, set }), [get, set]);
+  const obj = useMemo(() => ({ get, set, actor }), [actor, get, set]);
 
   return obj;
 }
