@@ -1,5 +1,6 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
+import { chineseToNumber, numberToChinese } from '.';
 
 /**
  * @description: 获取当前角色数据
@@ -140,28 +141,79 @@ function getLingQiForRate() {
   return xw;
 }
 
-const JingJie1Transform = (j: string) => {
-  switch (j) {
-    case '一阶':
-      return '二阶';
-    case '二阶':
-      return '三阶';
-    case '三阶':
-      return '四阶';
-    case '四阶':
-      return '五阶';
-    case '五阶':
-      return '六阶';
-    case '六阶':
-      return '七阶';
-    case '七阶':
-      return '八阶';
-    case '八阶':
-      return '九阶';
-    case '九阶':
-      return '一阶';
+/**
+ * @description: 获取每个境界最大小境界
+ * @return {*}
+ */
+export const getJingJieMaxDep = () => {
+  const actor = getActor();
+  switch (actor.jingjie) {
+    case '练气':
+      return 12;
+    case '筑基':
+    case '结丹':
+    case '元婴':
+    case '化神':
+    case '返虚':
+    case '合体':
+    case '大乘':
+      return 9;
+    default:
+      return 9;
   }
 };
+
+/**
+ * @description: 小境界或数字转换为小境界
+ * @param {string} s
+ * @param {*} max_dep
+ * @param {*} addNum
+ * @return {*}
+ */
+export function TransformToJingJie1(
+  s: string | number,
+  max_dep = 9,
+  addNum = 0
+) {
+  let current: number = 0;
+  if (typeof s === 'string') {
+    current = chineseToNumber(s);
+    if (current === undefined) {
+      return s;
+    }
+  }
+
+  let next = current + addNum;
+  if (next > max_dep) {
+    next = 1;
+  }
+
+  const nextChinese = numberToChinese(next);
+  return nextChinese ? `${nextChinese}阶` : '一阶';
+}
+
+/**
+ * @description: 小境界转换为数字
+ * @param {string} s
+ * @return {*}
+ */
+export const JingJie1ToNumber = (s: string) =>
+  chineseToNumber(s.replace('阶', ''));
+
+/**
+ * @description: 转换小境界
+ * @param {string} j
+ * @return {*}
+ */
+const JingJie1Transform = (j: string) => {
+  return TransformToJingJie1(j, getJingJieMaxDep(), 1);
+};
+
+/**
+ * @description: 转换大境界
+ * @param {string} j
+ * @return {*}
+ */
 const JingJieTransform = (j: string) => {
   switch (j) {
     case '练气':

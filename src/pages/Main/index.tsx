@@ -11,9 +11,11 @@ import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
 import { ZhouTian } from '@/utils';
 import {
+  getJingJieMaxDep,
   getLingQiForJingJie,
   getLingQiForRate,
   getLingQiToNumber,
+  JingJie1ToNumber,
   JingJie1Transform,
   JingJieTransform,
 } from '@/utils/actor';
@@ -62,7 +64,7 @@ function Main() {
         set('lv', get('lv') + 1);
         set('xiuwei', Math.ceil(get('xiuwei') - get('max_xiuwei')));
         set('max_xiuwei', calc);
-        if (get('max_jingjie') === '九阶') {
+        if (JingJie1ToNumber(get('max_jingjie')) === getJingJieMaxDep()) {
           set('jingjie', JingJieTransform(get('jingjie')));
           set('max_jingjie', JingJie1Transform(get('max_jingjie')));
         } else {

@@ -1,5 +1,6 @@
 export const linggenArray = ['金', '木', '水', '火', '土', '风', '雷'];
 
+
 export const monsterSurnames = [
 	'古',
 	'风',
