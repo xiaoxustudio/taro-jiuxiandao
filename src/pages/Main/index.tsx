@@ -69,6 +69,12 @@ function Main() {
           set('max_jingjie', JingJie1Transform(get('max_jingjie')));
         } else {
           set('max_jingjie', JingJie1Transform(get('max_jingjie')));
+          const lv1 = get('lv') / 20 + 1;
+          const calcGongji = get('gongji') + 10 * lv1;
+          const calcQixue = get('qixue') + 100 * lv1;
+          set('gongji', calcGongji);
+          set('qixue', calcQixue);
+          JXToast().show(`目前气血：${calcQixue}，攻击：${calcGongji}`);
         }
       },
     },

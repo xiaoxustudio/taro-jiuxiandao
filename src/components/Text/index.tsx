@@ -12,6 +12,7 @@ export interface TextProps {
   verticalText: boolean; // 垂直排列
   space: number; // 文字间距
   inline: boolean; // 行
+  noWrap: boolean; // 不换行
   textShadow: boolean; // 文字阴影
   style: CSSProperties;
 }
@@ -28,6 +29,7 @@ function Text({
   inline,
   textShadow,
   verticalText,
+  noWrap,
   ...props
 }: PropsWithChildren<Partial<TextProps>>) {
   return (
@@ -35,6 +37,7 @@ function Text({
       className={classNames(styles.Text, className, {
         [styles.FlexCenter]: center,
         [styles.TextVertical]: verticalText,
+        [styles.TextNoWrap]: noWrap,
       })}
       style={{
         ...style,
