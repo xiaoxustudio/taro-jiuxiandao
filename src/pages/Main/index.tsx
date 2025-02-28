@@ -21,7 +21,7 @@ import {
 } from '@/utils/actor';
 import { View } from '@tarojs/components';
 import { Image } from 'antd-mobile';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import styles from './index.module.less';
 
 function Main() {
@@ -64,12 +64,18 @@ function Main() {
         set('lv', get('lv') + 1);
         set('xiuwei', Math.ceil(get('xiuwei') - get('max_xiuwei')));
         set('max_xiuwei', calc);
+        const lv1 = get('lv') / 20 + 1;
+        // 速度
+        if (get('jingjie') !== '练气') {
+          const calcSudu = get('sudu') + 3 * lv1;
+          set('sudu', calcSudu);
+        }
+        // 气血和物理、境界转换
         if (JingJie1ToNumber(get('max_jingjie')) === getJingJieMaxDep()) {
           set('jingjie', JingJieTransform(get('jingjie')));
           set('max_jingjie', JingJie1Transform(get('max_jingjie')));
         } else {
           set('max_jingjie', JingJie1Transform(get('max_jingjie')));
-          const lv1 = get('lv') / 20 + 1;
           const calcGongji = get('gongji') + 10 * lv1;
           const calcQixue = get('qixue') + 100 * lv1;
           set('gongji', calcGongji);
@@ -165,6 +171,24 @@ function Main() {
       },
     });
   };
+
+  useEffect(() => {
+    // 寿元计算
+    const time1 = get('time1');
+    const calcShouYuan = (Date.now() - time1) / 3600000;
+    if (calcShouYuan >= 24) {
+      const _calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
+      set('shouyuan', _calcCache);
+      // 判断寿元是否到期
+      if (_calcCache >= get('max_shouyuan')) {
+        JXToast().show('寿元已到极限');
+      } else {
+        const needAdd = time1 + (calcShouYuan / 24) * 3600000 * 24;
+        //计算应增加的时间
+        set('time1', needAdd);
+      }
+    }
+  }, []); //eslint-disable-line
 
   return (
     <View>
