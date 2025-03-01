@@ -53,7 +53,7 @@ function Main() {
       name: '升阶',
       click() {
         if (get('xiuwei') < get('max_xiuwei')) {
-          JXToast('修为不足，无法突破！');
+          JXToast('修为不足，无法升阶！').show();
           return;
         }
         // 计算
@@ -187,6 +187,18 @@ function Main() {
         //计算应增加的时间
         set('time1', needAdd);
       }
+    }
+    // 神识计算
+    const shenshiTime = get('shenshiTime');
+    const calcShenShi = (Date.now() - shenshiTime) / 3600000;
+    if (calcShenShi <= 1) {
+      //计算神识恢复程度
+      const max_shenshi = get('max_shenshi');
+      let data = get('shenshi') + (max_shenshi * calcShenShi) / 24;
+      if (data < max_shenshi) {
+        data = max_shenshi;
+      }
+      set('shenshi', data);
     }
   }, []); //eslint-disable-line
 

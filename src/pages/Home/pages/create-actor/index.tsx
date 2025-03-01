@@ -128,7 +128,8 @@ function Index() {
       dj: [],
       max: 30, // 容量
     },
-    time1: Date.now(), // 时间1
+    time1: Date.now(), // 时间1 （计算寿元）
+    shenshiTime: Date.now(), // 计算神识
     xiulian: null,
     dongfu: null,
   });

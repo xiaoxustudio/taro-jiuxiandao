@@ -53,6 +53,7 @@ export interface ActorDataConfig {
   sudu: number; // 速度
   cw: CuWuType;
   time1: number; // 时间1
+  shenshiTime: number; // 神识计算
   xiulian: null | {
     time: number;
   }; //修炼
