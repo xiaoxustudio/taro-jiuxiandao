@@ -142,7 +142,11 @@ function Main() {
 
   // 打开修炼弹窗
   const handleOpenXiuLian = () => {
-    const _add = get('lv') + getLingQiForJingJie();
+    let need = getLingQiForJingJie();
+    if (get('zhongzu') === '灵族') {
+      need *= 1.8; // 灵族1.8倍
+    }
+    const _add = get('lv') + need;
     const cwcalc = Math.round(
       getLingQiForRate() * ZhouTian(xiulian.time) + _add
     );
@@ -191,14 +195,14 @@ function Main() {
     // 神识计算
     const shenshiTime = get('shenshiTime');
     const calcShenShi = (Date.now() - shenshiTime) / 3600000;
-    if (calcShenShi <= 1) {
+    if (calcShenShi >= 1) {
       //计算神识恢复程度
       const max_shenshi = get('max_shenshi');
       let data = get('shenshi') + (max_shenshi * calcShenShi) / 24;
-      if (data < max_shenshi) {
+      if (data > max_shenshi) {
         data = max_shenshi;
       }
-      set('shenshi', data);
+      set('shenshi', Math.round(data));
     }
   }, []); //eslint-disable-line
 
