@@ -1,9 +1,9 @@
-import { View } from '@tarojs/components';
+import { View, ViewProps } from '@tarojs/components';
 import classNames from 'classnames';
 import { CSSProperties, PropsWithChildren } from 'react';
 import styles from './index.module.less';
 
-export interface TextProps {
+export interface TextProps extends ViewProps {
   size: number; // 文字大小
   bold: boolean; // 加粗
   center: boolean; // 居中对齐

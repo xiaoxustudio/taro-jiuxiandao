@@ -4,6 +4,7 @@ export default defineAppConfig({
     'pages/Home/pages/create-actor/index',
     'pages/Home/pages/actor-list/index',
     'pages/Main/index',
+    'pages/Main/pages/qiandao/index',
   ],
   window: {
     backgroundTextStyle: 'light',

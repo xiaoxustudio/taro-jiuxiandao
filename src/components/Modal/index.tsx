@@ -15,7 +15,7 @@ export interface JXModalProps extends ModalProps {
   okText: string;
   cancleText: string;
   onOk: () => void;
-  onCancle: () => void;
+  onCancel: () => void;
   disableConfirm: boolean;
   disableCancle: boolean;
 }
@@ -23,12 +23,13 @@ export interface JXModalProps extends ModalProps {
 function JXModal({
   children,
   className,
+  actions,
   okText = '确认',
   cancleText = '取消',
   disableConfirm = false,
   disableCancle = false,
   onOk = () => {},
-  onCancle = () => {},
+  onCancel = () => {},
   ...props
 }: PropsWithChildren<Partial<JXModalProps>>) {
   const [action, setAction] = useState<Action[]>([]);
@@ -53,7 +54,7 @@ function JXModal({
           text: cancleText,
           disabled: false,
           className: styles.MadalCancle,
-          onClick: onCancle,
+          onClick: onCancel,
         },
       ]);
     }
@@ -65,17 +66,17 @@ function JXModal({
       destroyOnClose
       closeOnMaskClick
       closeOnAction
-      actions={action}
+      actions={Array.isArray(actions) ? [...action, ...actions] : action}
       {...props}
     />
   );
 }
 
 JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
-  const actions: Action[] = [];
+  const action: Action[] = [];
 
   if (props.disableConfirm != true) {
-    actions.push({
+    action.push({
       key: 'confirm',
       text: props.okText || '确认',
       disabled: false,
@@ -84,18 +85,20 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
     });
   }
   if (props.disableCancle != true) {
-    actions.push({
+    action.push({
       key: 'cancle',
       text: props.cancleText || '取消',
       disabled: false,
       className: styles.MadalCancle,
-      onClick: props.onCancle,
+      onClick: props.onCancel,
     });
   }
   return Modal.show({
     ...props,
     closeOnMaskClick: true,
-    actions,
+    actions: Array.isArray(props.actions)
+      ? [...action, ...props.actions]
+      : action,
   });
 };
 

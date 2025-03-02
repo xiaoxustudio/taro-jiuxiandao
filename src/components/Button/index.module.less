@@ -2,4 +2,26 @@
   --adm-button-border-color: transparent;
   --border-width: 0px;
   --border-style: none;
+
+  position: relative;
+  overflow: hidden;
+
+  &Shadow {
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.12);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #ccc 10%, transparent 10.1%);
+    transform: scale(10);
+    opacity: 0;
+    transition: all 0.6s;
+  }
+  &:active::after {
+    transform: scale(0);
+    opacity: 0.5;
+    transition: 0s;
+  }
 }

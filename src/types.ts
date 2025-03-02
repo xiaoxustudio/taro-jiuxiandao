@@ -3,6 +3,14 @@ export enum CWType {
   CL,
   DJ,
 }
+
+// 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
+export type NestedKeyOf<Obj> = Obj extends object
+  ? {
+      [K in keyof Obj & string]: `${K}` | `${K}.${NestedKeyOf<Obj[K]>}`;
+    }[keyof Obj & string]
+  : never;
+
 /**
  * @description: 基础储物类型
  * @return {*}
@@ -54,6 +62,11 @@ export interface ActorDataConfig {
   cw: CuWuType;
   time1: number; // 时间1
   shenshiTime: number; // 神识计算
+  qiandao: {
+    count: number; // 累计
+    last: number; // 最后一次签到
+    time: number; // 当前时间对比
+  };
   xiulian: null | {
     time: number;
   }; //修炼

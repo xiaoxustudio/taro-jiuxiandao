@@ -8,8 +8,8 @@ import { chineseToNumber, numberToChinese } from '.';
  */
 function getActor() {
   const { current } = useStore.getState();
-  const actor = useActorStore.getState();
-  const acData = actor[current];
+  const { actors } = useActorStore.getState();
+  const acData = actors[current];
   return acData;
 }
 
@@ -19,8 +19,8 @@ function getActor() {
  * @return {*}
  */
 function HasActor(name: string) {
-  const actor = useActorStore.getState();
-  const acData = actor[name];
+  const { actors } = useActorStore.getState();
+  const acData = actors[name];
   return !!acData;
 }
 

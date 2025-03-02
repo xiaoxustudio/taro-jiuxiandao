@@ -1,7 +1,7 @@
 import { JXButton, JXInput, JXSpace, JXToast, Text } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { CWType } from '@/types';
+import { ActorDataConfig, CWType } from '@/types';
 import { generateUUID } from '@/utils';
 import { HasActor } from '@/utils/actor';
 import chuwu from '@/utils/chuwu';
@@ -100,7 +100,7 @@ const races = [
 function Index() {
   const { set: setStore } = useStore();
   const { set: setActorStore } = useActorStore();
-  const [actor, setActor] = useState({
+  const [actor, setActor] = useState<ActorDataConfig>({
     uuid: generateUUID(),
     daohao: '',
     linggen: '金',
@@ -130,6 +130,11 @@ function Index() {
     },
     time1: Date.now(), // 时间1 （计算寿元）
     shenshiTime: Date.now(), // 计算神识
+    qiandao: {
+      count: 0,
+      last: 0,
+      time: 0,
+    },
     xiulian: null,
     dongfu: null,
   });
@@ -146,7 +151,7 @@ function Index() {
     setStore(actor.daohao);
     setActorStore(actor.daohao, actor);
     chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: 30000 });
-    JXToast('创建角色成功').show();
+    JXToast().show('创建角色成功');
     setTimeout(() => {
       Taro.navigateBack({ delta: 1 });
     }, 1000);

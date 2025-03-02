@@ -46,8 +46,8 @@ function Has({ name, type = CWType.WP }: { name: string; type: CWType }) {
  */
 function Add({ name, type = CWType.WP, num = 1, isPile = false }: AddProps) {
   const { current } = useStore.getState();
-  const actor = useActorStore.getState();
-  const acData = actor[current];
+  const acData = getActor();
+  const { set } = useActorStore.getState();
   if (!isPile) {
     num = 1;
   }
@@ -66,7 +66,7 @@ function Add({ name, type = CWType.WP, num = 1, isPile = false }: AddProps) {
       }
       break;
   }
-  actor.set(current, acData);
+  set(current, acData);
   return;
 }
 

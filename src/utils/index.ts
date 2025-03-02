@@ -3,7 +3,7 @@ import Taro from '@tarojs/taro';
 import { omit } from 'lodash-es';
 
 /**
- * @description: 跳转路由（自动加pages）
+ * @description: 跳转路由（自动加顶层pages）
  * @param {*} url
  * @param {Taro} options
  * @return {*}

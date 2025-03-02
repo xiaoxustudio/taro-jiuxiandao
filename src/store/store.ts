@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface StoreParams {
-  current: string;
+  current: string; //当前选择的存档
   set: (newVal: string) => void;
 }
 

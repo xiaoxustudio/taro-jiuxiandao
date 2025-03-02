@@ -9,7 +9,7 @@ import {
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
-import { ZhouTian } from '@/utils';
+import { navigateTo, ZhouTian } from '@/utils';
 import {
   getJingJieMaxDep,
   getLingQiForJingJie,
@@ -311,7 +311,14 @@ function Main() {
           </JXGrid.Item>
           <JXGrid.Item align='center'>
             <JXButton size='mini' transparent>
-              <Text textShadow>签到</Text>
+              <Text
+                textShadow
+                onClick={() => {
+                  navigateTo('Main/pages/qiandao/index');
+                }}
+              >
+                签到
+              </Text>
             </JXButton>
           </JXGrid.Item>
         </JXGrid>

@@ -1,5 +1,6 @@
 // 二次封装
 export { default as JXButton } from './Button';
+export { default as JXDivider } from './Divider';
 export { default as JXInput } from './Input';
 export { default as JXModal } from './Modal';
 export { default as JXSpace } from './Space';

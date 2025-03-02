@@ -1,7 +1,13 @@
-import { JXButton, JXModal, JXSpace, Paragraph } from '@/components';
+import {
+  JXButton,
+  JXDivider,
+  JXModal,
+  JXSpace,
+  Paragraph,
+  Text,
+} from '@/components';
 import { navigateTo } from '@/utils';
 import { View } from '@tarojs/components';
-import { Divider } from 'antd-mobile';
 import { useState } from 'react';
 import styles from './index.module.less';
 
@@ -12,7 +18,10 @@ function Home() {
       <View className={styles.homeTitle}>
         上古鸿蒙未分，天地混沌。待到道化万物，炎黄现世，世人便已有追求天道之意。而后，袭明自然，道法天地，修仙之辈皆以己心明悟修道之法。待到日后上古九神君修为大成，修仙界更是步入一大盛世。然则无论人妖，纵使已初悟天道，亦难逃邪念惑心。于是人，鬼，妖，魔四族互相倾轧，以致各方元气大伤，从此修仙界便入沉寂。但如今，各方之斗又现端倪。且灵兽谷之诞生，又为此番争斗增添了几分难料之意。此番风起云涌之际，怎可料是否会有新的大能续写传奇……
       </View>
-      <Divider />
+      <Text style={{ padding: '0 20px' }} size={30} space={4}>
+        九仙道
+      </Text>
+      <JXDivider margin='0 0 16px 0' />
       <JXSpace className={styles.homeContent} direction='vertical' gap={20}>
         <JXSpace
           className={styles.homeContent}
@@ -49,7 +58,9 @@ function Home() {
         </JXSpace>
       </JXSpace>
       <View className={styles.team}>九仙团队™</View>
-      <View className={styles.copyRight}>CopyRight&emsp;® 2018-&nbsp;2025</View>
+      <View className={styles.copyRight}>
+        CopyRight&emsp;® 2018-&nbsp;2025
+      </View>
       <JXModal
         title='关于我们'
         visible={showAbout}

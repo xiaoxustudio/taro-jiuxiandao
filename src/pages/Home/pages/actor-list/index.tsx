@@ -1,23 +1,19 @@
 import { JXModal, JXSpace } from '@/components';
-import useActorController from '@/hooks/useActorController';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { navigateTo } from '@/utils';
 import { View } from '@tarojs/components';
 import { List } from 'antd-mobile';
-import { omit } from 'lodash-es';
-import { useMemo } from 'react';
 import './index.less';
 
 export default function ActorList() {
-  const actor = useActorStore();
   const { set: setStore } = useStore();
-  const actorController = useActorController();
-  const list = useMemo(() => omit(actor, 'set'), [actor]);
+  const { remove, actors } = useActorStore();
+
   return (
     <View className='actor-list'>
       <List header='角色列表'>
-        {Object.keys(list).map((v) => (
+        {Object.keys(actors).map((v) => (
           <List.Item
             key={v}
             onClick={() => {
@@ -29,10 +25,16 @@ export default function ActorList() {
                   navigateTo('Main/index');
                   c.close();
                 },
+                cancleText: '删除',
+                async onCancel() {
+                  setStore('');
+                  remove(v);
+                  c.close();
+                },
               });
             }}
           >
-            {v}({+actorController.get('lv')})
+            {v}
           </List.Item>
         ))}
       </List>

@@ -7,6 +7,7 @@ export interface JXButtonProps extends ButtonProps {
   width: number;
   height: number;
   className: string;
+  shadow: boolean; // 阴影
   transparent: boolean; // 背景透明
 }
 
@@ -17,11 +18,16 @@ function JXButton({
   style,
   className,
   transparent,
+  shadow,
   ...props
 }: PropsWithChildren<Partial<JXButtonProps>>) {
   return (
     <Button
-      className={classNames(styles.JXButton, className)}
+      className={classNames(
+        styles.JXButton,
+        shadow && styles.JXButtonShadow,
+        className
+      )}
       style={{
         ...style,
         width: width && `${width}px`,
