@@ -132,8 +132,8 @@ function Index() {
     shenshiTime: Date.now(), // 计算神识
     qiandao: {
       count: 0,
-      last: 0,
-      time: 0,
+      last: '',
+      time: '',
     },
     xiulian: null,
     dongfu: null,

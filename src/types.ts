@@ -64,8 +64,8 @@ export interface ActorDataConfig {
   shenshiTime: number; // 神识计算
   qiandao: {
     count: number; // 累计
-    last: number; // 最后一次签到
-    time: number; // 当前时间对比
+    last: string; // 最后一次签到
+    time: string; // 当前时间对比
   };
   xiulian: null | {
     time: number;

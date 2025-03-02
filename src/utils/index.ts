@@ -203,3 +203,16 @@ export function numberToChinese(number: number): string {
 
   return str.replace(/^一十/, '十').replace(/零+$/, '');
 }
+
+/**
+ * 获取当前日期的字符串格式（YYYY-MM-DD）
+ * @returns {string} 当前日期的字符串
+ */
+export function getCurrentDate(): string {
+  const now = new Date(); // 获取当前时间
+  const year = now.getFullYear(); // 获取年份
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // 获取月份（补零）
+  const day = String(now.getDate()).padStart(2, '0'); // 获取日期（补零）
+
+  return `${year}-${month}-${day}`; // 返回格式化后的日期
+}

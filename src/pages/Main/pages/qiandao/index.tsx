@@ -1,7 +1,10 @@
 import { JXButton, JXDivider, JXSpace, JXToast, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
-import { ActorDataConfig } from '@/types';
+import { ActorDataConfig, CWType } from '@/types';
+import { getCurrentDate } from '@/utils';
+import chuwu from '@/utils/chuwu';
 import { View } from '@tarojs/components';
+import { random } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
 
 function QianDao() {
@@ -11,11 +14,16 @@ function QianDao() {
     [get]
   );
   const handleQianDao = useCallback(() => {
-    if (qiandao.time === Date.now()) {
+    const currentDate = getCurrentDate();
+    if (qiandao.time === currentDate) {
       JXToast().show('今天已经签到过了！');
       return;
     }
-    set('qiandao.time', 'xuran');
+    const ls = random(0, 9999);
+    set('qiandao.time', currentDate);
+    set('qiandao.last', currentDate);
+    chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: ls });
+    JXToast().show(`签到成功，获得灵石：${ls}`);
   }, [qiandao.time, set]);
   return (
     <View>
@@ -24,8 +32,8 @@ function QianDao() {
       </Text>
       <JXDivider />
       <JXSpace direction='vertical' style={{ width: '100%' }}>
-        <Text>累计签到天数：{qiandao.count}</Text>
-        <Text>上次签到日期：{qiandao.time}</Text>
+        <Text>累计签到天数：{qiandao.count} 天</Text>
+        <Text>上次签到日期：{qiandao.last || ''}</Text>
         <JXSpace center style={{ width: '100%' }}>
           <JXButton width={200} onClick={handleQianDao}>
             签到
