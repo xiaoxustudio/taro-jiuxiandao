@@ -22,9 +22,10 @@ function QianDao() {
     const ls = random(0, 9999);
     set('qiandao.time', currentDate);
     set('qiandao.last', currentDate);
+    set('qiandao.count', get('qiandao.count') + 1);
     chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: ls });
     JXToast().show(`签到成功，获得灵石：${ls}`);
-  }, [qiandao.time, set]);
+  }, [get, qiandao.time, set]);
   return (
     <View>
       <Text textShadow size={25}>

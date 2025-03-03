@@ -21,16 +21,26 @@ function useActorController() {
   }
 
   /**
-   * @description: 获取属性
-   * @return {*}
+   * @description: 获取属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
    */
   const get = useCallback(
-    (name: keyof ActorDataConfig) => {
-      try {
-        return actor[name] as any;
-      } catch {
-        return null;
+    (key: NestedKeyOf<ActorDataConfig>) => {
+      // 合法性校验
+      if (/\s/.test(key)) {
+        throw new Error('Key 包含非法空格');
       }
+
+      const pathParts = key.split('.');
+      let currentValue: any = actor;
+
+      for (const part of pathParts) {
+        if (currentValue === null || currentValue === undefined) {
+          return null;
+        }
+        currentValue = currentValue[part];
+      }
+
+      return currentValue ?? null;
     },
     [actor]
   );
