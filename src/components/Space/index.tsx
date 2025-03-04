@@ -7,6 +7,7 @@ export interface JXSpaceProps extends SpaceProps {
   gap?: number;
   center?: boolean;
   between?: boolean;
+  flexOne?: boolean;
 }
 
 function JXSpace({
@@ -16,12 +17,14 @@ function JXSpace({
   className,
   style,
   between,
+  flexOne,
   ...props
 }: PropsWithChildren<JXSpaceProps>) {
   const gapStyle = useMemo(
     () =>
       ({
         '--gap': gap ? `${gap}px` : undefined,
+        '--gap-horizontal': gap ? `${gap}px` : undefined,
       }) as CSSProperties & {
         [k: string]: string;
       },
@@ -34,7 +37,8 @@ function JXSpace({
         className,
         styles.Space,
         center && styles.FlexCenter,
-        between && styles.FlexBetween
+        between && styles.FlexBetween,
+        flexOne && styles.FlexOne
       )}
       style={{ ...style, ...gapStyle }}
       {...props}

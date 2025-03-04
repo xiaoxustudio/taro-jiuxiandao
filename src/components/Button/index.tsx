@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react';
 import styles from './index.module.less';
 
 export interface JXButtonProps extends ButtonProps {
-  width: number;
+  width: number | string;
   height: number;
   className: string;
   shadow: boolean; // 阴影
@@ -30,7 +30,11 @@ function JXButton({
       )}
       style={{
         ...style,
-        width: width && `${width}px`,
+        width: width
+          ? typeof width === 'number'
+            ? `${width}px`
+            : width
+          : undefined,
         height: height && `${height}px`,
         ...(transparent ? { '--background-color': 'transparent' } : {}),
       }}

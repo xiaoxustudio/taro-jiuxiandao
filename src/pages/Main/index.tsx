@@ -212,7 +212,11 @@ function Main() {
     <View>
       <JXSpace className={styles.MainBox} direction='vertical'>
         <JXSpace className={styles.Title}>
-          <Image width={120} src={title} />
+          <Image
+            width={120}
+            src={title}
+            onClick={() => navigateTo('Main/pages/actor-info/index')}
+          />
         </JXSpace>
         {/* 属性 */}
         <JXSpace className={styles.Attr} direction='vertical'>

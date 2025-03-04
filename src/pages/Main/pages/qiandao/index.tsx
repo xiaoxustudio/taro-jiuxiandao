@@ -22,7 +22,7 @@ function QianDao() {
     set('qiandao.time', currentDate);
     set('qiandao.last', currentDate);
     set('qiandao.count', get('qiandao.count') + 1);
-    chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: ls });
+    chuwu.Add({ name: '灵石', type: CWType.QT, isPile: true, num: ls });
     JXToast().show(`签到成功，获得灵石：${ls}`);
   }, [get, qiandao.time, set]);
   return (

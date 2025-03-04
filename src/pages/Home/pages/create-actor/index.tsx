@@ -123,9 +123,9 @@ function Index() {
     shenshi: 100, // 神识
     max_shenshi: 100,
     cw: {
-      wp: [],
-      cl: [],
-      dj: [],
+      fb: [],
+      dy: [],
+      qt: [],
       max: 30, // 容量
     },
     time1: Date.now(), // 时间1 （计算寿元）
@@ -150,7 +150,7 @@ function Index() {
     }
     setStore(actor.daohao);
     setActorStore(actor.daohao, actor);
-    chuwu.Add({ name: '灵石', type: CWType.WP, isPile: true, num: 30000 });
+    chuwu.Add({ name: '灵石', type: CWType.QT, isPile: true, num: 30000 });
     JXToast().show('创建角色成功');
     setTimeout(() => {
       Taro.navigateBack({ delta: 1 });

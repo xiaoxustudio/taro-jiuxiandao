@@ -1,13 +1,13 @@
 import { View, ViewProps } from '@tarojs/components';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 import JXDivider from '../Divider';
 import JXSpace from '../Space';
 import Text from '../Text';
 import styles from './index.module.less';
 
 interface ContainerProps extends ViewProps {
-  title: string;
-  desc: string;
+  title: string | ReactNode;
+  desc: string | ReactNode;
 }
 
 function Container({
@@ -23,7 +23,7 @@ function Container({
           {title}
         </Text>
         {desc && (
-          <Text textShadow size={25}>
+          <Text className={styles.Desc} size={14}>
             {desc}
           </Text>
         )}

@@ -1,7 +1,7 @@
 export enum CWType {
-  WP,
-  CL,
-  DJ,
+  FB, // 法宝
+  DY, //丹药
+  QT, // 其他
 }
 
 // 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
@@ -21,20 +21,20 @@ export interface BaseType {
   desc?: string; //描述
   num: number;
 }
-export interface WPType extends BaseType {
-  type: CWType.WP;
+export interface FBType extends BaseType {
+  type: CWType.FB;
 }
-export interface CLType extends BaseType {
-  type: CWType.CL;
+export interface DYType extends BaseType {
+  type: CWType.DY;
 }
-export interface DJType extends BaseType {
-  type: CWType.DJ;
+export interface QTType extends BaseType {
+  type: CWType.QT;
 }
 
 export interface CuWuType {
-  wp: WPType[]; // 物品
-  cl: CLType[]; // 材料
-  dj: DJType[]; // 道具
+  fb: FBType[]; // 法宝
+  dy: DYType[]; // 丹药
+  qt: QTType[]; // 其他
   max: number; //容量
 }
 export interface ActorDataConfig {

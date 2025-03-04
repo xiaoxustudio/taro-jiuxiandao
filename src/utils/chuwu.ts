@@ -12,14 +12,14 @@ export interface AddProps extends BaseType {
 
 function TR(type: CWType) {
   switch (type) {
-    case CWType.CL:
-      return 'cl';
-    case CWType.DJ:
-      return 'dj';
-    case CWType.WP:
-      return 'wp';
+    case CWType.FB:
+      return 'fb';
+    case CWType.DY:
+      return 'dy';
+    case CWType.QT:
+      return 'qt';
     default:
-      return 'wp';
+      return 'fb';
   }
 }
 
@@ -28,11 +28,11 @@ function TR(type: CWType) {
  * @param {object} param1
  * @return {*}
  */
-function Has({ name, type = CWType.WP }: { name: string; type: CWType }) {
+function Has({ name, type = CWType.FB }: { name: string; type: CWType }) {
   const acData = getActor();
   const cw = acData.cw[TR(type)];
   let index = -1;
-  cw.some((v: BaseType, ind) => {
+  cw.some((v: BaseType, ind: number) => {
     index = ind;
     return v.name === name;
   });
@@ -44,7 +44,7 @@ function Has({ name, type = CWType.WP }: { name: string; type: CWType }) {
  * @param {AddProps} param1
  * @return {*}
  */
-function Add({ name, type = CWType.WP, num = 1, isPile = false }: AddProps) {
+function Add({ name, type = CWType.FB, num = 1, isPile = false }: AddProps) {
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();
@@ -53,14 +53,14 @@ function Add({ name, type = CWType.WP, num = 1, isPile = false }: AddProps) {
   }
   const has = Has({ name, type });
   switch (type) {
-    case CWType.WP:
+    case CWType.QT:
       if (~has) {
-        acData.cw.wp[has].num += num;
+        acData.cw.qt[has].num += num;
       } else {
-        acData.cw.wp.push({
+        acData.cw.qt.push({
           name,
           isPile,
-          type: CWType.WP,
+          type: CWType.QT,
           num,
         });
       }

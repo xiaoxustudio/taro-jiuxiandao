@@ -1,12 +1,22 @@
 .Space {
   --gap-horizontal: 0px;
   max-width: 100%;
+  width: 100%;
 }
-.FlexCenter {
-  justify-content: center;
-  align-items: center;
-}
-.FlexBetween {
-  justify-content: space-between;
-  align-items: center;
+.Flex {
+  &Center {
+    justify-content: center;
+    align-items: center;
+  }
+  &Between {
+    justify-content: space-between;
+    align-items: center;
+  }
+  &One {
+    :global {
+      .adm-space-item {
+        flex: 1;
+      }
+    }
+  }
 }
