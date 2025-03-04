@@ -1,4 +1,4 @@
-import { Container, JXButton, JXSpace, Paragraph } from '@/components';
+import { Box, Container, JXButton, JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { BaseType, CWType } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,12 +47,15 @@ export default function Chuwu() {
         {list &&
           list.map((v, index) => {
             return (
-              <Paragraph
+              <Box
                 className='m-chuwu-List__Item'
                 key={`${v.name}${index}`}
+                style={{ padding: '0 4px' }}
+                shadow
               >
                 {v.name}
-              </Paragraph>
+                <Text>数量：{v.num}</Text>
+              </Box>
             );
           })}
       </JXSpace>
