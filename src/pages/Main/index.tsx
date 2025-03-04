@@ -104,7 +104,9 @@ function Main() {
     },
     {
       name: '储物',
-      click() {},
+      click() {
+        navigateTo('Main/pages/chuwu/index');
+      },
     },
     {
       name: '灵兽',

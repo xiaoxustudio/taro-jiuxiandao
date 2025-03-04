@@ -1,9 +1,8 @@
-import { JXButton, JXDivider, JXSpace, JXToast, Text } from '@/components';
+import { Container, JXButton, JXSpace, JXToast, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { ActorDataConfig, CWType } from '@/types';
 import { getCurrentDate } from '@/utils';
 import chuwu from '@/utils/chuwu';
-import { View } from '@tarojs/components';
 import { random } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
 
@@ -27,11 +26,7 @@ function QianDao() {
     JXToast().show(`签到成功，获得灵石：${ls}`);
   }, [get, qiandao.time, set]);
   return (
-    <View>
-      <Text textShadow size={25}>
-        签到
-      </Text>
-      <JXDivider />
+    <Container title='签到'>
       <JXSpace direction='vertical' style={{ width: '100%' }}>
         <Text>累计签到天数：{qiandao.count} 天</Text>
         <Text>上次签到日期：{qiandao.last || ''}</Text>
@@ -49,7 +44,7 @@ function QianDao() {
         </Text>
         <Text>（相关爆率请查看攻略 =_= ）</Text>
       </JXSpace>
-    </View>
+    </Container>
   );
 }
 export default QianDao;

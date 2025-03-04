@@ -1,14 +1,15 @@
 export default defineAppConfig({
   pages: [
-    'pages/index/index',
-    'pages/Home/pages/create-actor/index',
-    'pages/Home/pages/actor-list/index',
-    'pages/Main/index',
-    'pages/Main/pages/qiandao/index',
-  ],
+  'pages/index/index',
+  'pages/Home/pages/create-actor/index',
+  'pages/Home/pages/actor-list/index',
+  'pages/Main/index',
+  'pages/Main/pages/qiandao/index', "pages/Main/pages/chuwu/index"],
+
+
   window: {
     backgroundTextStyle: 'light',
     navigationBarTitleText: 'JiuXianDao',
-    navigationBarTextStyle: 'black',
-  },
+    navigationBarTextStyle: 'black'
+  }
 });

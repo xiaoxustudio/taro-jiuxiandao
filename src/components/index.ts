@@ -10,6 +10,7 @@ export { JXToast, default as Toast } from './Message';
 export type { JXToastProps } from './Message';
 
 // 自定义组件
+export { default as Container } from './Container';
 export { default as Paragraph } from './Paragraph';
 export { default as Text } from './Text';
 
