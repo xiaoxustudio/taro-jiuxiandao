@@ -184,14 +184,14 @@ function Main() {
     const calcShouYuan = (Date.now() - time1) / 3600000;
     if (calcShouYuan >= 24) {
       const _calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
-      set('shouyuan', _calcCache);
+      set('shouyuan', Math.round(_calcCache));
       // 判断寿元是否到期
       if (_calcCache >= get('max_shouyuan')) {
         JXToast().show('寿元已到极限');
       } else {
         const needAdd = time1 + (calcShouYuan / 24) * 3600000 * 24;
         //计算应增加的时间
-        set('time1', needAdd);
+        set('time1', Math.round(needAdd));
       }
     }
     // 神识计算
