@@ -2,6 +2,11 @@ import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
 import Taro from '@tarojs/taro';
 import { omit } from 'lodash-es';
 
+let UniqueIndex = 0;
+export const CreateUniqueIndex = () => {
+  return ++UniqueIndex;
+};
+
 /**
  * @description: 跳转路由（自动加顶层pages）
  * @param {*} url

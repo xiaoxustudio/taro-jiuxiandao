@@ -1,13 +1,15 @@
+import { CreateUniqueIndex } from '@/utils';
 import { Space, SpaceProps } from 'antd-mobile';
 import classNames from 'classnames';
-import { CSSProperties, PropsWithChildren, useMemo } from 'react';
+import { CSSProperties, PropsWithChildren, useMemo, useRef } from 'react';
 import styles from './index.module.less';
 
 export interface JXSpaceProps extends SpaceProps {
   gap?: number;
   center?: boolean;
   between?: boolean;
-  flexOne?: boolean;
+  flexOne?: boolean; // 子项设置flex:1
+  hscroll?: boolean; // 横向滚动（可能和其他属性冲突）
 }
 
 function JXSpace({
@@ -18,8 +20,10 @@ function JXSpace({
   style,
   between,
   flexOne,
+  hscroll,
   ...props
 }: PropsWithChildren<JXSpaceProps>) {
+  const id = useRef(`Space-${CreateUniqueIndex()}`);
   const gapStyle = useMemo(
     () =>
       ({
@@ -33,12 +37,14 @@ function JXSpace({
 
   return (
     <Space
+      data-id={id.current}
       className={classNames(
         className,
         styles.Space,
         center && styles.FlexCenter,
         between && styles.FlexBetween,
-        flexOne && styles.FlexOne
+        flexOne && styles.FlexOne,
+        hscroll && styles.HScroll
       )}
       style={{ ...style, ...gapStyle }}
       {...props}

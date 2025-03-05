@@ -1,7 +1,20 @@
 .Space {
   --gap-horizontal: 0px;
-  max-width: 100%;
+  max-width: 100vw;
   width: 100%;
+  min-width: 0;
+}
+.HScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  > div[class='adm-space-item'] {
+    display: inline-block;
+    white-space: normal;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .Flex {
   &Center {
@@ -13,10 +26,8 @@
     align-items: center;
   }
   &One {
-    :global {
-      .adm-space-item {
-        flex: 1;
-      }
+    > div[class='adm-space-item'] {
+      flex: 1;
     }
   }
 }

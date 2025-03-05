@@ -100,7 +100,9 @@ function Main() {
   const operaterOptions2 = [
     {
       name: '坊市',
-      click() {},
+      click() {
+        navigateTo('Main/pages/fangshi/index');
+      },
     },
     {
       name: '储物',
