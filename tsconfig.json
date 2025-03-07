@@ -21,14 +21,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules",
-        "options": {
-          "goToDefinition": true
-        }
-      }
-    ]
   },
   "include": ["./src", "./types", "./config"],
   "compileOnSave": false
