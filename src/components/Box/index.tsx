@@ -1,10 +1,10 @@
 import { View, ViewProps } from '@tarojs/components';
 import { CSSProperties } from 'react';
 
-interface BoxProp extends ViewProps {
-  shadow: boolean;
+export interface BoxProps extends ViewProps {
+  shadow?: boolean;
 }
-function Box({ shadow, children, style, ...props }: Partial<BoxProp>) {
+function Box({ shadow, children, style, ...props }: Partial<BoxProps>) {
   return (
     <View
       style={{

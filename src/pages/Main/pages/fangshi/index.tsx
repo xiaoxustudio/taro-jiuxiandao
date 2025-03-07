@@ -1,9 +1,86 @@
-import { Container, JXButton, JXSpace } from '@/components';
-import { useState } from 'react';
+import fsAssets from '@/assets/fs.json';
+import {
+  Box,
+  Container,
+  JXButton,
+  JXModal,
+  JXSpace,
+  JXToast,
+  List,
+  Text,
+} from '@/components';
+import { ActorDataConfigForZhanDou } from '@/types';
+import { AttrTransformChinese } from '@/utils';
+import chuwu from '@/utils/chuwu';
+import { useMemo, useState } from 'react';
+import { CWType } from '../../../../types';
 import './index.less';
 
 export default function Fangshi() {
   const [type, setType] = useState(0);
+  const list = useMemo(() => {
+    return fsAssets.fb.map((v, index) => ({
+      ...v,
+      title: (
+        <Box>
+          <Text>{v.name}</Text>
+          <Text>灵石：{v.ls}</Text>
+        </Box>
+      ),
+      key: `${v.name}-${index}`,
+      value: v.name,
+      click() {
+        const instance = JXModal.show({
+          okText: '购买',
+          content: (
+            <>
+              <Text size={20} bold>
+                {v.name}
+              </Text>
+              <JXSpace direction='vertical' title='属性'>
+                {v.attr.map((item) => (
+                  <Text key={item.name}>
+                    {AttrTransformChinese(
+                      item.name as keyof ActorDataConfigForZhanDou
+                    )}
+                    ：
+                    {item.value >= 0 ? (
+                      <Text color='green' inline>
+                        {item.value}
+                      </Text>
+                    ) : (
+                      <Text color='red' inline>
+                        {item.value}
+                      </Text>
+                    )}
+                  </Text>
+                ))}
+              </JXSpace>
+              <Text>售价灵石：{v.ls}</Text>
+            </>
+          ),
+          onOk() {
+            instance.close();
+            if (~chuwu.Has(v) && !v.isPile) {
+              JXToast('已拥有该物品！').show();
+              return;
+            }
+            if (chuwu.LingShiThan(v.ls)) {
+              chuwu.Add(v);
+              chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
+              JXToast(`购买物品：${v.name}`).show();
+            } else {
+              const needLS = chuwu.Get({ name: '灵石', type: CWType.QT });
+              JXToast(`灵石不足，还差${v.ls - needLS!.num!}`).show();
+            }
+          },
+          onCancel() {
+            instance.close();
+          },
+        });
+      },
+    }));
+  }, []);
   return (
     <Container
       title='坊市'
@@ -29,6 +106,7 @@ export default function Fangshi() {
           丹方
         </JXButton>
       </JXSpace>
+      {type === 0 && <List list={list} />}
     </Container>
   );
 }

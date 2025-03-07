@@ -19,7 +19,7 @@ export interface BaseType {
   name: string; // 名称
   isPile: boolean; // 可堆叠
   desc?: string; //描述
-  num: number;
+  num?: number;
 }
 export interface FBType extends BaseType {
   type: CWType.FB;
@@ -37,7 +37,25 @@ export interface CuWuType {
   qt: QTType[]; // 其他
   max: number; //容量
 }
-export interface ActorDataConfig {
+
+/**
+ * @description:战斗属性
+ * @return {*}
+ */
+export interface ActorDataConfigForZhanDou {
+  qixue: number; // 气血
+  fangyu: number; // 防御
+  baoji: number; // 暴击
+  fashu: number; // 法术
+  gongji: number; // 攻击
+  sudu: number; // 速度
+}
+
+/**
+ * @description: 角色属性
+ * @return {*}
+ */
+export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   uuid: string; // 唯一id
   daohao: string; // 道号
   linggen: string; // 灵根
@@ -49,16 +67,10 @@ export interface ActorDataConfig {
   max_shenshi: number;
   shouyuan: number; // 寿元
   max_shouyuan: number;
-  qixue: number; // 气血
-  fangyu: number; // 防御
-  baoji: number; // 暴击
-  fashu: number; // 法术
   zhongzu: string; // 种族
   lv: number; //等级
   xuanyuan: number; // 仙缘
   xiulianbeilv: number; // 修炼倍率
-  gongji: number; // 攻击
-  sudu: number; // 速度
   cw: CuWuType;
   time1: number; // 时间1
   shenshiTime: number; // 神识计算

@@ -1,3 +1,4 @@
+import { Text } from '@/components';
 import { CreateUniqueIndex } from '@/utils';
 import { Space, SpaceProps } from 'antd-mobile';
 import classNames from 'classnames';
@@ -5,6 +6,7 @@ import { CSSProperties, PropsWithChildren, useMemo, useRef } from 'react';
 import styles from './index.module.less';
 
 export interface JXSpaceProps extends SpaceProps {
+  title?: string;
   gap?: number;
   center?: boolean;
   between?: boolean;
@@ -21,6 +23,7 @@ function JXSpace({
   between,
   flexOne,
   hscroll,
+  title,
   ...props
 }: PropsWithChildren<JXSpaceProps>) {
   const id = useRef(`Space-${CreateUniqueIndex()}`);
@@ -49,6 +52,11 @@ function JXSpace({
       style={{ ...style, ...gapStyle }}
       {...props}
     >
+      {title && (
+        <Text className={styles.SpaceTitle} size={18}>
+          {title}
+        </Text>
+      )}
       {children}
     </Space>
   );

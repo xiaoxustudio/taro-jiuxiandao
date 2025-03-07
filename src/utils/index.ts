@@ -1,4 +1,5 @@
 import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
+import { ActorDataConfigForZhanDou } from '@/types';
 import Taro from '@tarojs/taro';
 import { omit } from 'lodash-es';
 
@@ -221,3 +222,27 @@ export function getCurrentDate(): string {
 
   return `${year}-${month}-${day}`; // 返回格式化后的日期
 }
+
+/**
+ * @description: 属性转换中文文字
+ * @param {keyof} attr
+ * @return {*}
+ */
+export const AttrTransformChinese = (attr: keyof ActorDataConfigForZhanDou) => {
+  switch (attr) {
+    case 'gongji':
+      return '物理攻击';
+    case 'baoji':
+      return '暴击';
+    case 'fangyu':
+      return '防御';
+    case 'fashu':
+      return '法术';
+    case 'qixue':
+      return '气血';
+    case 'sudu':
+      return '速度';
+    default:
+      throw new Error(`not found attr ${attr}`);
+  }
+};

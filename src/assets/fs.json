@@ -1,0 +1,16 @@
+{
+  "fb": [
+    {
+      "name": "青莲剑",
+      "type": 0,
+      "attr": [
+        {
+          "name": "gongji",
+          "value": -20
+        }
+      ],
+      "isPile": false,
+      "ls": 30000
+    }
+  ]
+}
