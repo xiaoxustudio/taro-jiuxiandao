@@ -21,7 +21,7 @@
 		"paths": {
 			// TS5090 leading './'
 			"@/*": ["./src/*"]
-		}
+		}, "plugins": [{ "name": "typescript-plugin-css-modules" }]
 	},
 	"include": ["./src", "./types", "./config"],
 	"compileOnSave": false
