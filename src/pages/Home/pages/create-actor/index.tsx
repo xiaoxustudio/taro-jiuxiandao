@@ -111,17 +111,26 @@ function Index() {
     xuanyuan: 10, // 仙缘
     jingjie: '练气',
     max_jingjie: '一阶',
-    fashu: 0,
     xiulianbeilv: 10, // 修炼倍率
     qixue: 1200, // 气血
     gongji: 80, // 攻击
     fangyu: 40, // 防御
     baoji: 2, // 暴击
     sudu: 20, // 速度
+    fashu: 0, // 法术
     shouyuan: 13, // 寿元
     max_shouyuan: 100,
     shenshi: 100, // 神识
     max_shenshi: 100,
+    addAttr: {
+      // 加成属性
+      qixue: 0, // 气血
+      gongji: 0, // 攻击
+      fangyu: 0, // 防御
+      baoji: 0, // 暴击
+      sudu: 0, // 速度
+      fashu: 0, // 法术
+    },
     cw: {
       fb: [],
       dy: [],

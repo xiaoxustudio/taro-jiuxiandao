@@ -47,7 +47,9 @@ function Main() {
     },
     {
       name: '法宝',
-      click() {},
+      click() {
+        navigateTo('Main/pages/fabao/index');
+      },
     },
     {
       name: '升阶',

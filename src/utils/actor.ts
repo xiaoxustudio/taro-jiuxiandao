@@ -1,6 +1,7 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { chineseToNumber, numberToChinese } from '.';
+/* 角色相关操作 */
 
 /**
  * @description: 获取当前角色数据

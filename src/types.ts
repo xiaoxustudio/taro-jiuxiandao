@@ -3,6 +3,16 @@ export enum CWType {
   DY, //丹药
   QT, // 其他
 }
+export enum FabaoType {
+  手持武器,
+  头戴战盔,
+  身穿战甲,
+  腰带护具,
+  饰品加持,
+  鞋子护腿,
+  魂器镇魂,
+  本名法宝,
+}
 
 // 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
 export type NestedKeyOf<Obj> = Obj extends object
@@ -10,33 +20,6 @@ export type NestedKeyOf<Obj> = Obj extends object
       [K in keyof Obj & string]: `${K}` | `${K}.${NestedKeyOf<Obj[K]>}`;
     }[keyof Obj & string]
   : never;
-
-/**
- * @description: 基础储物类型
- * @return {*}
- */
-export interface BaseType {
-  name: string; // 名称
-  isPile: boolean; // 可堆叠
-  desc?: string; //描述
-  num?: number;
-}
-export interface FBType extends BaseType {
-  type: CWType.FB;
-}
-export interface DYType extends BaseType {
-  type: CWType.DY;
-}
-export interface QTType extends BaseType {
-  type: CWType.QT;
-}
-
-export interface CuWuType {
-  fb: FBType[]; // 法宝
-  dy: DYType[]; // 丹药
-  qt: QTType[]; // 其他
-  max: number; //容量
-}
 
 /**
  * @description:战斗属性
@@ -50,6 +33,44 @@ export interface ActorDataConfigForZhanDou {
   gongji: number; // 攻击
   sudu: number; // 速度
 }
+
+/**
+ * @description: 基础储物类型
+ * @return {*}
+ */
+export interface BaseType {
+  name: string; // 名称
+  isPile: boolean; // 可堆叠
+  desc?: string; //描述
+  num?: number;
+}
+
+export interface FBItemType extends BaseType {
+  type: CWType.FB;
+  attr: {
+    [K in keyof ActorDataConfigForZhanDou]: number;
+  }; // 属性
+  Itype: FabaoType; // 法宝类型
+  pj: string; // 法宝品级
+  lv: number; // 强化等级
+}
+export interface DYItemType extends BaseType {
+  type: CWType.DY;
+}
+export interface QTItemType extends BaseType {
+  type: CWType.QT;
+}
+
+export interface CuWuType {
+  fb: FBItemType[]; // 法宝
+  dy: DYItemType[]; // 丹药
+  qt: QTItemType[]; // 其他
+  max: number; //容量
+}
+
+export type ActorDataConfigForFaBao = {
+  [K in keyof typeof FabaoType]: FBItemType;
+};
 
 /**
  * @description: 角色属性
@@ -74,6 +95,8 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   cw: CuWuType;
   time1: number; // 时间1
   shenshiTime: number; // 神识计算
+  fabao: ActorDataConfigForFaBao; // 法宝
+  addAttr: ActorDataConfigForZhanDou; // 加成属性（功法，法宝等）
   qiandao: {
     count: number; // 累计
     last: string; // 最后一次签到

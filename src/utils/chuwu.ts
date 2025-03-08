@@ -1,8 +1,8 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { BaseType, CWType, DYType, FBType, QTType } from '@/types';
+import { BaseType, CWType, DYItemType, FBItemType, QTItemType } from '@/types';
 import { getActor } from './actor';
-// 角色储物
+/* 角色储物相关操作 */
 
 export interface AddProps extends BaseType {
   name: string;
@@ -92,13 +92,13 @@ function Remove(item: OperaterType) {
   }
   switch (item.type) {
     case CWType.QT:
-      acData.cw.qt = cw as QTType[];
+      acData.cw.qt = cw as QTItemType[];
       break;
     case CWType.FB:
-      acData.cw.fb = cw as FBType[];
+      acData.cw.fb = cw as FBItemType[];
       break;
     case CWType.DY:
-      acData.cw.dy = cw as DYType[];
+      acData.cw.dy = cw as DYItemType[];
       break;
   }
   // 设置数据
@@ -154,7 +154,7 @@ function Add({
           acData.cw.fb.push({
             type: CWType.FB,
             ...baseObject,
-          });
+          } as FBItemType);
         }
       }
       break;

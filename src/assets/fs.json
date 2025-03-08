@@ -9,6 +9,9 @@
           "value": -20
         }
       ],
+      "lv": 0,
+      "pj": "玄",
+      "itype": "手持武器",
       "isPile": false,
       "ls": 30000
     }
