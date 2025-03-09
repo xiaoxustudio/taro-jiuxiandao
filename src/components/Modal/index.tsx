@@ -16,7 +16,7 @@ export interface JXModalProps extends ModalProps {
   cancleText: string;
   onOk: () => void;
   onCancel: () => void;
-  disableConfirm: boolean;
+  disableOk: boolean;
   disableCancle: boolean;
 }
 
@@ -26,7 +26,7 @@ function JXModal({
   actions,
   okText = '确认',
   cancleText = '取消',
-  disableConfirm = false,
+  disableOk = false,
   disableCancle = false,
   onOk = () => {},
   onCancel = () => {},
@@ -34,7 +34,7 @@ function JXModal({
 }: PropsWithChildren<Partial<JXModalProps>>) {
   const [action, setAction] = useState<Action[]>([]);
   useEffect(() => {
-    if (!disableConfirm) {
+    if (!disableOk) {
       setAction((v) => [
         ...v,
         {
@@ -58,7 +58,7 @@ function JXModal({
         },
       ]);
     }
-  }, [cancleText, disableCancle, disableConfirm, okText]); //eslint-disable-line
+  }, [cancleText, disableCancle, disableOk, okText]); //eslint-disable-line
   return (
     <Modal
       className={classNames(styles.JSXButton, className)}
@@ -75,7 +75,7 @@ function JXModal({
 JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
   const action: Action[] = [];
 
-  if (props.disableConfirm != true) {
+  if (props.disableOk != true) {
     action.push({
       key: 'confirm',
       text: props.okText || '确认',

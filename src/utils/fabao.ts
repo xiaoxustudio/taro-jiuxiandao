@@ -1,8 +1,11 @@
 /* 法宝相关操作 */
 
-import { FabaoType } from '@/types';
+import useActorStore from '@/store/actor';
+import useStore from '@/store/store';
+import { CWType, FabaoType, FBItemType } from '@/types';
 import { AutoMapObject } from '.';
 import { getActor } from './actor';
+import chuwu from './chuwu';
 import ErrorController, { ErrorTypeCode } from './ErrorManager';
 
 const FBError = new ErrorController(ErrorTypeCode.法宝错误);
@@ -36,12 +39,37 @@ function FaBaoTypeTransform(type: FabaoType): string {
  * @return {*}
  */
 function WearFaBao(index: number) {
+  const { current } = useStore.getState();
+  const { set } = useActorStore.getState();
   const actor = getActor();
   const { fb } = actor.cw;
   const len = fb.length;
   if (index > len - 1) {
-    FBError.emitError('超出索引范围');
+    throw new Error('超出索引范围');
   }
+  const fbObj = fb[index] as FBItemType;
+  const slotName =
+    typeof fbObj.itype === 'number'
+      ? FaBaoTypeTransform(fbObj.itype)
+      : fbObj.itype;
+  if (!slotName)
+    Object.defineProperty(actor.fabao, slotName, {
+      value: null,
+      configurable: true,
+      enumerable: true,
+    });
+  actor.fabao[slotName] = fbObj;
+  // addAttr 修改
+  const keys = Object.keys(fbObj.attr);
+  for (const k of keys) {
+    if (typeof actor.addAttr[k] === 'number') {
+      actor.addAttr[k] = actor.addAttr[k] + fbObj.attr[k];
+    }
+  }
+  // 设置数据
+  set(current, actor);
+  chuwu.Remove({ name: fbObj.name, type: CWType.FB, num: 1 });
 }
 
 export { FaBaoTypeTransform, FBError, getFaBao, WearFaBao };
+

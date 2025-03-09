@@ -118,6 +118,7 @@ function Index() {
     baoji: 2, // 暴击
     sudu: 20, // 速度
     fashu: 0, // 法术
+    xianyuan: 0,
     shouyuan: 13, // 寿元
     max_shouyuan: 100,
     shenshi: 100, // 神识
@@ -129,7 +130,18 @@ function Index() {
       fangyu: 0, // 防御
       baoji: 0, // 暴击
       sudu: 0, // 速度
-      fashu: 0, // 法术
+      fashu: 0,
+      xianyuan: 0, // 仙缘
+    },
+    fabao: {
+      手持武器: null,
+      头戴战盔: null,
+      身穿战甲: null,
+      腰带护具: null,
+      饰品加持: null,
+      鞋子护腿: null,
+      魂器镇魂: null,
+      本名法宝: null,
     },
     cw: {
       fb: [],

@@ -38,25 +38,25 @@ export default function Fangshi() {
                 {v.name}
               </Text>
               <JXSpace direction='vertical' title='属性'>
-                {v.attr.map((item) => (
-                  <Text key={item.name}>
+                {Object.keys(v.attr).map((item) => (
+                  <Text key={v.attr[item]}>
                     {AttrTransformChinese(
-                      item.name as keyof ActorDataConfigForZhanDou
+                      item as keyof ActorDataConfigForZhanDou
                     )}
                     ：
-                    {item.value >= 0 ? (
+                    {v.attr[item] >= 0 ? (
                       <Text color='green' inline>
-                        {item.value}
+                        {v.attr[item]}
                       </Text>
                     ) : (
                       <Text color='red' inline>
-                        {item.value}
+                        {v.attr[item]}
                       </Text>
                     )}
                   </Text>
                 ))}
+                <Text>售价：{v.ls}</Text>
               </JXSpace>
-              <Text>售价灵石：{v.ls}</Text>
             </>
           ),
           onOk() {

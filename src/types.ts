@@ -44,6 +44,7 @@ export interface BaseType {
   name: string; // 名称
   isPile: boolean; // 可堆叠
   desc?: string; //描述
+  type: CWType; //类型
   num?: number;
 }
 
@@ -52,7 +53,7 @@ export interface FBItemType extends BaseType {
   attr: {
     [K in keyof ActorDataConfigForZhanDou]: number;
   }; // 属性
-  Itype: FabaoType; // 法宝类型
+  itype: FabaoType; // 法宝类型
   pj: string; // 法宝品级
   lv: number; // 强化等级
 }
@@ -71,7 +72,7 @@ export interface CuWuType {
 }
 
 export type ActorDataConfigForFaBao = {
-  [K in keyof typeof FabaoType]: FBItemType;
+  [K in keyof typeof FabaoType]: FBItemType | null | undefined;
 };
 
 /**

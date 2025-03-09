@@ -1,13 +1,12 @@
 import { Container, JXButton, JXSpace, Text } from '@/components';
 import { FabaoType } from '@/types';
-import { getFaBao, WearFaBao } from '@/utils/fabao';
+import { getFaBao } from '@/utils/fabao';
 import { useMemo, useState } from 'react';
 import './index.less';
 
 export default function Fabao() {
   const [type, setType] = useState(FabaoType.头戴战盔);
   const targetFB = useMemo(() => getFaBao(type), [type]);
-  WearFaBao(9999);
   return (
     <Container
       title='法宝'
@@ -48,7 +47,7 @@ export default function Fabao() {
           名称：{targetFB?.name ? `${targetFB.name}（+${targetFB.lv}）` : '空'}
         </Text>
         <Text className='item' color='#888' bold>
-          类型：{targetFB?.Itype || '空'}
+          类型：{targetFB?.itype || '空'}
         </Text>
         <Text className='item' color='#888' bold>
           品阶：{targetFB?.pj || '空'}

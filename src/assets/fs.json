@@ -3,12 +3,9 @@
     {
       "name": "青莲剑",
       "type": 0,
-      "attr": [
-        {
-          "name": "gongji",
-          "value": -20
-        }
-      ],
+      "attr": {
+        "gongji": -20
+      },
       "lv": 0,
       "pj": "玄",
       "itype": "手持武器",
