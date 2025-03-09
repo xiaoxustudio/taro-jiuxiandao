@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es';
 /* 法宝相关操作 */
 
 import useActorStore from '@/store/actor';
@@ -24,7 +25,11 @@ function getFaBao(type: FabaoType) {
 // 自动生成映射
 const FaBaoTypeMap = AutoMapObject(FabaoType);
 
-// 类型转换为中文
+/**
+ * @description: 类型转换为中文
+ * @param {FabaoType} type 位置类型
+ * @return {*}
+ */
 function FaBaoTypeTransform(type: FabaoType): string {
   const result = FaBaoTypeMap[type];
   if (!result) {
@@ -71,5 +76,31 @@ function WearFaBao(index: number) {
   chuwu.Remove({ name: fbObj.name, type: CWType.FB, num: 1 });
 }
 
-export { FaBaoTypeTransform, FBError, getFaBao, WearFaBao };
+/**
+ * @description: 卸下法宝
+ * @param {FabaoType} type 位置类型
+ * @return {*}
+ */
+function TakeOffFaBao(type: FabaoType) {
+  const typeZh = FaBaoTypeTransform(type);
+  const { current } = useStore.getState();
+  const { set } = useActorStore.getState();
+  const actor = getActor();
+  const fabaoData = actor.fabao;
+  if (!fabaoData[typeZh]) return;
+  const fbObj = cloneDeep(fabaoData[typeZh]);
+  actor.fabao[typeZh] = null;
+  // addAttr 修改
+  const keys = Object.keys(fbObj.attr);
+  for (const k of keys) {
+    if (typeof actor.addAttr[k] === 'number') {
+      actor.addAttr[k] = actor.addAttr[k] - fbObj.attr[k];
+    }
+  }
+  // 设置数据
+  set(current, actor);
+  chuwu.Add(fbObj);
+}
+
+export { FaBaoTypeTransform, FBError, getFaBao, TakeOffFaBao, WearFaBao };
 

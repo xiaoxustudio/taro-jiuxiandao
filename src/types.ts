@@ -5,14 +5,14 @@ export enum CWType {
 }
 
 export enum FabaoType {
-  手持武器,
-  头戴战盔,
-  身穿战甲,
-  腰带护具,
-  饰品加持,
-  鞋子护腿,
-  魂器镇魂,
-  本名法宝,
+  手持武器 = '手持武器',
+  头戴战盔 = '头戴战盔',
+  身穿战甲 = '身穿战甲',
+  腰带护具 = '腰带护具',
+  饰品加持 = '饰品加持',
+  鞋子护腿 = '鞋子护腿',
+  魂器镇魂 = '魂器镇魂',
+  本名法宝 = '本名法宝',
 }
 
 // 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
@@ -72,7 +72,7 @@ export interface CuWuType {
 }
 
 export type ActorDataConfigForFaBao = {
-  [K in keyof typeof FabaoType]: FBItemType | null | undefined;
+  [K in keyof typeof FabaoType]: null | undefined | FBItemType;
 };
 
 /**

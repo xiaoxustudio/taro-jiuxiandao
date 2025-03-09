@@ -1,12 +1,25 @@
 import { Container, JXButton, JXSpace, Text } from '@/components';
-import { FabaoType } from '@/types';
-import { getFaBao } from '@/utils/fabao';
-import { useMemo, useState } from 'react';
+import { FabaoType, FBItemType } from '@/types';
+import { getFaBao, TakeOffFaBao } from '@/utils/fabao';
+import { useCallback, useEffect, useState } from 'react';
 import './index.less';
 
 export default function Fabao() {
   const [type, setType] = useState(FabaoType.头戴战盔);
-  const targetFB = useMemo(() => getFaBao(type), [type]);
+  const [targetFB, setTargetFB] = useState<FBItemType | null>(null);
+
+  const updateInfo = useCallback(() => {
+    setTargetFB(getFaBao(type));
+  }, [type]);
+
+  const handleTakeOffFaBao = useCallback(() => {
+    TakeOffFaBao(type);
+    updateInfo();
+  }, [type, updateInfo]);
+
+  useEffect(() => {
+    updateInfo();
+  }, [type, updateInfo]);
   return (
     <Container
       title='法宝'
@@ -74,7 +87,9 @@ export default function Fabao() {
       <JXSpace flexOne>
         <JXButton width='100%'>强化</JXButton>
         <JXButton width='100%'>升阶</JXButton>
-        <JXButton width='100%'>卸下</JXButton>
+        <JXButton width='100%' onClick={handleTakeOffFaBao}>
+          卸下
+        </JXButton>
       </JXSpace>
     </Container>
   );

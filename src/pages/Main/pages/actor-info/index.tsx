@@ -31,10 +31,10 @@ export default function ActorInfo() {
           气血：{get('qixue')}
         </Text>
         <Text className='item' size={16} bold>
-          总攻击：{get('gongji')}
+          总攻击：{get('gongji') + get('addAttr.gongji')}
         </Text>
         <Text className='item' size={16} bold>
-          总防御：{get('fangyu')}
+          总防御：{get('fangyu') + get('addAttr.fangyu')}
         </Text>
         <Text className='item' size={16} bold>
           攻速：{get('sudu')}
