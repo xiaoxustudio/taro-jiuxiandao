@@ -17,7 +17,7 @@ const FBError = new ErrorController(ErrorTypeCode.法宝错误);
  */
 function getFaBao(type: FabaoType) {
   const actor = getActor();
-  const target = actor.fabao?.[type];
+  const target = actor.fabao?.[FaBaoTypeTransform(type)];
   return target ? target : null;
 }
 
