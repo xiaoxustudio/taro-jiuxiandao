@@ -1,7 +1,11 @@
 /* 法宝相关操作 */
 
 import { FabaoType } from '@/types';
+import { AutoMapObject } from '.';
 import { getActor } from './actor';
+import ErrorController, { ErrorTypeCode } from './ErrorManager';
+
+const FBError = new ErrorController(ErrorTypeCode.法宝错误);
 
 /**
  * @description: 获取指定位置的法宝
@@ -15,15 +19,7 @@ function getFaBao(type: FabaoType) {
 }
 
 // 自动生成映射
-const FaBaoTypeMap: Record<FabaoType, string> = Object.values(FabaoType).reduce(
-  (acc, key) => {
-    if (typeof key === 'string') {
-      acc[FabaoType[key]] = key;
-    }
-    return acc;
-  },
-  {} as Record<FabaoType, string>
-);
+const FaBaoTypeMap = AutoMapObject(FabaoType);
 
 // 类型转换为中文
 function FaBaoTypeTransform(type: FabaoType): string {
@@ -34,5 +30,18 @@ function FaBaoTypeTransform(type: FabaoType): string {
   return result;
 }
 
-export { FaBaoTypeTransform, getFaBao };
+/**
+ * @description: 穿戴法宝
+ * @param {number} index 法宝在背包位置索引
+ * @return {*}
+ */
+function WearFaBao(index: number) {
+  const actor = getActor();
+  const { fb } = actor.cw;
+  const len = fb.length;
+  if (index > len - 1) {
+    FBError.emitError('超出索引范围');
+  }
+}
 
+export { FaBaoTypeTransform, FBError, getFaBao, WearFaBao };

@@ -95,6 +95,22 @@ export function getRandomElement<T>(array: T[]): T {
 }
 
 /**
+ * @description: 自动生成枚举映射
+ * @param {*} T
+ * @return {*}
+ */
+export const AutoMapObject = <T extends object>(mapType: T) =>
+  Object.values(mapType).reduce(
+    (acc, key) => {
+      if (typeof key === 'string') {
+        acc[mapType[key]] = key;
+      }
+      return acc;
+    },
+    {} as Record<keyof typeof mapType, string>
+  ) as Record<keyof typeof mapType, string>;
+
+/**
  * @description: 生成基于增幅比的角色属性
  * @return {*}
  */

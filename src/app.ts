@@ -1,15 +1,12 @@
 import { PropsWithChildren } from 'react';
-import { useLaunch } from '@tarojs/taro';
-
 import './app.less';
+import { FBError } from './utils/fabao';
 
+FBError.addEventListener((e) => {
+  console.log(e);
+});
 function App({ children }: PropsWithChildren<any>) {
-	useLaunch(() => {
-		console.log('App launched.');
-	});
-
-	// children 是将要会渲染的页面
-	return children;
+  return children;
 }
 
 export default App;

@@ -3,6 +3,7 @@ export enum CWType {
   DY, //丹药
   QT, // 其他
 }
+
 export enum FabaoType {
   手持武器,
   头戴战盔,
@@ -32,6 +33,7 @@ export interface ActorDataConfigForZhanDou {
   fashu: number; // 法术
   gongji: number; // 攻击
   sudu: number; // 速度
+  xianyuan: number; // 仙缘
 }
 
 /**
