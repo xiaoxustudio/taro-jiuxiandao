@@ -4,7 +4,7 @@ import {
   JXModal,
   JXSpace,
   Paragraph,
-  Text,
+  Text
 } from '@/components';
 import { navigateTo } from '@/utils';
 import { View } from '@tarojs/components';
@@ -16,6 +16,7 @@ function Home() {
       title: '九仙团队™',
       content: (
         <>
+          <Text>原公告：</Text>
           <Text>
             我们团队拥有丰富的文字游戏开发经验，团队组织人方寸是第一款安卓文字修仙游戏九仙道的作者！开创了安卓文字修仙游戏先河！
           </Text>
@@ -50,7 +51,7 @@ function Home() {
       onOk() {
         close();
       },
-      disableCancle: true,
+      disableCancle: true
     });
   };
   return (
@@ -119,7 +120,7 @@ function Home() {
                 onOk() {
                   close();
                 },
-                disableCancle: true,
+                disableCancle: true
               });
             }}
           >

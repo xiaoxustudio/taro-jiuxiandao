@@ -14,6 +14,7 @@ export interface TextProps extends ViewProps {
   inline: boolean; // 行
   noWrap: boolean; // 不换行
   textShadow: boolean; // 文字阴影
+  align: 'left' | 'center' | 'right'; // 文字方向
   style: CSSProperties;
 }
 
@@ -29,6 +30,7 @@ function Text({
   inline,
   textShadow,
   verticalText,
+  align,
   noWrap,
   ...props
 }: PropsWithChildren<Partial<TextProps>>) {
@@ -37,7 +39,7 @@ function Text({
       className={classNames(styles.Text, className, {
         [styles.FlexCenter]: center,
         [styles.TextVertical]: verticalText,
-        [styles.TextNoWrap]: noWrap,
+        [styles.TextNoWrap]: noWrap
       })}
       style={{
         ...style,
@@ -47,6 +49,7 @@ function Text({
         letterSpacing: space ? `${space}px` : '',
         display: inline ? `inline-block` : '',
         textShadow: textShadow ? `2px 2px 2px grey` : '',
+        textAlign: align ? align : undefined
       }}
       {...props}
     >

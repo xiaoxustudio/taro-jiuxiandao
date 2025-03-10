@@ -28,7 +28,7 @@ export default function ActorInfo() {
           神识：{get('shenshi')}/{get('max_shenshi')}
         </Text>
         <Text className='item' size={16} bold>
-          气血：{get('qixue')}
+          气血：{get('qixue') + get('addAttr.qixue')}
         </Text>
         <Text className='item' size={16} bold>
           总攻击：{get('gongji') + get('addAttr.gongji')}
@@ -37,13 +37,13 @@ export default function ActorInfo() {
           总防御：{get('fangyu') + get('addAttr.fangyu')}
         </Text>
         <Text className='item' size={16} bold>
-          攻速：{get('sudu')}
+          攻速：{get('sudu') + get('addAttr.sudu')}
         </Text>
         <Text className='item' size={16} bold>
           仙缘：{get('xuanyuan')}
         </Text>
         <Text className='item' size={16} bold>
-          暴击：{get('baoji')}
+          暴击：{get('baoji') + get('addAttr.baoji')}
         </Text>
         <Text className='item' size={16} bold>
           灵根：{get('linggen')}灵根

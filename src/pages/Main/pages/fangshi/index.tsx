@@ -7,7 +7,7 @@ import {
   JXSpace,
   JXToast,
   List,
-  Text,
+  Text
 } from '@/components';
 import { ActorDataConfigForZhanDou } from '@/types';
 import { AttrTransformChinese } from '@/utils';
@@ -24,7 +24,10 @@ export default function Fangshi() {
       title: (
         <Box>
           <Text>{v.name}</Text>
-          <Text>灵石：{v.ls}</Text>
+          <JXSpace between>
+            <Text>灵石：{v.ls}</Text>
+            <Text align='right'>{v.itype}</Text>
+          </JXSpace>
         </Box>
       ),
       key: `${v.name}-${index}`,
@@ -33,10 +36,13 @@ export default function Fangshi() {
         const instance = JXModal.show({
           okText: '购买',
           content: (
-            <>
+            <JXSpace direction='vertical'>
               <Text size={20} bold>
                 {v.name}
               </Text>
+              <Text>品阶：{v.pj}</Text>
+              <Text>类型：{v.itype}</Text>
+              <Text>描述：{v.desc}</Text>
               <JXSpace direction='vertical' title='属性'>
                 {Object.keys(v.attr).map((item) => (
                   <Text key={v.attr[item]}>
@@ -46,7 +52,7 @@ export default function Fangshi() {
                     ：
                     {v.attr[item] >= 0 ? (
                       <Text color='green' inline>
-                        {v.attr[item]}
+                        + {v.attr[item]}
                       </Text>
                     ) : (
                       <Text color='red' inline>
@@ -57,7 +63,7 @@ export default function Fangshi() {
                 ))}
                 <Text>售价：{v.ls}</Text>
               </JXSpace>
-            </>
+            </JXSpace>
           ),
           onOk() {
             instance.close();
@@ -76,9 +82,9 @@ export default function Fangshi() {
           },
           onCancel() {
             instance.close();
-          },
+          }
         });
-      },
+      }
     }));
   }, []);
   return (
