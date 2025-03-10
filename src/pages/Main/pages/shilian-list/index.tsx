@@ -26,6 +26,9 @@ export default function ShilianList() {
           魂殁残界（筑基期）
         </JXButton>
         <JXButton color='white' style={{ background: '#aaa' }}>
+          尊者洞府（结丹期）
+        </JXButton>
+        <JXButton color='white' style={{ background: '#aaa' }}>
           南城古迹（元婴期）
         </JXButton>
       </JXSpace>
