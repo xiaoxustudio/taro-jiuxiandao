@@ -1,7 +1,7 @@
 export enum CWType {
   FB, // 法宝
   DY, //丹药
-  QT, // 其他
+  QT // 其他
 }
 
 export enum FabaoType {
@@ -12,7 +12,7 @@ export enum FabaoType {
   饰品加持 = '饰品加持',
   鞋子护腿 = '鞋子护腿',
   魂器镇魂 = '魂器镇魂',
-  本名法宝 = '本名法宝',
+  本名法宝 = '本名法宝'
 }
 
 // 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
@@ -84,7 +84,8 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   daohao: string; // 道号
   linggen: string; // 灵根
   jingjie: string; // 境界
-  max_jingjie: string;
+  jingjie1: string; // 小境界
+  jingjie2: string; // 阶段境界
   xiuwei: number; // 修为
   max_xiuwei: number;
   shenshi: number; // 神识

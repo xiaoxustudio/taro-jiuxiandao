@@ -22,7 +22,8 @@ export default function ActorInfo() {
         </Text>
         <Text className='item' size={16} bold>
           境界：{get('jingjie')}
-          {get('max_jingjie')}
+          {get('jingjie1')}
+          {get('jingjie2')}
         </Text>
         <Text className='item' size={16} bold>
           神识：{get('shenshi')}/{get('max_shenshi')}

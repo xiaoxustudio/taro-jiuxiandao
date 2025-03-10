@@ -5,7 +5,7 @@ import {
   JXSpace,
   JXToast,
   Paragraph,
-  Text,
+  Text
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
@@ -17,7 +17,8 @@ import {
   getLingQiToNumber,
   JingJie1ToNumber,
   JingJie1Transform,
-  JingJieTransform,
+  JingJie2Transform,
+  JingJieTransform
 } from '@/utils/actor';
 import { View } from '@tarojs/components';
 import { Image } from 'antd-mobile';
@@ -35,21 +36,23 @@ function Main() {
   const operaterOptions = [
     {
       name: '试炼',
-      click() {},
+      click() {
+        navigateTo('Main/pages/shilian-list/index');
+      }
     },
     {
       name: '炼丹',
-      click() {},
+      click() {}
     },
     {
       name: '炼器',
-      click() {},
+      click() {}
     },
     {
       name: '法宝',
       click() {
         navigateTo('Main/pages/fabao/index');
-      },
+      }
     },
     {
       name: '升阶',
@@ -72,70 +75,72 @@ function Main() {
           const calcSudu = get('sudu') + 3 * lv1;
           set('sudu', calcSudu);
         }
-        // 气血和物理、境界转换
-        if (JingJie1ToNumber(get('max_jingjie')) === getJingJieMaxDep()) {
-          set('jingjie', JingJieTransform(get('jingjie')));
-          set('max_jingjie', JingJie1Transform(get('max_jingjie')));
-        } else {
-          set('max_jingjie', JingJie1Transform(get('max_jingjie')));
-          const calcGongji = get('gongji') + 10 * lv1;
-          const calcQixue = get('qixue') + 100 * lv1;
-          set('gongji', calcGongji);
-          set('qixue', calcQixue);
-          JXToast().show(`目前气血：${calcQixue}，攻击：${calcGongji}`);
+        // 气血和物理
+        // 阶段境界
+        if (get('jingjie2') === '大圆满') {
+          set('jingjie1', JingJie1Transform(get('jingjie1')));
+          if (JingJie1ToNumber(get('jingjie2')) === getJingJieMaxDep()) {
+            set('jingjie', JingJieTransform(get('jingjie'))); // 大境界转换
+          }
         }
-      },
+        set('jingjie2', JingJie2Transform(get('jingjie2')));
+        const calcGongji = get('gongji') + 10 * lv1;
+        const calcQixue = get('qixue') + 100 * lv1;
+        set('gongji', calcGongji);
+        set('qixue', calcQixue);
+        JXToast().show(`目前气血：${calcQixue}，攻击：${calcGongji}`);
+      }
     },
     {
       name: '功法',
-      click() {},
+      click() {}
     },
     {
       name: '突破',
-      click() {},
+      click() {}
     },
     {
       name: '法术',
-      click() {},
-    },
+      click() {}
+    }
   ];
   const operaterOptions2 = [
     {
       name: '坊市',
       click() {
         navigateTo('Main/pages/fangshi/index');
-      },
+      }
     },
     {
       name: '储物',
       click() {
         navigateTo('Main/pages/chuwu/index');
-      },
+      }
     },
     {
       name: '灵兽',
-      click() {},
+      click() {}
     },
     {
       name: '门派',
-      click() {},
+      click() {}
     },
     {
       name: '药园',
-      click() {},
+      click() {}
     },
     {
       name: '洞府',
-      click() {},
+      click() {}
     },
     {
       name: '成就',
-      click() {},
+      click() {}
     },
     {
       name: '赌场',
-      click() {},
-    },
+      click() {}
+    }
   ];
 
   // 开始修炼
@@ -178,7 +183,7 @@ function Main() {
         c.close();
         set('xiuwei', get('xiuwei') + cwcalc);
         set('xiulian', null);
-      },
+      }
     });
   };
 
@@ -253,7 +258,8 @@ function Main() {
               境界：
             </Text>
             {get('jingjie')}
-            {get('max_jingjie')}
+            {get('jingjie1')}
+            {get('jingjie2')}
           </Text>
         </JXSpace>
         {/* 修炼 */}

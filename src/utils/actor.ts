@@ -194,6 +194,17 @@ export function TransformToJingJie1(
 }
 
 /**
+ * @description: 阶段境界转换
+ * @param {string} s
+ * @return {*}
+ */
+function JingJie2Transform(s: string) {
+  const arr = ['初期', '中期', '后期', '圆满', '大圆满'];
+  const f = arr.findIndex((v) => v === s);
+  return arr[~f ? f + 1 : 0] || arr[0];
+}
+
+/**
  * @description: 小境界转换为数字
  * @param {string} s
  * @return {*}
@@ -243,6 +254,7 @@ export {
   getLingQiToNumber,
   HasActor,
   JingJie1Transform,
+  JingJie2Transform,
   JingJieTransform
 };
 

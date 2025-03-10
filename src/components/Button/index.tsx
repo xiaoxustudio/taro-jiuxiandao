@@ -3,7 +3,8 @@ import classNames from 'classnames';
 import { PropsWithChildren } from 'react';
 import styles from './index.module.less';
 
-export interface JXButtonProps extends ButtonProps {
+export interface JXButtonProps extends Omit<ButtonProps, 'color'> {
+  color?: string;
   width: number | string;
   height: number;
   className: string;
@@ -19,6 +20,7 @@ function JXButton({
   className,
   transparent,
   shadow,
+  color,
   ...props
 }: PropsWithChildren<Partial<JXButtonProps>>) {
   return (
@@ -36,7 +38,8 @@ function JXButton({
             : width
           : undefined,
         height: height && `${height}px`,
-        ...(transparent ? { '--background-color': 'transparent' } : {}),
+        color: color ? color : undefined,
+        ...(transparent ? { '--background-color': 'transparent' } : {})
       }}
       {...props}
     >

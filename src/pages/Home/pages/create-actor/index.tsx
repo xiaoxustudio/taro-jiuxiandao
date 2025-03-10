@@ -18,7 +18,7 @@ const options = [
         金灵根
       </Text>
     ),
-    value: '金',
+    value: '金'
   },
   {
     label: (
@@ -26,7 +26,7 @@ const options = [
         木灵根
       </Text>
     ),
-    value: '木',
+    value: '木'
   },
   {
     label: (
@@ -34,7 +34,7 @@ const options = [
         水灵根
       </Text>
     ),
-    value: '水',
+    value: '水'
   },
   {
     label: (
@@ -42,7 +42,7 @@ const options = [
         火灵根
       </Text>
     ),
-    value: '火',
+    value: '火'
   },
   {
     label: (
@@ -50,8 +50,8 @@ const options = [
         土灵根
       </Text>
     ),
-    value: '土',
-  },
+    value: '土'
+  }
 ];
 
 const races = [
@@ -61,7 +61,7 @@ const races = [
         人族
       </Text>
     ),
-    value: '人',
+    value: '人'
   },
   {
     label: (
@@ -69,7 +69,7 @@ const races = [
         魔族
       </Text>
     ),
-    value: '魔',
+    value: '魔'
   },
   {
     label: (
@@ -77,7 +77,7 @@ const races = [
         妖族
       </Text>
     ),
-    value: '妖',
+    value: '妖'
   },
   {
     label: (
@@ -85,7 +85,7 @@ const races = [
         鬼族
       </Text>
     ),
-    value: '鬼',
+    value: '鬼'
   },
   {
     label: (
@@ -93,8 +93,8 @@ const races = [
         灵族
       </Text>
     ),
-    value: '灵',
-  },
+    value: '灵'
+  }
 ];
 
 function Index() {
@@ -110,7 +110,8 @@ function Index() {
     max_xiuwei: 500,
     xuanyuan: 10, // 仙缘
     jingjie: '练气',
-    max_jingjie: '一阶',
+    jingjie1: '一阶',
+    jingjie2: '初期',
     xiulianbeilv: 10, // 修炼倍率
     qixue: 1200, // 气血
     gongji: 80, // 攻击
@@ -131,7 +132,7 @@ function Index() {
       baoji: 0, // 暴击
       sudu: 0, // 速度
       fashu: 0,
-      xianyuan: 0, // 仙缘
+      xianyuan: 0 // 仙缘
     },
     fabao: {
       手持武器: null,
@@ -141,23 +142,23 @@ function Index() {
       饰品加持: null,
       鞋子护腿: null,
       魂器镇魂: null,
-      本名法宝: null,
+      本名法宝: null
     },
     cw: {
       fb: [],
       dy: [],
       qt: [],
-      max: 30, // 容量
+      max: 30 // 容量
     },
     time1: Date.now(), // 时间1 （计算寿元）
     shenshiTime: Date.now(), // 计算神识
     qiandao: {
       count: 0,
       last: '',
-      time: '',
+      time: ''
     },
     xiulian: null,
-    dongfu: null,
+    dongfu: null
   });
 
   const handleRegister = useCallback(() => {
