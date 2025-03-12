@@ -1,11 +1,17 @@
 export default defineAppConfig({
   pages: [
-  'pages/index/index',
-  'pages/Home/pages/create-actor/index',
-  'pages/Home/pages/actor-list/index',
-  'pages/Main/index',
-  'pages/Main/pages/qiandao/index', "pages/Main/pages/chuwu/index", "pages/Main/pages/actor-info/index", "pages/Main/pages/fangshi/index", "pages/Main/pages/fabao/index", "pages/Main/pages/shilian-list/index", "pages/Main/pages/shilian/index"],
-
+    'pages/index/index',
+    'pages/Home/pages/create-actor/index',
+    'pages/Home/pages/actor-list/index',
+    'pages/Main/index',
+    'pages/Main/pages/qiandao/index',
+    'pages/Main/pages/chuwu/index',
+    'pages/Main/pages/actor-info/index',
+    'pages/Main/pages/fangshi/index',
+    'pages/Main/pages/fabao/index',
+    'pages/Main/pages/shilian-list/index',
+    'pages/Main/pages/shilian/index'
+  ],
 
   window: {
     backgroundTextStyle: 'light',

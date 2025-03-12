@@ -83,7 +83,13 @@ function Home() {
           >
             创建角色
           </JXButton>
-          <JXButton>设置</JXButton>
+          <JXButton
+            onClick={() => {
+              window.JXApi.GoToSetting();
+            }}
+          >
+            设置
+          </JXButton>
           <JXButton
             onClick={() => {
               const { close } = JXModal.show({
