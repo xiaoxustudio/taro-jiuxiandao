@@ -60,7 +60,6 @@
 		"lodash-es": "^4.17.21",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0",
-		"vconsole": "^3.15.1",
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
@@ -72,6 +71,7 @@
 		"@tarojs/plugin-html": "^4.0.9",
 		"@tarojs/vite-runner": "4.0.9",
 		"@types/lodash-es": "^4.17.12",
+		"@types/node": "^22.13.10",
 		"@types/react": "^18.0.0",
 		"@typescript-eslint/eslint-plugin": "^8.24.1",
 		"@vitejs/plugin-react": "^4.3.0",
