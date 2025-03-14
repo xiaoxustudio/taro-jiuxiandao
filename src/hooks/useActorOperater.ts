@@ -57,7 +57,7 @@ function useActorOperater(): ActorOperater {
     () => ({
       delete: deleteActor,
       get,
-      getAll,
+      getAll
     }),
     [deleteActor, get, getAll]
   );

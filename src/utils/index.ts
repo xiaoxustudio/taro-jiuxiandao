@@ -17,7 +17,7 @@ export const CreateUniqueIndex = () => {
 export function navigateTo(url, options?: Taro.navigateTo.Option) {
   Taro.navigateTo({
     url: `/pages/${url}`,
-    ...(options ? omit(options, ['url']) : {}),
+    ...(options ? omit(options, ['url']) : {})
   });
 }
 
@@ -128,7 +128,7 @@ export function generateActorAttributes(ratios: {
     wuli: 150,
     gongsu: 20,
     baoji: 0.0,
-    fashu: 0,
+    fashu: 0
   };
   const qixue = Math.round(baseAttributes.qixue * (ratios.qixueRatio ?? 1));
   const newAttributes = {
@@ -140,7 +140,7 @@ export function generateActorAttributes(ratios: {
     baoji: parseFloat(
       (baseAttributes.baoji * (ratios.baojiRatio ?? 1)).toFixed(2)
     ),
-    fashu: Math.round(baseAttributes.fashu * (ratios.fashuRatio ?? 1)),
+    fashu: Math.round(baseAttributes.fashu * (ratios.fashuRatio ?? 1))
   };
 
   return newAttributes;
@@ -172,7 +172,7 @@ export function chineseToNumber(chineseNum: string): number {
     百: 100,
     千: 1000,
     万: 10000,
-    亿: 100000000,
+    亿: 100000000
   };
 
   let result = 0;

@@ -56,19 +56,6 @@
       "name": "赤血剑",
       "type": 0,
       "attr": {
-        "sudu": 95
-      },
-      "lv": 0,
-      "pj": "法器",
-      "itype": "手持武器",
-      "isPile": false,
-      "desc": "古器门炼制",
-      "ls": 12900
-    },
-    {
-      "name": "赤血剑",
-      "type": 0,
-      "attr": {
         "gongji": 91
       },
       "lv": 0,

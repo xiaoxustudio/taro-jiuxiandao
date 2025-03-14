@@ -61,7 +61,7 @@ function WearFaBao(index: number) {
     Object.defineProperty(actor.fabao, slotName, {
       value: null,
       configurable: true,
-      enumerable: true,
+      enumerable: true
     });
   actor.fabao[slotName] = fbObj;
   // addAttr 修改

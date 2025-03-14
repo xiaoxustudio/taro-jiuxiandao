@@ -18,7 +18,7 @@ const useActorStore = create<ActorStore>()(
       set: (store, val) =>
         set((state) => ({
           ...state,
-          actors: { ...state.actors, [store]: val },
+          actors: { ...state.actors, [store]: val }
         })),
       remove: (store) =>
         set((state) => {
@@ -26,10 +26,10 @@ const useActorStore = create<ActorStore>()(
           const om = omit(state.actors, oArray.concat(ActorIdents));
           state.actors = om;
           return state;
-        }),
+        })
     }),
     {
-      name: 'actor',
+      name: 'actor'
     }
   )
 );

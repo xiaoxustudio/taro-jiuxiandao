@@ -4,7 +4,7 @@ import {
   ActorDataConfigForZhanDou,
   BaseType,
   CWType,
-  FBItemType,
+  FBItemType
 } from '@/types';
 import { AttrTransformChinese } from '@/utils';
 import { WearFaBao } from '@/utils/fabao';
@@ -117,7 +117,7 @@ export default function Chuwu() {
                       },
                       onCancel() {
                         close();
-                      },
+                      }
                     });
                   }
                   setSelect(v);

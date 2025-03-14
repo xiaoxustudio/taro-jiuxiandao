@@ -129,7 +129,7 @@ function Add({
     name,
     isPile,
     num,
-    ...props,
+    ...props
   };
   switch (type) {
     case CWType.QT:
@@ -140,7 +140,7 @@ function Add({
         } else {
           acData.cw.qt.push({
             type: CWType.QT,
-            ...baseObject,
+            ...baseObject
           });
         }
       }
@@ -153,7 +153,7 @@ function Add({
         } else {
           acData.cw.fb.push({
             type: CWType.FB,
-            ...baseObject,
+            ...baseObject
           } as FBItemType);
         }
       }
@@ -166,7 +166,7 @@ function Add({
         } else {
           acData.cw.dy.push({
             type: CWType.DY,
-            ...baseObject,
+            ...baseObject
           });
         }
       }

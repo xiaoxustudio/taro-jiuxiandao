@@ -87,8 +87,8 @@ function useActorController() {
         ...state,
         actors: {
           ...state.actors,
-          [curr]: newActor, // 确保更新完整对象
-        },
+          [curr]: newActor // 确保更新完整对象
+        }
       };
     });
   }, []);

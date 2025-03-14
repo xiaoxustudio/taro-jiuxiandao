@@ -9,11 +9,11 @@ import {
   List,
   Text
 } from '@/components';
-import { ActorDataConfigForZhanDou } from '@/types';
+import { ActorDataConfigForZhanDou } from '@/types/types';
 import { AttrTransformChinese } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import { useMemo, useState } from 'react';
-import { CWType } from '../../../../types';
+import { CWType } from '../../../../types/types';
 import './index.less';
 
 export default function Fangshi() {

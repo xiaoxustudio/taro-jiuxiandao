@@ -14,17 +14,10 @@ const functions = {
 };
 
 export default function () {
+  // 注入H5API
   Object.defineProperty(window, 'H5Api', {
-    value: {},
+    value: functions,
     configurable: false,
     enumerable: true
   });
-  // 注入H5API
-  for (const api in functions) {
-    Object.defineProperty(window, api, {
-      value: window.H5Api[api],
-      configurable: false,
-      enumerable: true
-    });
-  }
 }
