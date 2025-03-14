@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import fsAssets from '@/assets/fs.json';
 import {
   Box,
@@ -7,16 +8,18 @@ import {
   JXSpace,
   JXToast,
   List,
+  Scroll,
   Text
 } from '@/components';
 import { ActorDataConfigForZhanDou, CWType } from '@/types';
 import { AttrTransformChinese } from '@/utils';
 import chuwu from '@/utils/chuwu';
-import { useMemo, useState } from 'react';
+import useContainer from '@/hooks/useContainer';
 import './index.less';
 
 export default function Fangshi() {
   const [type, setType] = useState(0);
+  const container = useContainer();
   const list = useMemo(() => {
     return fsAssets.fb.map((v, index) => ({
       ...v,
@@ -66,6 +69,7 @@ export default function Fangshi() {
           ),
           onOk() {
             instance.close();
+            // eslint-disable-next-line no-bitwise
             if (~chuwu.Has(v) && !v.isPile) {
               JXToast('已拥有该物品！').show();
               return;
@@ -90,6 +94,8 @@ export default function Fangshi() {
     <Container
       title='坊市'
       desc='云雾散开，寻路符渐渐失效，一座灵气浓郁，建筑华丽的坊市出现在你的面前…'
+      context={container}
+      scroll
     >
       <JXSpace gap={10} style={{ width: '100%' }} hscroll>
         <JXButton width='100px' onClick={() => setType(0)}>
@@ -111,7 +117,11 @@ export default function Fangshi() {
           丹方
         </JXButton>
       </JXSpace>
-      {type === 0 && <List list={list} />}
+      {type === 0 && (
+        <Scroll calc={container.calcHeight + 50}>
+          <List list={list} />
+        </Scroll>
+      )}
     </Container>
   );
 }

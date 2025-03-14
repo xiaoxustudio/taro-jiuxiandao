@@ -117,7 +117,7 @@ export default function Shilian() {
           ]
         }));
         clearTimeout(timer.current);
-        timer.current = -1;
+        setHuiheState((v) => ({ ...v, start: false, end: true }));
         return;
       }
       if (YaoShouInstance.qixue <= 0) {
@@ -131,7 +131,7 @@ export default function Shilian() {
           ]
         }));
         clearTimeout(timer.current);
-        timer.current = -1;
+        setHuiheState((v) => ({ ...v, start: false, end: true }));
         return;
       }
       // 战斗计算
