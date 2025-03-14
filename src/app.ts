@@ -1,15 +1,8 @@
 import { PropsWithChildren } from 'react';
 import './app.less';
-import windowApi from './windowApi';
+import H5Api from './H5Api';
 
-// 注入全局API
-for (const api in windowApi) {
-  Object.defineProperty(window, api, {
-    value: windowApi[api],
-    configurable: false,
-    enumerable: true
-  });
-}
+H5Api(); // 初始化H5Api
 
 function App({ children }: PropsWithChildren<any>) {
   return children;

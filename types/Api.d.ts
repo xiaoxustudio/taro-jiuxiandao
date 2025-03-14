@@ -1,6 +1,6 @@
 declare interface Window {
   /**
-   * @description: 九仙安卓API
+   * @description: 九仙安卓API（H5使用）
    * @return {*}
    */
   JXApi: {
@@ -9,5 +9,16 @@ declare interface Window {
      * @return {*}
      */
     GoToSetting: () => void;
+  };
+  /**
+   * @description: H5API（安卓使用）
+   * @return {*}
+   */
+  H5Api: {
+    /**
+     * @description: 清除存档
+     * @return {*}
+     */
+    clearStore: () => void;
   };
 }
