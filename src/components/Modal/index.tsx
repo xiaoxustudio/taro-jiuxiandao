@@ -3,7 +3,7 @@ import {
   ModalAlertProps,
   ModalConfirmProps,
   ModalProps,
-  ModalShowProps,
+  ModalShowProps
 } from 'antd-mobile';
 import { Action } from 'antd-mobile/es/components/modal';
 import classNames from 'classnames';
@@ -42,8 +42,8 @@ function JXModal({
           text: okText,
           disabled: false,
           className: styles.MadalConfirm,
-          onClick: onOk,
-        },
+          onClick: onOk
+        }
       ]);
     }
     if (!disableCancle) {
@@ -54,8 +54,8 @@ function JXModal({
           text: cancleText,
           disabled: false,
           className: styles.MadalCancle,
-          onClick: onCancel,
-        },
+          onClick: onCancel
+        }
       ]);
     }
   }, [cancleText, disableCancle, disableOk, okText]); //eslint-disable-line
@@ -81,7 +81,7 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
       text: props.okText || '确认',
       disabled: false,
       className: styles.MadalConfirm,
-      onClick: props.onOk,
+      onClick: props.onOk
     });
   }
   if (props.disableCancle != true) {
@@ -90,7 +90,7 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
       text: props.cancleText || '取消',
       disabled: false,
       className: styles.MadalCancle,
-      onClick: props.onCancel,
+      onClick: props.onCancel
     });
   }
   return Modal.show({
@@ -98,7 +98,7 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
     closeOnMaskClick: true,
     actions: Array.isArray(props.actions)
       ? [...action, ...props.actions]
-      : action,
+      : action
   });
 };
 

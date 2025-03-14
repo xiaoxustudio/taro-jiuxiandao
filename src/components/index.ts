@@ -16,4 +16,4 @@ export { default as List } from './List';
 export type { ListItemData } from './List';
 export { default as Paragraph } from './Paragraph';
 export { default as Text } from './Text';
-
+export { default as Scroll } from './Scroll';

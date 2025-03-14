@@ -10,10 +10,10 @@ const useStore = create<StoreParams>()(
   persist(
     (set) => ({
       current: '',
-      set: (val: string) => set((state) => ({ ...state, current: val })),
+      set: (val: string) => set((state) => ({ ...state, current: val }))
     }),
     {
-      name: 'store',
+      name: 'store'
     }
   )
 );

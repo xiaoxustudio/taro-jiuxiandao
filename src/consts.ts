@@ -27,7 +27,7 @@ export const monsterSurnames = [
   '土',
   '月',
   '日',
-  '星',
+  '星'
 ];
 export const monsterNames = [
   '龙',
@@ -49,7 +49,7 @@ export const monsterNames = [
   '鹏',
   '鲲',
   '鳐',
-  '鲸',
+  '鲸'
 ];
 // 常见的古风姓氏
 export const surnames = [
@@ -112,7 +112,7 @@ export const surnames = [
   '俞',
   '任',
   '袁',
-  '柳',
+  '柳'
 ];
 
 // 常见的古风名字的单字
@@ -166,5 +166,5 @@ export const nameParts = [
   '彤',
   '灵',
   '萤',
-  '如',
+  '如'
 ];

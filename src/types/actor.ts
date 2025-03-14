@@ -48,6 +48,10 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     last: string; // 最后一次签到
     time: string; // 当前时间对比
   };
+  zd: {
+    time: number; // 挂机时间
+    df: string; // 地方
+  };
   xiulian: null | {
     time: number;
   }; //修炼

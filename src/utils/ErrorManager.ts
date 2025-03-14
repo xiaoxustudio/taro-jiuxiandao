@@ -7,7 +7,7 @@ import { AutoMapObject } from '.';
 export enum ErrorTypeCode {
   法宝错误,
   储物错误,
-  角色错误,
+  角色错误
 }
 
 // 自动生成映射

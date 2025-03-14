@@ -103,4 +103,3 @@ function TakeOffFaBao(type: FabaoType) {
 }
 
 export { FaBaoTypeTransform, FBError, getFaBao, TakeOffFaBao, WearFaBao };
-

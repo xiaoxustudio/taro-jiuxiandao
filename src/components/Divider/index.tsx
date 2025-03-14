@@ -11,7 +11,7 @@ function JXDivider({ className, margin, ...props }: Partial<JXDividerProps>) {
     <Divider
       className={classNames(className, styles.Divider)}
       style={{
-        margin,
+        margin
       }}
       {...props}
     />

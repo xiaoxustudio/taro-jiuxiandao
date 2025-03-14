@@ -1,8 +1,8 @@
-import { Text } from '@/components';
-import { CreateUniqueIndex } from '@/utils';
 import { Space, SpaceProps } from 'antd-mobile';
 import classNames from 'classnames';
 import { CSSProperties, PropsWithChildren, useMemo, useRef } from 'react';
+import { CreateUniqueIndex } from '@/utils';
+import { Text } from '@/components';
 import styles from './index.module.less';
 
 export interface JXSpaceProps extends SpaceProps {
@@ -12,6 +12,7 @@ export interface JXSpaceProps extends SpaceProps {
   between?: boolean;
   flexOne?: boolean; // 子项设置flex:1
   hscroll?: boolean; // 横向滚动（可能和其他属性冲突）
+  noFlex?: boolean; // 取消Flex使用block
 }
 
 function JXSpace({
@@ -23,6 +24,7 @@ function JXSpace({
   between,
   flexOne,
   hscroll,
+  noFlex,
   title,
   ...props
 }: PropsWithChildren<JXSpaceProps>) {
@@ -32,10 +34,11 @@ function JXSpace({
       ({
         '--gap': gap ? `${gap}px` : undefined,
         '--gap-horizontal': gap ? `${gap}px` : undefined,
+        display: noFlex && 'block'
       }) as CSSProperties & {
         [k: string]: string;
       },
-    [gap]
+    [gap, noFlex]
   );
 
   return (

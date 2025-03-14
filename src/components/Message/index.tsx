@@ -22,7 +22,7 @@ export function JXToast(props?: JXToastProps) {
       }
       current = Toast.show({
         ...omit(target, ['content']),
-        content: <ContentToast content={target.content} />,
+        content: <ContentToast content={target.content} />
       });
     },
     loading: (args?: JXToastProps) => {
@@ -36,7 +36,7 @@ export function JXToast(props?: JXToastProps) {
       }
       current = Toast.show({
         ...omit(target, ['content']),
-        content: <ContentToast loading content={target.content} />,
+        content: <ContentToast loading content={target.content} />
       });
     },
     close: () => {
@@ -44,7 +44,7 @@ export function JXToast(props?: JXToastProps) {
     },
     closeAll: () => {
       Toast.clear();
-    },
+    }
   };
 }
 

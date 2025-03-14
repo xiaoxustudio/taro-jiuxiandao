@@ -1,4 +1,5 @@
 import { View, ViewProps } from '@tarojs/components';
+import classNames from 'classnames';
 import { PropsWithChildren, ReactNode } from 'react';
 import JXDivider from '../Divider';
 import JXSpace from '../Space';
@@ -8,16 +9,18 @@ import styles from './index.module.less';
 interface ContainerProps extends ViewProps {
   title: string | ReactNode;
   desc: string | ReactNode;
+  className: string;
 }
 
 function Container({
   title,
   desc,
   children,
+  className,
   ...props
 }: PropsWithChildren<Partial<ContainerProps>>) {
   return (
-    <View {...props}>
+    <View className={classNames(styles.Container, className)} {...props}>
       <JXSpace direction='vertical'>
         <Text className={styles.Title} textShadow size={25}>
           {title}
@@ -29,9 +32,7 @@ function Container({
         )}
       </JXSpace>
       <JXDivider />
-      <JXSpace direction='vertical' style={{ width: '100%' }}>
-        {children}
-      </JXSpace>
+      {children}
     </View>
   );
 }

@@ -1,3 +1,8 @@
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .Title {
   margin-top: 12px;
   padding: 0 8px;
@@ -6,4 +11,15 @@
 .Desc {
   color: #bab9be;
   padding: 0 8px;
+}
+
+.Space {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  :global {
+    .adm-space-item:last-of-type {
+      flex: 1;
+    }
+  }
 }

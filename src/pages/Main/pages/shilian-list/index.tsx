@@ -1,10 +1,14 @@
 import dfList from '@/assets/df.json';
 import { Container, JXButton, JXSpace } from '@/components';
+import useActorController from '@/hooks/useActorController';
+import { DiFangType } from '@/types';
 import { navigateTo } from '@/utils';
 import './index.less';
 
 export default function ShilianList() {
-  const handleNavigate = (item: { name: string; jingjie: string }) => {
+  const { set } = useActorController();
+  const handleNavigate = (item: DiFangType) => {
+    set('zd.df', item.name);
     navigateTo('Main/pages/shilian/index', {
       events: {
         loader: item
