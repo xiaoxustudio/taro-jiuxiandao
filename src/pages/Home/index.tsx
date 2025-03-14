@@ -147,7 +147,7 @@ function Home() {
       </JXSpace>
       <View className={styles.team}>九仙团队™</View>
       <View className={styles.copyRight} onClick={handleJiuXianYear}>
-        CopyRight&emsp;® 2018-&nbsp;2025
+        CopyRight&emsp;® 2016-&nbsp;2025
       </View>
     </View>
   );
