@@ -34,6 +34,7 @@
     "react/require-default-props": "off",
     "react/no-array-index-key": "off",
     "no-plusplus": "off",
+    "default-case": "off",
     "import/no-unresolved": [
       2,
       {
@@ -42,4 +43,3 @@
     ]
   }
 }
-

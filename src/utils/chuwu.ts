@@ -39,8 +39,11 @@ function Has({ name, type = CWType.FB }: OperaterType) {
   const cw = acData.cw[TR(type)];
   let index = -1;
   cw.some((v: BaseType, ind: number) => {
-    index = ind;
-    return v.name === name;
+    if (v.name === name) {
+      index = ind;
+      return true;
+    }
+    return false;
   });
   return index;
 }
@@ -103,7 +106,6 @@ function Remove(item: OperaterType) {
   }
   // 设置数据
   set(current, acData);
-  return;
 }
 
 /**
@@ -135,6 +137,7 @@ function Add({
     case CWType.QT:
       {
         const target = acData.cw.qt[has];
+        // eslint-disable-next-line no-bitwise
         if (~has && target.num) {
           target.num += num;
         } else {
@@ -148,6 +151,7 @@ function Add({
     case CWType.FB:
       {
         const target = acData.cw.fb[has];
+        // eslint-disable-next-line no-bitwise
         if (~has && target.num) {
           target.num += num;
         } else {
@@ -161,6 +165,7 @@ function Add({
     case CWType.DY:
       {
         const target = acData.cw.fb[has];
+        // eslint-disable-next-line no-bitwise
         if (~has && target.num) {
           target.num += num;
         } else {
@@ -173,7 +178,6 @@ function Add({
       break;
   }
   set(current, acData);
-  return;
 }
 
 /**
@@ -187,6 +191,7 @@ function LingShiThan(num: number = 0) {
   if (!lsData) {
     return false;
   }
+  // eslint-disable-next-line no-underscore-dangle
   const _num = lsData.num ? lsData.num : 1;
   return _num >= num;
 }

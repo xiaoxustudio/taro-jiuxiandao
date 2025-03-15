@@ -4,8 +4,16 @@ import difangData from '@/assets/df.json';
 import ysData from '@/assets/ys.json';
 import { Container, JXButton, JXSpace, Scroll, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
-import { ActorZDType, DiFangType, HuiHeType, YaoShouZDType } from '@/types';
+import {
+  ActorZDType,
+  CWType,
+  DiFangType,
+  HuiHeType,
+  QTItemType,
+  YaoShouZDType
+} from '@/types';
 import useScroll from '@/hooks/useScroll';
+import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
 
 export default function Shilian() {
@@ -89,7 +97,14 @@ export default function Shilian() {
         {
           text: (
             <>
-              {zd1.name}突然向{zd2.name}发动攻击，造成：
+              <Text color='black' inline>
+                {zd1.name}
+              </Text>
+              突然{b && '使出全力一击'}向
+              <Text color='black' inline>
+                {zd2.name}
+              </Text>
+              发动攻击，造成：
               <Text color='red' inline bold={b}>
                 {zd1.gongji}
               </Text>
@@ -123,16 +138,30 @@ export default function Shilian() {
         return;
       }
       if (YaoShouInstance.qixue <= 0) {
+        const clData = {
+          name: YaoShouInstance.cl,
+          isPile: true,
+          type: CWType.QT,
+          num: random(1, 4)
+        } as QTItemType;
         setHuiheState((v) => ({
           ...v,
           logs: [
             ...v.logs,
             {
               text: <>{YaoShouInstance.name}阵亡了</>
+            },
+            {
+              text: (
+                <>
+                  你获得材料：{clData.name}X{clData.num}
+                </>
+              )
             }
           ]
         }));
         clearTimeout(timer.current);
+        chuwu.Add(clData);
         setHuiheState((v) => ({ ...v, start: false, end: true }));
         return;
       }
@@ -170,7 +199,7 @@ export default function Shilian() {
   useEffect(() => {
     if (HuiheState.start) {
       // eslint-disable-next-line no-bitwise
-      timer.current = setTimeout(zhandou, 500);
+      timer.current = setTimeout(zhandou, 1);
     }
     scrollHook.scrollTo(scrollHook.dom?.scrollHeight || 0);
   }, [HuiheState]); // eslint-disable-line

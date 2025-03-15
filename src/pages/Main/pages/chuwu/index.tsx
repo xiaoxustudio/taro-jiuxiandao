@@ -1,3 +1,4 @@
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Box, Container, JXButton, JXModal, JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import {
@@ -8,12 +9,12 @@ import {
 } from '@/types';
 import { AttrTransformChinese } from '@/utils';
 import { WearFaBao } from '@/utils/fabao';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
 import './index.less';
 
 export default function Chuwu() {
   const { get } = useActorController();
   const [list, setList] = useState<BaseType[]>([]); // 列表
+  // eslint-disable-next-line no-unused-vars
   const [select, setSelect] = useState<BaseType | null>(null);
   const [type, setType] = useState<CWType>(CWType.FB);
   const updateChuWu = useCallback(() => {
@@ -21,13 +22,13 @@ export default function Chuwu() {
     const target = get('cw');
     switch (type) {
       case CWType.FB:
-        setList(target['fb']);
+        setList(target.fb);
         break;
       case CWType.QT:
-        setList(target['qt']);
+        setList(target.qt);
         break;
       case CWType.DY:
-        setList(target['dy']);
+        setList(target.dy);
         break;
     }
   }, [get, type]);
@@ -69,7 +70,7 @@ export default function Chuwu() {
           其他
         </JXButton>
       </JXSpace>
-      <JXSpace flexOne>
+      <JXSpace title='' direction='vertical' flexOne>
         {list &&
           list.map((v, index) => {
             return (
