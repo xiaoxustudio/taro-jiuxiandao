@@ -1,9 +1,9 @@
+import { cloneDeep, omit } from 'lodash-es';
+import { useCallback, useMemo } from 'react';
 import { ActorIdents } from '@/consts';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { ActorDataConfig, NestedKeyOf } from '@/types';
-import { cloneDeep, omit } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
 
 /**
  * @description: 当前角色控制器
@@ -33,6 +33,7 @@ function useActorController() {
       const pathParts = key.split('.');
       let currentValue: any = actor;
 
+      // eslint-disable-next-line no-restricted-syntax
       for (const part of pathParts) {
         if (currentValue === null || currentValue === undefined) {
           return null;

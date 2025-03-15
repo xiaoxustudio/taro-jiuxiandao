@@ -1,14 +1,16 @@
 // hooks/useActorOperater.ts
+import { omit } from 'lodash-es';
+import { useCallback, useMemo } from 'react';
 import { ActorIdents } from '@/consts';
 import useActorStore from '@/store/actor';
 import { ActorDataConfig } from '@/types';
-import { omit } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
 
 type ActorOperater = {
   /** 删除角色 */
+  // eslint-disable-next-line no-unused-vars
   delete: (name: string) => void;
   /** 获取单个角色数据 */
+  // eslint-disable-next-line no-unused-vars
   get: <T = ActorDataConfig>(name: string) => T | null;
   /** 获取所有非受保护角色数据 */
   getAll: () => Record<string, ActorDataConfig>;

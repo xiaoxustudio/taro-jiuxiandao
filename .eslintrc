@@ -1,4 +1,8 @@
 {
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
   "plugins": ["prettier", "eslint-plugin-import"],
   "extends": [
     "taro/react",
@@ -29,6 +33,7 @@
     "react/jsx-props-no-spreading": "off",
     "react/require-default-props": "off",
     "react/no-array-index-key": "off",
+    "no-plusplus": "off",
     "import/no-unresolved": [
       2,
       {
@@ -37,3 +42,4 @@
     ]
   }
 }
+

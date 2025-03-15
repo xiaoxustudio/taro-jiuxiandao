@@ -5,9 +5,11 @@ import ysData from '@/assets/ys.json';
 import { Container, JXButton, JXSpace, Scroll, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { ActorZDType, DiFangType, HuiHeType, YaoShouZDType } from '@/types';
+import useScroll from '@/hooks/useScroll';
 import styles from './index.module.less';
 
 export default function Shilian() {
+  const scrollHook = useScroll();
   const { get } = useActorController();
   // eslint-disable-next-line no-undef
   const timer = useRef<NodeJS.Timeout | number>(-1);
@@ -170,11 +172,12 @@ export default function Shilian() {
       // eslint-disable-next-line no-bitwise
       timer.current = setTimeout(zhandou, 500);
     }
-  }, [HuiheState]);
+    scrollHook.scrollTo(scrollHook.dom?.scrollHeight || 0);
+  }, [HuiheState]); // eslint-disable-line
 
   useEffect(() => {
     resetZhanDou();
-  }, []);
+  }, []); // eslint-disable-line
   return (
     <Container className={styles.container} title={df.name} desc={df.desc}>
       <JXSpace gap={5} between>
@@ -191,7 +194,7 @@ export default function Shilian() {
         <JXButton>材料</JXButton>
         <JXButton>战况</JXButton>
       </JXSpace>
-      <Scroll className={styles.content}>
+      <Scroll className={styles.content} Scroll={scrollHook}>
         {!HuiheState.logs.length && (
           <Text color='gray'>
             你来到了
