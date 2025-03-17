@@ -2,7 +2,14 @@ import { random } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import difangData from '@/assets/df.json';
 import ysData from '@/assets/ys.json';
-import { Container, JXButton, JXSpace, Scroll, Text } from '@/components';
+import {
+  Container,
+  JXButton,
+  JXSpace,
+  JXToast,
+  Scroll,
+  Text
+} from '@/components';
 import useActorController from '@/hooks/useActorController';
 import {
   ActorZDType,
@@ -34,44 +41,9 @@ export default function Shilian() {
     huihe: 0,
     target: 0, // 出手方
     logs: [], // 日志
-    end: false, // 是否战斗结束
-    start: false
+    end: true, // 是否战斗结束
+    can: false // 是否可以开始战斗
   });
-  /**
-   * @description: 重置数据
-   * @return {*}
-   */
-  const resetZhanDou = useCallback(() => {
-    clearTimeout(timer.current);
-    const parse = ysList[random(0, ysList.length - 1)].split(';');
-    setYaoShouInstance({
-      name: parse[0],
-      qixue: parse[1],
-      gongji: parse[2],
-      fangyu: parse[3],
-      sudu: parse[4],
-      baoji: parse[5],
-      cl: parse[6],
-      xw: parse[7],
-      df: parse[8]
-    });
-    setActorInstance({
-      name: get('daohao'),
-      qixue: get('qixue'),
-      gongji: get('gongji'),
-      fangyu: get('fangyu'),
-      sudu: get('sudu'),
-      baoji: get('baoji')
-    });
-    setHuiheState({
-      huihe: 0,
-      target: 0, // 出手方
-      logs: [], // 日志
-      end: false,
-      start: false // 是否开始战斗
-    });
-  }, [get, ysList]);
-
   /**
    * @description: 一次攻击
    * @return {*}
@@ -135,6 +107,7 @@ export default function Shilian() {
         }));
         clearTimeout(timer.current);
         setHuiheState((v) => ({ ...v, start: false, end: true }));
+        setActorInstance(null);
         return;
       }
       if (YaoShouInstance.qixue <= 0) {
@@ -163,6 +136,7 @@ export default function Shilian() {
         clearTimeout(timer.current);
         chuwu.Add(clData);
         setHuiheState((v) => ({ ...v, start: false, end: true }));
+        setActorInstance(null);
         return;
       }
       // 战斗计算
@@ -181,36 +155,74 @@ export default function Shilian() {
     }
   }, [ActorInstance, HuiheState.target, YaoShouInstance]);
 
-  const handleStartZD = useCallback(() => {
-    // 已经开始战斗
-    if (HuiheState.start) return;
-    setHuiheState((v) => ({
-      ...v,
-      start: true,
+  const handleSearchYaoShou = useCallback(() => {
+    if (!HuiheState.end) {
+      JXToast('请先解决当前的妖兽！').show();
+      return;
+    }
+
+    // 直接生成妖兽数据
+    const parse = ysList[random(0, ysList.length - 1)].split(';');
+    const newYaoShou = {
+      name: parse[0],
+      qixue: parse[1],
+      gongji: parse[2],
+      fangyu: parse[3],
+      sudu: parse[4],
+      baoji: parse[5],
+      cl: parse[6],
+      xw: parse[7],
+      df: parse[8]
+    };
+
+    // 立即更新状态
+    setYaoShouInstance(newYaoShou);
+    setActorInstance({
+      name: get('daohao'),
+      qixue: get('qixue'),
+      gongji: get('gongji'),
+      fangyu: get('fangyu'),
+      sudu: get('sudu'),
+      baoji: get('baoji')
+    });
+
+    // 使用同步生成的妖兽名称
+    setHuiheState((prev) => ({
+      ...prev,
+      can: false,
       logs: [
-        {
-          text: <>你发现了{YaoShouInstance?.name}，它似乎也发现了你</>
-        }
-      ]
+        { text: `你发现了${newYaoShou.name}，它似乎也发现了你` } // 直接使用newYaoShou
+      ],
+      end: false
     }));
-    zhandou();
-  }, [HuiheState.start, YaoShouInstance?.name, zhandou]);
+  }, [HuiheState.end, get, ysList]);
+
+  const handleStartZD = useCallback(() => {
+    if (!HuiheState.can) {
+      setHuiheState({
+        ...HuiheState,
+        can: true
+      });
+      zhandou();
+    }
+  }, [HuiheState, zhandou]);
 
   useEffect(() => {
-    if (HuiheState.start) {
-      // eslint-disable-next-line no-bitwise
+    if (HuiheState.can && YaoShouInstance) {
       timer.current = setTimeout(zhandou, 1);
     }
     scrollHook.scrollTo(scrollHook.dom?.scrollHeight || 0);
-  }, [HuiheState]); // eslint-disable-line
+    return () => {
+      if (typeof timer.current === 'number') {
+        clearTimeout(timer.current);
+      }
+    };
+  }, [HuiheState, YaoShouInstance, scrollHook]); //eslint-disable-line
 
-  useEffect(() => {
-    resetZhanDou();
-  }, []); // eslint-disable-line
   return (
     <Container className={styles.container} title={df.name} desc={df.desc}>
       <JXSpace gap={5} between>
-        <JXButton onClick={resetZhanDou}>探索</JXButton>
+        <JXButton onClick={handleSearchYaoShou}>探索</JXButton>
         <JXButton>挂机</JXButton>
         <JXButton>挂机详情</JXButton>
         <JXButton>停挂</JXButton>

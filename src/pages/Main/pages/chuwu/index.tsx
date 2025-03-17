@@ -1,5 +1,13 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { Box, Container, JXButton, JXModal, JXSpace, Text } from '@/components';
+import {
+  Box,
+  Container,
+  JXButton,
+  JXModal,
+  JXSpace,
+  Scroll,
+  Text
+} from '@/components';
 import useActorController from '@/hooks/useActorController';
 import {
   ActorDataConfigForZhanDou,
@@ -9,14 +17,17 @@ import {
 } from '@/types';
 import { AttrTransformChinese } from '@/utils';
 import { WearFaBao } from '@/utils/fabao';
+import useScroll from '@/hooks/useScroll';
 import './index.less';
 
 export default function Chuwu() {
   const { get } = useActorController();
   const [list, setList] = useState<BaseType[]>([]); // 列表
+  const scrollHook = useScroll();
   // eslint-disable-next-line no-unused-vars
   const [select, setSelect] = useState<BaseType | null>(null);
   const [type, setType] = useState<CWType>(CWType.FB);
+
   const updateChuWu = useCallback(() => {
     setList([]);
     const target = get('cw');
@@ -32,6 +43,7 @@ export default function Chuwu() {
         break;
     }
   }, [get, type]);
+
   useEffect(() => {
     updateChuWu();
   }, [type, updateChuWu]);
@@ -70,14 +82,13 @@ export default function Chuwu() {
           其他
         </JXButton>
       </JXSpace>
-      <JXSpace title='' direction='vertical' flexOne>
+      <Scroll Scroll={scrollHook} style={{ padding: '0 4px' }}>
         {list &&
           list.map((v, index) => {
             return (
               <Box
                 className='m-chuwu-List__Item'
                 key={`${v.name}${index}`}
-                style={{ padding: '0 4px' }}
                 onClick={() => {
                   let content: ReactNode;
                   if (v.type === CWType.FB) {
@@ -130,7 +141,7 @@ export default function Chuwu() {
               </Box>
             );
           })}
-      </JXSpace>
+      </Scroll>
     </Container>
   );
 }

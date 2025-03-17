@@ -29,7 +29,7 @@ export interface HuiHeType {
   huihe: number;
   target: number; // 出手方
   end: boolean;
-  start: boolean;
+  can: boolean;
   logs: {
     text: ReactNode;
   }[]; // 日志
