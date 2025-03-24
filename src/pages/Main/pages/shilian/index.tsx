@@ -5,6 +5,7 @@ import ysData from '@/assets/ys.json';
 import {
   Container,
   JXButton,
+  JXModal,
   JXSpace,
   JXToast,
   Scroll,
@@ -38,6 +39,7 @@ export default function Shilian() {
   ); // 妖兽实例
   const [ActorInstance, setActorInstance] = useState<ActorZDType | null>(null); //  角色实例
   const [HuiheState, setHuiheState] = useState<HuiHeType>({
+    guaji: false,
     huihe: 0,
     target: 0, // 出手方
     logs: [], // 日志
@@ -155,6 +157,11 @@ export default function Shilian() {
     }
   }, [ActorInstance, HuiheState.target, YaoShouInstance]);
 
+  /**
+   * @description: 探索
+   * @param {*} useCallback
+   * @return {*}
+   */
   const handleSearchYaoShou = useCallback(() => {
     if (!HuiheState.end) {
       JXToast('请先解决当前的妖兽！').show();
@@ -197,6 +204,11 @@ export default function Shilian() {
     }));
   }, [HuiheState.end, get, ysList]);
 
+  /**
+   * @description: 开始战斗
+   * @param {*} useCallback
+   * @return {*}
+   */
   const handleStartZD = useCallback(() => {
     if (!HuiheState.can) {
       setHuiheState({
@@ -204,8 +216,29 @@ export default function Shilian() {
         can: true
       });
       zhandou();
+    } else {
+      JXToast('妖兽死亡，请继续探索！').show();
     }
   }, [HuiheState, zhandou]);
+
+  const handleSeeYaoShou = useCallback(() => {
+    JXModal.show({
+      title: YaoShouInstance?.name,
+      content: (
+        <>
+          <Text>气血：{YaoShouInstance?.qixue}</Text>
+          <Text>攻击：{YaoShouInstance?.gongji}</Text>
+          <Text>防御：{YaoShouInstance?.fangyu}</Text>
+          <Text>速度：{YaoShouInstance?.sudu}</Text>
+          <Text>暴击：{YaoShouInstance?.baoji}</Text>
+          <Text>掉落：{YaoShouInstance?.cl}</Text>
+        </>
+      ),
+      disableCancle: true,
+      disableOk: true,
+      closeOnMaskClick: true
+    });
+  }, [YaoShouInstance]);
 
   useEffect(() => {
     if (HuiheState.can && YaoShouInstance) {
@@ -230,7 +263,7 @@ export default function Shilian() {
       </JXSpace>
       <JXSpace gap={5} between>
         <JXButton onClick={handleStartZD}>战斗</JXButton>
-        <JXButton>查看</JXButton>
+        <JXButton onClick={handleSeeYaoShou}>查看</JXButton>
         <JXButton>副本</JXButton>
         <JXButton>材料</JXButton>
         <JXButton>战况</JXButton>

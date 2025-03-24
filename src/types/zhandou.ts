@@ -26,6 +26,7 @@ export interface ActorZDType
  * @return {*}
  */
 export interface HuiHeType {
+  guaji: boolean;
   huihe: number;
   target: number; // 出手方
   end: boolean;
