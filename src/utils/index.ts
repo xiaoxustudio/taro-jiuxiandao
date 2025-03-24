@@ -1,24 +1,41 @@
-import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
-import { ActorDataConfigForZhanDou } from '@/types';
 import Taro from '@tarojs/taro';
 import { omit } from 'lodash-es';
+import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
+import { ActorDataConfigForZhanDou } from '@/types';
 
 let UniqueIndex = 0;
 export const CreateUniqueIndex = () => {
   return ++UniqueIndex;
 };
 
+type NavigateOptions = Omit<
+  (Taro.navigateTo.Option | Taro.redirectTo.Option) & {
+    replace?: boolean;
+  },
+  'url'
+>;
 /**
  * @description: 跳转路由（自动加顶层pages）
  * @param {*} url
  * @param {Taro} options
  * @return {*}
  */
-export function navigateTo(url, options?: Taro.navigateTo.Option) {
+export function navigateTo(url, options?: NavigateOptions) {
+  if (options && options.replace) {
+    Taro.redirectTo({
+      ...options,
+      url: `/pages/${url}`
+    } as Taro.redirectTo.Option);
+    return;
+  }
   Taro.navigateTo({
     url: `/pages/${url}`,
     ...(options ? omit(options, ['url']) : {})
   });
+}
+
+export function navigateBack(option?: Parameters<typeof Taro.navigateBack>[0]) {
+  Taro.navigateBack(option);
 }
 
 /**
@@ -31,8 +48,10 @@ export function generateUUID() {
   crypto.getRandomValues(buffer);
 
   // 设置版本位（第7字节的高四位为0100）
+  // eslint-disable-next-line no-bitwise
   buffer[6] = (buffer[6] & 0x0f) | 0x40;
   // 设置变体位（第9字节的高两位为10）
+  // eslint-disable-next-line no-bitwise
   buffer[8] = (buffer[8] & 0x3f) | 0x80;
 
   // 转换为十六进制字符串并格式化
@@ -40,7 +59,7 @@ export function generateUUID() {
     .map((byte, index) => {
       // 按规范在指定位置插入分隔符
       if ([4, 6, 8, 10].includes(index))
-        return '-' + byte.toString(16).padStart(2, '0');
+        return `-${byte.toString(16).padStart(2, '0')}`;
       return byte.toString(16).padStart(2, '0');
     })
     .join('')
@@ -72,7 +91,7 @@ export function generateRandomMonsterName() {
  */
 export function generateRandomName() {
   const surname = surnames[Math.floor(Math.random() * surnames.length)];
-  const nameLength = Math.floor(Math.random() * 3) + 1; //在2到4字之间
+  const nameLength = Math.floor(Math.random() * 3) + 1; // 在2到4字之间
 
   let name = surname; // 姓氏
 
@@ -182,6 +201,7 @@ export function chineseToNumber(chineseNum: string): number {
     const char = chineseNum[i];
     const num = chineseNumbers[char];
 
+    // eslint-disable-next-line no-continue
     if (num === undefined) continue;
 
     if (num >= 10) {

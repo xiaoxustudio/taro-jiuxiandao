@@ -22,11 +22,12 @@ import {
 } from '@/types';
 import useScroll from '@/hooks/useScroll';
 import chuwu from '@/utils/chuwu';
+import { navigateTo } from '@/utils';
 import styles from './index.module.less';
 
 export default function Shilian() {
   const scrollHook = useScroll();
-  const { get } = useActorController();
+  const { get, set } = useActorController();
   // eslint-disable-next-line no-undef
   const timer = useRef<NodeJS.Timeout | number>(-1);
   const df = useMemo(
@@ -202,7 +203,8 @@ export default function Shilian() {
       ],
       end: false
     }));
-  }, [HuiheState.end, get, ysList]);
+    set('shenshi', get('shenshi') - 1);
+  }, [HuiheState.end, get, set, ysList]);
 
   /**
    * @description: 开始战斗
@@ -259,7 +261,13 @@ export default function Shilian() {
         <JXButton>挂机</JXButton>
         <JXButton>挂机详情</JXButton>
         <JXButton>停挂</JXButton>
-        <JXButton>主页</JXButton>
+        <JXButton
+          onClick={() => {
+            navigateTo('Main/index', { replace: true });
+          }}
+        >
+          主页
+        </JXButton>
       </JXSpace>
       <JXSpace gap={5} between>
         <JXButton onClick={handleStartZD}>战斗</JXButton>
