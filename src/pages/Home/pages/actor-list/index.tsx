@@ -1,9 +1,9 @@
+import { View } from '@tarojs/components';
+import { List } from 'antd-mobile';
 import { JXModal, JXSpace } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { navigateTo } from '@/utils';
-import { View } from '@tarojs/components';
-import { List } from 'antd-mobile';
 import './index.less';
 
 export default function ActorList() {
@@ -22,7 +22,7 @@ export default function ActorList() {
                 okText: '进入',
                 onOk() {
                   setStore(v);
-                  navigateTo('Main/index');
+                  navigateTo('Main/index', { replace: true });
                   c.close();
                 },
                 cancleText: '删除',
@@ -38,7 +38,7 @@ export default function ActorList() {
           </List.Item>
         ))}
       </List>
-      <JXSpace direction='vertical'></JXSpace>
+      <JXSpace direction='vertical' />
     </View>
   );
 }

@@ -1,3 +1,4 @@
+import { View } from '@tarojs/components';
 import {
   JXButton,
   JXDivider,
@@ -7,7 +8,6 @@ import {
   Text
 } from '@/components';
 import { navigateTo } from '@/utils';
-import { View } from '@tarojs/components';
 import styles from './index.module.less';
 
 function Home() {
@@ -71,7 +71,7 @@ function Home() {
         >
           <JXButton
             onClick={() => {
-              navigateTo('Home/pages/actor-list/index');
+              navigateTo('Home/pages/actor-list/index', { replace: true });
             }}
           >
             进入游戏
@@ -95,33 +95,31 @@ function Home() {
               const { close } = JXModal.show({
                 title: '关于我们',
                 content: (
-                  <>
-                    <JXSpace direction='vertical'>
-                      <Paragraph>
-                        感谢各位道友，一直以来对九仙道的支持与热爱！
-                      </Paragraph>
-                      <Paragraph>我们也在一直努力把游戏做好做强！</Paragraph>
-                      <Paragraph>
-                        从这个版本开始，我们也会逐渐的推出更多玩法，以及更多联网的玩法…
-                      </Paragraph>
-                      <Paragraph>
-                        游戏的维护成本以及服务器及其它开发方面的维护成本越来越高，其实团队成员以及方寸已经投入了不少的资金，用于开发维护方面以及服务器续费以及维护，团队成员并没有发工资…
-                      </Paragraph>
-                      <Paragraph>
-                        但是游戏走向弱联网的提升，如今也是打算投入资金来打造好九仙道，希望各位道友能与我们一起见证九仙道的成长！
-                      </Paragraph>
-                      <Paragraph>
-                        我们现在做的也许还不是最好，但是我们会一直努力把梦想做好！
-                      </Paragraph>
-                      <Paragraph>
-                        在此九仙团队所有成员向所有犒赏过，支持和热爱我们的道友表示衷心的感谢！
-                      </Paragraph>
-                      <Paragraph>
-                        我们团队在此承诺，只要团队还有人在九仙道就一直会更新下去，并且不搞充值！
-                      </Paragraph>
-                      <Paragraph>再次感谢打赏过我们的道友…</Paragraph>
-                    </JXSpace>
-                  </>
+                  <JXSpace direction='vertical'>
+                    <Paragraph>
+                      感谢各位道友，一直以来对九仙道的支持与热爱！
+                    </Paragraph>
+                    <Paragraph>我们也在一直努力把游戏做好做强！</Paragraph>
+                    <Paragraph>
+                      从这个版本开始，我们也会逐渐的推出更多玩法，以及更多联网的玩法…
+                    </Paragraph>
+                    <Paragraph>
+                      游戏的维护成本以及服务器及其它开发方面的维护成本越来越高，其实团队成员以及方寸已经投入了不少的资金，用于开发维护方面以及服务器续费以及维护，团队成员并没有发工资…
+                    </Paragraph>
+                    <Paragraph>
+                      但是游戏走向弱联网的提升，如今也是打算投入资金来打造好九仙道，希望各位道友能与我们一起见证九仙道的成长！
+                    </Paragraph>
+                    <Paragraph>
+                      我们现在做的也许还不是最好，但是我们会一直努力把梦想做好！
+                    </Paragraph>
+                    <Paragraph>
+                      在此九仙团队所有成员向所有犒赏过，支持和热爱我们的道友表示衷心的感谢！
+                    </Paragraph>
+                    <Paragraph>
+                      我们团队在此承诺，只要团队还有人在九仙道就一直会更新下去，并且不搞充值！
+                    </Paragraph>
+                    <Paragraph>再次感谢打赏过我们的道友…</Paragraph>
+                  </JXSpace>
                 ),
                 onOk() {
                   close();
