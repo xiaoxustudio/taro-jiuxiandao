@@ -311,7 +311,13 @@ function Main() {
         {/* 修炼 */}
         <JXGrid className={styles.BottomBox} columns={4}>
           <JXGrid.Item align='center'>
-            <JXButton size='mini' transparent>
+            <JXButton
+              size='mini'
+              transparent
+              onClick={() => {
+                navigateTo('Home/pages/actor-list/index', { replace: true });
+              }}
+            >
               <Text textShadow>角色</Text>
             </JXButton>
           </JXGrid.Item>
