@@ -38,7 +38,7 @@ pnpm build
 
 # 贡献
 
-参照 [CONTRIBUTING](./CONTRIBUTING) 进行
+参照 [CONTRIBUTING](./CONTRIBUTING.md) 进行
 
 # 进度
 
