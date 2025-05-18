@@ -13,11 +13,11 @@ const functions = {
   }
 };
 
-export default function () {
+export default () => {
   // 注入H5API
   Object.defineProperty(window, 'H5Api', {
     value: functions,
     configurable: false,
     enumerable: true
   });
-}
+};
