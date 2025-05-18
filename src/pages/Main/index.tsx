@@ -1,3 +1,6 @@
+import { Image } from 'antd-mobile';
+import { View } from '@tarojs/components';
+import { useCallback, useEffect, useMemo } from 'react';
 import title from '@/assets/logo.png';
 import {
   JXButton,
@@ -20,9 +23,6 @@ import {
   JingJie2Transform,
   JingJieTransform
 } from '@/utils/actor';
-import { View } from '@tarojs/components';
-import { Image } from 'antd-mobile';
-import { useCallback, useEffect, useMemo } from 'react';
 import styles from './index.module.less';
 
 function Main() {
@@ -157,9 +157,9 @@ function Main() {
     if (get('zhongzu') === '灵族') {
       need *= 1.8; // 灵族1.8倍
     }
-    const _add = get('lv') + need;
+    const add = get('lv') + need;
     const cwcalc = Math.round(
-      getLingQiForRate() * ZhouTian(xiulian.time) + _add
+      getLingQiForRate() * ZhouTian(xiulian.time) + add
     );
     const content = (
       <>
@@ -192,14 +192,14 @@ function Main() {
     const time1 = get('time1');
     const calcShouYuan = (Date.now() - time1) / 3600000;
     if (calcShouYuan >= 24) {
-      const _calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
-      set('shouyuan', Math.round(_calcCache));
+      const calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
+      set('shouyuan', Math.round(calcCache));
       // 判断寿元是否到期
-      if (_calcCache >= get('max_shouyuan')) {
+      if (calcCache >= get('max_shouyuan')) {
         JXToast().show('寿元已到极限');
       } else {
         const needAdd = time1 + (calcShouYuan / 24) * 3600000 * 24;
-        //计算应增加的时间
+        // 计算应增加的时间
         set('time1', Math.round(needAdd));
       }
     }
@@ -207,11 +207,11 @@ function Main() {
     const shenshiTime = get('shenshiTime');
     const calcShenShi = (Date.now() - shenshiTime) / 3600000;
     if (calcShenShi >= 1) {
-      //计算神识恢复程度
-      const max_shenshi = get('max_shenshi');
-      let data = get('shenshi') + (max_shenshi * calcShenShi) / 24;
-      if (data > max_shenshi) {
-        data = max_shenshi;
+      // 计算神识恢复程度
+      const maxShenShi = get('max_shenshi');
+      let data = get('shenshi') + (maxShenShi * calcShenShi) / 24;
+      if (data > maxShenShi) {
+        data = maxShenShi;
       }
       set('shenshi', Math.round(data));
     }
