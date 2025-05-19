@@ -11,17 +11,6 @@ import ErrorController, { ErrorTypeCode } from './ErrorManager';
 
 const FBError = new ErrorController(ErrorTypeCode.法宝错误);
 
-/**
- * @description: 获取指定位置的法宝
- * @param {FabaoType} type
- * @return {*}
- */
-function getFaBao(type: FabaoType) {
-  const actor = getActor();
-  const target = actor.fabao?.[FaBaoTypeTransform(type)];
-  return target ? target : null;
-}
-
 // 自动生成映射
 const FaBaoTypeMap = AutoMapObject(FabaoType);
 
@@ -36,6 +25,17 @@ function FaBaoTypeTransform(type: FabaoType): string {
     throw new Error('未知的法宝类型');
   }
   return result;
+}
+
+/**
+ * @description: 获取指定位置的法宝
+ * @param {FabaoType} type
+ * @return {*}
+ */
+function getFaBao(type: FabaoType) {
+  const actor = getActor();
+  const target = actor.fabao?.[FaBaoTypeTransform(type)];
+  return target || null;
 }
 
 /**
@@ -68,7 +68,7 @@ function WearFaBao(index: number) {
   const keys = Object.keys(fbObj.attr);
   for (const k of keys) {
     if (typeof actor.addAttr[k] === 'number') {
-      actor.addAttr[k] = actor.addAttr[k] + fbObj.attr[k];
+      actor.addAttr[k] += fbObj.attr[k];
     }
   }
   // 设置数据
@@ -94,7 +94,7 @@ function TakeOffFaBao(type: FabaoType) {
   const keys = Object.keys(fbObj.attr);
   for (const k of keys) {
     if (typeof actor.addAttr[k] === 'number') {
-      actor.addAttr[k] = actor.addAttr[k] - fbObj.attr[k];
+      actor.addAttr[k] -= fbObj.attr[k];
     }
   }
   // 设置数据

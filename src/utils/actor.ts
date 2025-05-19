@@ -167,13 +167,13 @@ export const getJingJieMaxDep = () => {
 /**
  * @description: 小境界或数字转换为小境界
  * @param {string} s
- * @param {*} max_dep
+ * @param {*} maxDep
  * @param {*} addNum
  * @return {*}
  */
 export function TransformToJingJie1(
   s: string | number,
-  max_dep = 9,
+  maxDep = 9,
   addNum = 0
 ) {
   let current: number = 0;
@@ -185,7 +185,7 @@ export function TransformToJingJie1(
   }
 
   let next = current + addNum;
-  if (next > max_dep) {
+  if (next > maxDep) {
     next = 1;
   }
 
@@ -201,6 +201,7 @@ export function TransformToJingJie1(
 function JingJie2Transform(s: string) {
   const arr = ['初期', '中期', '后期', '圆满', '大圆满'];
   const f = arr.findIndex((v) => v === s);
+  // eslint-disable-next-line no-bitwise
   return arr[~f ? f + 1 : 0] || arr[0];
 }
 
@@ -245,6 +246,7 @@ const JingJieTransform = (j: string) => {
     case '大乘':
       return '';
   }
+  return '';
 };
 
 export {

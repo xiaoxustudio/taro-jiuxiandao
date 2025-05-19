@@ -34,11 +34,7 @@ pnpm dev
 pnpm build
 ```
 
-**PS： 安卓端项目工程还在开发当中，所以暂不开源。**
-
-# 贡献
-
-参照 [CONTRIBUTING](./CONTRIBUTING.md) 进行
+[安卓端项目工程](https://github.com/xiaoxustudio/taro-jiuxiandao-android)
 
 # 进度
 
@@ -76,6 +72,10 @@ pnpm build
 - [ ] CDK功能
 - [x] 签到
       ...待定
+
+# 贡献
+
+参照 [CONTRIBUTING](./CONTRIBUTING.md) 进行
 
 # 关于
 

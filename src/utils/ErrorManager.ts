@@ -1,9 +1,9 @@
+/* eslint-disable no-unused-vars */
+/* global EventListenerOrEventListenerObject, AddEventListenerOptions,EventInit */
+
 import { AutoMapObject } from '.';
 
-/**
- * @description: 错误前缀
- * @return {*}
- */
+// eslint-disable-next-line no-shadow
 export enum ErrorTypeCode {
   法宝错误,
   储物错误,
@@ -29,7 +29,9 @@ export interface ErrorEventInit extends EventInit {
 
 class ErrorEvent extends Event {
   content: string;
+
   code: ErrorTypeCode;
+
   constructor(type: string, options: ErrorEventInit) {
     super(type, options);
     this.content = options.content || '';
@@ -43,25 +45,31 @@ class ErrorEvent extends Event {
  */
 class ErrorController {
   tag: ErrorTypeCode; // 错误类型标识
+
   eventType: string; // 错误类型
+
   constructor(tag: ErrorTypeCode) {
     this.tag = tag;
     this.eventType = `ErrorController-${this.tag}`;
   }
+
   emitError(content: string) {
     const e = new ErrorEvent(this.eventType, { content, type: this.tag });
     window.document.dispatchEvent(e);
+    // eslint-disable-next-line no-throw-literal
     throw `[${ErrorTypeTransform(this.tag)}]：${content}`;
   }
+
   addEventListener(
     callback: EventListenerOrEventListenerObject,
     options?: AddEventListenerOptions | boolean
   ): void {
     window.document.addEventListener(this.eventType, callback, options);
   }
+
   removeEventListener(
     callback: EventListenerOrEventListenerObject,
-    options?: EventListenerOptions | boolean
+    options?: AddEventListenerOptions | boolean
   ): void {
     window.document.removeEventListener(this.eventType, callback, options);
   }

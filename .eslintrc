@@ -35,6 +35,8 @@
     "react/no-array-index-key": "off",
     "no-plusplus": "off",
     "default-case": "off",
+    "max-classes-per-file": "off",
+    "no-restricted-syntax": "off",
     "import/no-unresolved": [
       2,
       {
