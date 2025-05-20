@@ -1,7 +1,8 @@
 {
   "env": {
     "browser": true,
-    "es2021": true
+    "es2021": true,
+    "es6": true
   },
   "plugins": ["prettier", "eslint-plugin-import"],
   "extends": [
@@ -9,7 +10,8 @@
     "airbnb",
     "eslint:recommended",
     "plugin:prettier/recommended",
-    "plugin:import/recommended"
+    "plugin:import/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "settings": {
     "import/resolver": {

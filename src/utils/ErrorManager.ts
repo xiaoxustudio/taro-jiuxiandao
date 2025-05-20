@@ -1,9 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* global EventListenerOrEventListenerObject, AddEventListenerOptions,EventInit */
-
 import { AutoMapObject } from '.';
 
-// eslint-disable-next-line no-shadow
 export enum ErrorTypeCode {
   法宝错误,
   储物错误,

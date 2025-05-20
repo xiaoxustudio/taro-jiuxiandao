@@ -28,6 +28,13 @@ export default function Fangshi() {
         targetList = fsAssets.fb;
         break;
       case 1:
+        targetList = fsAssets.dy.map((v) => ({
+          ...danfangData[v],
+          type: 1,
+          ls: danfangData[v].ls * 0.9
+        }));
+        break;
+      case 5:
         targetList = fsAssets.dy.map((v) => danfangData[v]);
         break;
     }
@@ -127,7 +134,7 @@ export default function Fangshi() {
           丹方
         </JXButton>
       </JXSpace>
-      {type <= 1 && (
+      {[0, 1, 5].includes(type) && (
         <Scroll calc={container.calcHeight + 50}>
           <List list={list} noFlex />
         </Scroll>

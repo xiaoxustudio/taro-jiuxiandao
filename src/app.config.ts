@@ -10,7 +10,8 @@ export default defineAppConfig({
     'pages/Main/pages/fangshi/index',
     'pages/Main/pages/fabao/index',
     'pages/Main/pages/shilian-list/index',
-    'pages/Main/pages/shilian/index'
+    'pages/Main/pages/shilian/index',
+    'pages/Main/pages/liandan/index'
   ],
 
   window: {
