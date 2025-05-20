@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import fsAssets from '@/assets/fs.json';
+import danfangData from '@/assets/danfang.json';
 import {
   Box,
   Container,
@@ -21,7 +22,16 @@ export default function Fangshi() {
   const [type, setType] = useState(0);
   const container = useContainer();
   const list = useMemo(() => {
-    return fsAssets.fb.map((v, index) => ({
+    let targetList: any;
+    switch (type) {
+      case 0:
+        targetList = fsAssets.fb;
+        break;
+      case 1:
+        targetList = fsAssets.dy.map((v) => danfangData[v]);
+        break;
+    }
+    return targetList.map((v, index) => ({
       ...v,
       title: (
         <Box>
@@ -42,7 +52,7 @@ export default function Fangshi() {
               <Text size={20} bold>
                 {v.name}
               </Text>
-              <Text>品阶：{v.pj}</Text>
+              {v.pj && <Text>品阶：{v.pj}</Text>}
               <Text>类型：{v.itype}</Text>
               <Text>描述：{v.desc}</Text>
               <JXSpace direction='vertical' title='属性'>
@@ -89,7 +99,7 @@ export default function Fangshi() {
         });
       }
     }));
-  }, []);
+  }, [type]);
   return (
     <Container
       title='坊市'
@@ -117,9 +127,9 @@ export default function Fangshi() {
           丹方
         </JXButton>
       </JXSpace>
-      {type === 0 && (
+      {type <= 1 && (
         <Scroll calc={container.calcHeight + 50}>
-          <List list={list} />
+          <List list={list} noFlex />
         </Scroll>
       )}
     </Container>

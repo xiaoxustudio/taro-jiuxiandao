@@ -8,17 +8,21 @@ export interface ListItemData {
   key: string;
   title: string | ReactNode;
   value: string;
+  // eslint-disable-next-line no-unused-vars
   click?: (item: ListItemData) => void;
 }
 
 interface ListProps extends JXSpaceProps {
-  item?: ReactNode;
   list: ListItemData[];
+  noFlex?: boolean;
 }
 
-function List({ list }: ListProps) {
+function List({ list, noFlex }: ListProps) {
   return (
-    <JXSpace className={classNames(styles.List)} direction='vertical'>
+    <JXSpace
+      className={classNames(styles.List, noFlex && styles.ListNoFlex)}
+      direction='vertical'
+    >
       {list.map((v, index) => (
         <ListItem
           key={`list-item__${v.key}-${index}`}

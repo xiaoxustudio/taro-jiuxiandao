@@ -259,12 +259,18 @@ export function getCurrentDate(): string {
   return `${year}-${month}-${day}`; // 返回格式化后的日期
 }
 
+export type ActorDataConfigForZhanDouEx = ActorDataConfigForZhanDou & {
+  shenshi: number;
+  xiuwei: number;
+};
 /**
  * @description: 属性转换中文文字
  * @param {keyof} attr
  * @return {*}
  */
-export const AttrTransformChinese = (attr: keyof ActorDataConfigForZhanDou) => {
+export const AttrTransformChinese = (
+  attr: keyof ActorDataConfigForZhanDouEx
+) => {
   switch (attr) {
     case 'gongji':
       return '物理攻击';
@@ -278,6 +284,10 @@ export const AttrTransformChinese = (attr: keyof ActorDataConfigForZhanDou) => {
       return '气血';
     case 'sudu':
       return '速度';
+    case 'shenshi':
+      return '神识';
+    case 'xiuwei':
+      return '修为';
     default:
       throw new Error(`not found attr ${attr}`);
   }
