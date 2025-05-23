@@ -1,10 +1,10 @@
+import { random } from 'lodash-es';
+import { useCallback, useMemo } from 'react';
 import { Container, JXButton, JXSpace, JXToast, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { ActorDataConfig, CWType } from '@/types';
 import { getCurrentDate } from '@/utils';
 import chuwu from '@/utils/chuwu';
-import { random } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
 
 function QianDao() {
   const { get, set } = useActorController();

@@ -1,7 +1,7 @@
+import { useCallback, useEffect, useState } from 'react';
 import { Container, JXButton, JXSpace, Text } from '@/components';
 import { FabaoType, FBItemType } from '@/types';
 import { getFaBao, TakeOffFaBao } from '@/utils/fabao';
-import { useCallback, useEffect, useState } from 'react';
 import './index.less';
 
 export default function Fabao() {

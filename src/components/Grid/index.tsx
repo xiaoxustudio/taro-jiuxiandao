@@ -10,12 +10,12 @@ export interface JXGridItemProps extends GridItemProps {
   style: CSSProperties;
 }
 
-JXGrid.Item = ({
+JXGrid.Item = function ({
   children,
   align,
   style,
   ...props
-}: PropsWithChildren<Partial<JXGridItemProps>>) => {
+}: PropsWithChildren<Partial<JXGridItemProps>>) {
   return (
     <Grid.Item {...props} style={{ ...style, textAlign: align }}>
       {children}

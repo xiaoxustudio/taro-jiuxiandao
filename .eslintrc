@@ -20,6 +20,7 @@
       }
     }
   },
+  "parser": "@typescript-eslint/parser",
   "rules": {
     "prettier/prettier": "error",
     "react/jsx-uses-react": "off",
@@ -39,6 +40,7 @@
     "default-case": "off",
     "max-classes-per-file": "off",
     "no-restricted-syntax": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
     "import/no-unresolved": [
       2,
       {

@@ -38,7 +38,7 @@ function JXButton({
             : width
           : undefined,
         height: height && `${height}px`,
-        color: color ? color : undefined,
+        color: color || undefined,
         ...(transparent ? { '--background-color': 'transparent' } : {})
       }}
       {...props}

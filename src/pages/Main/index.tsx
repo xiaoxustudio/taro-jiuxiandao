@@ -42,7 +42,9 @@ function Main() {
     },
     {
       name: '炼丹',
-      click() {}
+      click() {
+        navigateTo('Main/pages/liandan/index');
+      }
     },
     {
       name: '炼器',
@@ -197,6 +199,7 @@ function Main() {
       // 判断寿元是否到期
       if (calcCache >= get('max_shouyuan')) {
         JXToast().show('寿元已到极限');
+        // 后续处理todo
       } else {
         const needAdd = time1 + (calcShouYuan / 24) * 3600000 * 24;
         // 计算应增加的时间

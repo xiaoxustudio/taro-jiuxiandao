@@ -1,3 +1,7 @@
+import { View } from '@tarojs/components';
+import Taro from '@tarojs/taro';
+import { Selector } from 'antd-mobile';
+import { useCallback, useState } from 'react';
 import { JXButton, JXInput, JXSpace, JXToast, Text } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
@@ -5,10 +9,6 @@ import { ActorDataConfig, CWType } from '@/types';
 import { generateUUID } from '@/utils';
 import { HasActor } from '@/utils/actor';
 import chuwu from '@/utils/chuwu';
-import { View } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { Selector } from 'antd-mobile';
-import { useCallback, useState } from 'react';
 import styles from './index.module.less';
 
 const options = [

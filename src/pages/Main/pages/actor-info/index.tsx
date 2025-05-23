@@ -1,6 +1,6 @@
+import { View } from '@tarojs/components';
 import { JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
-import { View } from '@tarojs/components';
 import './index.less';
 
 export default function ActorInfo() {

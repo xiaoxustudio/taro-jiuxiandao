@@ -45,11 +45,11 @@ function Text({
         ...style,
         fontWeight: bold ? 'bold' : '',
         fontSize: size ? `${size}px` : '',
-        color: color ? color : '',
+        color: color || '',
         letterSpacing: space ? `${space}px` : '',
         display: inline ? `inline-block` : '',
         textShadow: textShadow ? `2px 2px 2px grey` : '',
-        textAlign: align ? align : undefined
+        textAlign: align || undefined
       }}
       {...props}
     >

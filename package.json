@@ -22,7 +22,7 @@
     "dev": "pnpm dev:h5",
     "build": "pnpm build:h5",
     "format": "prettier \"./src/**/*.{js,jsx,ts,tsx,vue}\" --write",
-    "lint": "eslint src/** --ext ts,tsx --fix",
+    "lint": "eslint src/** --ext ts,tsx --fix --ignore-pattern \"**/*.less\"",
     "dev:weapp": "npm run build:weapp -- --watch",
     "dev:swan": "npm run build:swan -- --watch",
     "dev:alipay": "npm run build:alipay -- --watch",
@@ -76,6 +76,7 @@
     "@types/node": "^22.13.10",
     "@types/react": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^4.3.0",
     "babel-preset-taro": "4.0.9",
     "eslint": "^8.57.0",
@@ -93,7 +94,7 @@
     "react-refresh": "^0.14.0",
     "stylelint": "^16.4.0",
     "terser": "^5.30.4",
-    "typescript": "~5.4.5",
+    "typescript": "^5.4.5",
     "vite": "^4.2.0"
   }
 }

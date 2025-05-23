@@ -13,22 +13,22 @@ importers:
         version: 7.27.1
       '@tarojs/components':
         specifier: 4.0.9
-        version: 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+        version: 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
       '@tarojs/helper':
         specifier: 4.0.9
         version: 4.0.9
       '@tarojs/plugin-framework-react':
         specifier: 4.0.9
-        version: 4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@vitejs/plugin-react@4.4.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)))(react@18.3.1)(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
+        version: 4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@vitejs/plugin-react@4.4.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)))(react@18.3.1)(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
       '@tarojs/plugin-platform-alipay':
         specifier: 4.0.9
         version: 4.0.9(@tarojs/service@4.0.9)(@tarojs/shared@4.0.9)
       '@tarojs/plugin-platform-h5':
         specifier: 4.0.9
-        version: 4.0.9(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
+        version: 4.0.9(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
       '@tarojs/plugin-platform-harmony-hybrid':
         specifier: 4.0.9
-        version: 4.0.9(@babel/core@7.27.1)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
+        version: 4.0.9(@babel/core@7.27.1)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
       '@tarojs/plugin-platform-jd':
         specifier: 4.0.9
         version: 4.0.9(@tarojs/service@4.0.9)(@tarojs/shared@4.0.9)
@@ -55,7 +55,7 @@ importers:
         version: 4.0.9
       '@tarojs/taro':
         specifier: 4.0.9
-        version: 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5)
+        version: 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5)
       antd-mobile:
         specifier: ^5.38.1
         version: 5.39.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -76,7 +76,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       zustand:
         specifier: ^5.0.3
-        version: 5.0.4(@types/react@18.3.21)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
+        version: 5.0.5(@types/react@18.3.22)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
     devDependencies:
       '@babel/core':
         specifier: ^7.24.4
@@ -101,22 +101,25 @@ importers:
         version: 4.1.1(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)
       '@tarojs/vite-runner':
         specifier: 4.0.9
-        version: 4.0.9(@tarojs/runtime@4.0.9)(@types/babel__core@7.20.5)(postcss@8.5.3)(rollup@3.29.5)(terser@5.39.2)(typescript@5.4.5)(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
+        version: 4.0.9(@tarojs/runtime@4.0.9)(@types/babel__core@7.20.5)(postcss@8.5.3)(rollup@3.29.5)(terser@5.39.2)(typescript@5.8.3)(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
       '@types/node':
         specifier: ^22.13.10
-        version: 22.15.19
+        version: 22.15.21
       '@types/react':
         specifier: ^18.0.0
-        version: 18.3.21
+        version: 18.3.22
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.24.1
-        version: 8.32.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)(typescript@5.4.5)
+        version: 8.32.1(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.32.1
+        version: 8.32.1(eslint@8.57.1)(typescript@5.8.3)
       '@vitejs/plugin-react':
         specifier: ^4.3.0
-        version: 4.4.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
+        version: 4.4.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
       babel-preset-taro:
         specifier: 4.0.9
         version: 4.0.9(@babel/core@7.27.1)(@babel/plugin-transform-typescript@7.27.1(@babel/core@7.27.1))(@babel/preset-react@7.27.1(@babel/core@7.27.1))(react-refresh@0.14.2)
@@ -125,16 +128,16 @@ importers:
         version: 8.57.1
       eslint-config-airbnb:
         specifier: ^19.0.4
-        version: 19.0.4(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1))(eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.1))(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)
+        version: 19.0.4(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.1))(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)
       eslint-config-prettier:
         specifier: ^10.1.1
         version: 10.1.5(eslint@8.57.1)
       eslint-config-taro:
         specifier: 4.0.9
-        version: 4.0.9(@babel/core@7.27.1)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.4.5)
+        version: 4.0.9(@babel/core@7.27.1)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.8.3)
       eslint-plugin-import:
         specifier: ^2.31.0
-        version: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)
+        version: 2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)
       eslint-plugin-jsx-a11y:
         specifier: ^6.10.2
         version: 6.10.2(eslint@8.57.1)
@@ -161,16 +164,16 @@ importers:
         version: 0.14.2
       stylelint:
         specifier: ^16.4.0
-        version: 16.19.1(typescript@5.4.5)
+        version: 16.19.1(typescript@5.8.3)
       terser:
         specifier: ^5.30.4
         version: 5.39.2
       typescript:
-        specifier: ~5.4.5
-        version: 5.4.5
+        specifier: ^5.4.5
+        version: 5.8.3
       vite:
         specifier: ^4.2.0
-        version: 4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
+        version: 4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
 
 packages:
 
@@ -1923,8 +1926,8 @@ packages:
   '@types/lodash.debounce@4.0.9':
     resolution: {integrity: sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==}
 
-  '@types/lodash@4.17.16':
-    resolution: {integrity: sha512-HX7Em5NYQAXKW+1T+FiuG27NGwzJfCX3s1GjOa7ujxZa52kjJLOr4FUxT+giF6Tgxv1e+/czV/iTtBw27WTU9g==}
+  '@types/lodash@4.17.17':
+    resolution: {integrity: sha512-RRVJ+J3J+WmyOTqnz3PiBLA501eKwXl2noseKOrNo/6+XEHjTAxO4xHvxQB6QuNm+s4WRbn6rSiap8+EA+ykFQ==}
 
   '@types/minimatch@5.1.2':
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
@@ -1932,8 +1935,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@22.15.19':
-    resolution: {integrity: sha512-3vMNr4TzNQyjHcRZadojpRaD9Ofr6LsonZAoQ+HMUa/9ORTPoxVIw0e0mpqWpdjj8xybyCM+oKOUH2vwFu/oEw==}
+  '@types/node@22.15.21':
+    resolution: {integrity: sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ==}
 
   '@types/postcss-url@10.0.4':
     resolution: {integrity: sha512-5QIO9NgbWmAkle65haRqkdgYPCOXheNsaFdbTJJQjT302yK3H49ql4t9a4y0NfpuPtU/UBo15VcV64WCSIMJKg==}
@@ -1941,8 +1944,8 @@ packages:
   '@types/prop-types@15.7.14':
     resolution: {integrity: sha512-gNMvNH49DJ7OJYv+KAKn0Xp45p8PLl6zo2YnvDIbTd4J6MER2BmWN49TG7n9LvkyihINxeKW8+3bfS2yDC9dzQ==}
 
-  '@types/react@18.3.21':
-    resolution: {integrity: sha512-gXLBtmlcRJeT09/sI4PxVwyrku6SaNUj/6cMubjE6T6XdY1fDmBL7r0nX0jbSZPU/Xr0KuwLLZh6aOYY5d91Xw==}
+  '@types/react@18.3.22':
+    resolution: {integrity: sha512-vUhG0YmQZ7kL/tmKLrD3g5zXbXXreZXB3pmROW8bg3CnLnpjkRVwUlLne7Ufa2r9yJ8+/6B73RzhAek5TBKh2Q==}
 
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
@@ -1982,6 +1985,13 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  '@typescript-eslint/parser@8.32.1':
+    resolution: {integrity: sha512-LKMrmwCPoLhM45Z00O1ulb6jwyVr2kr3XJp+G+tSEZcbauNnScewcQwtJqXDhXeYPDEjZ8C1SjXm015CirEmGg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^8.57.0 || ^9.0.0
+      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/scope-manager@6.21.0':
     resolution: {integrity: sha512-OwLUIWZJry80O99zvqXVEioyniJMa+d2GrqpUTqi5/v5D5rOrppJVBPa0yKCblcigC0/aYAzxxqQ1B+DS2RYsg==}
@@ -4199,8 +4209,8 @@ packages:
     resolution: {integrity: sha512-gjWOsm2SoGlgLEdAGt7a6slVOk9mGiXmPFMqrEhLQ68rhQuBnpfs3+EmlvqKyxnCo9/PPlF+9MtY02S1aFg+Jw==}
     engines: {node: '>=0.10.0'}
 
-  query-string@9.1.2:
-    resolution: {integrity: sha512-s3UlTyjxRux4KjwWaJsjh1Mp8zoCkSGKirbD9H89pEM9UOZsfpRZpdfzvsy2/mGlLfC3NnYVpy2gk7jXITHEtA==}
+  query-string@9.2.0:
+    resolution: {integrity: sha512-YIRhrHujoQxhexwRLxfy3VSjOXmvZRd2nyw1PwL1UUqZ/ys1dEZd1+NSgXkne2l/4X/7OXkigEAuhTX0g/ivJQ==}
     engines: {node: '>=18'}
 
   queue-microtask@1.2.3:
@@ -4786,8 +4796,8 @@ packages:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
 
-  typescript@5.4.5:
-    resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
+  typescript@5.8.3:
+    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -5007,8 +5017,8 @@ packages:
   yup@1.6.1:
     resolution: {integrity: sha512-JED8pB50qbA4FOkDol0bYF/p60qSEDQqBD0/qeIrUCG1KbPBIQ776fCUNb9ldbPcSTxA69g/47XTo4TqWiuXOA==}
 
-  zustand@5.0.4:
-    resolution: {integrity: sha512-39VFTN5InDtMd28ZhjLyuTnlytDr9HfwO512Ai4I8ZABCoyAj4F1+sr7sD1jP/+p7k77Iko0Pb5NhgBFDCX0kQ==}
+  zustand@5.0.5:
+    resolution: {integrity: sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -6353,12 +6363,12 @@ snapshots:
       - debug
       - supports-color
 
-  '@tarojs/components-advanced@4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)':
+  '@tarojs/components-advanced@4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)':
     dependencies:
-      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
       '@tarojs/runtime': 4.0.9
       '@tarojs/shared': 4.0.9
-      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5)
+      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5)
       classnames: 2.5.1
       csstype: 3.1.3
       memoize-one: 6.0.0
@@ -6375,12 +6385,12 @@ snapshots:
       - webpack-chain
       - webpack-dev-server
 
-  '@tarojs/components-react@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)':
+  '@tarojs/components-react@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)':
     dependencies:
       '@babel/runtime': 7.27.1
-      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
       '@tarojs/shared': 4.0.9
-      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5)
+      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5)
       classnames: 2.5.1
       react: 18.3.1
       solid-js: 1.9.7
@@ -6397,13 +6407,13 @@ snapshots:
       - webpack-chain
       - webpack-dev-server
 
-  '@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)':
+  '@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)':
     dependencies:
       '@stencil/core': 2.22.3
-      '@tarojs/components-advanced': 4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/components-advanced': 4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
       '@tarojs/runtime': 4.0.9
       '@tarojs/shared': 4.0.9
-      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5)
+      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5)
       classnames: 2.5.1
       hammerjs: 2.0.8
       hls.js: 1.6.2
@@ -6411,7 +6421,7 @@ snapshots:
       swiper: 11.1.15
       tslib: 2.8.1
     optionalDependencies:
-      '@types/react': 18.3.21
+      '@types/react': 18.3.22
     transitivePeerDependencies:
       - '@tarojs/helper'
       - html-webpack-plugin
@@ -6572,7 +6582,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tarojs/plugin-framework-react@4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@vitejs/plugin-react@4.4.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)))(react@18.3.1)(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
+  '@tarojs/plugin-framework-react@4.0.9(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@vitejs/plugin-react@4.4.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)))(react@18.3.1)(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
     dependencies:
       '@tarojs/helper': 4.0.9
       '@tarojs/runtime': 4.0.9
@@ -6582,9 +6592,9 @@ snapshots:
       lodash: 4.17.21
       tslib: 2.8.1
     optionalDependencies:
-      '@vitejs/plugin-react': 4.4.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
+      '@vitejs/plugin-react': 4.4.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
       react: 18.3.1
-      vite: 4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
+      vite: 4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
 
   '@tarojs/plugin-html@4.1.1(@tarojs/helper@4.0.9)(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)':
     dependencies:
@@ -6597,16 +6607,16 @@ snapshots:
       '@tarojs/service': 4.0.9
       '@tarojs/shared': 4.0.9
 
-  '@tarojs/plugin-platform-h5@4.0.9(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)':
+  '@tarojs/plugin-platform-h5@4.0.9(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)':
     dependencies:
       '@babel/core': 7.27.1
-      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
-      '@tarojs/components-react': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
+      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/components-react': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
       '@tarojs/helper': 4.0.9
       '@tarojs/runtime': 4.0.9
       '@tarojs/service': 4.0.9
       '@tarojs/shared': 4.0.9
-      '@tarojs/taro-h5': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))
+      '@tarojs/taro-h5': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))
       babel-plugin-transform-taroapi: 4.0.9(@babel/core@7.27.1)
       change-case: 4.1.2
       lodash-es: 4.17.21
@@ -6626,25 +6636,25 @@ snapshots:
       - webpack-chain
       - webpack-dev-server
 
-  '@tarojs/plugin-platform-harmony-hybrid@4.0.9(@babel/core@7.27.1)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)':
+  '@tarojs/plugin-platform-harmony-hybrid@4.0.9(@babel/core@7.27.1)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)':
     dependencies:
       '@tarojs/api': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)
-      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
-      '@tarojs/components-react': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
+      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/components-react': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
       '@tarojs/helper': 4.0.9
-      '@tarojs/plugin-platform-h5': 4.0.9(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
-      '@tarojs/router': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))
+      '@tarojs/plugin-platform-h5': 4.0.9(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)(solid-js@1.9.7)
+      '@tarojs/router': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))
       '@tarojs/runtime': 4.0.9
       '@tarojs/service': 4.0.9
       '@tarojs/shared': 4.0.9
-      '@tarojs/taro-h5': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))
+      '@tarojs/taro-h5': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))
       axios: 1.9.0
       babel-plugin-transform-taroapi: 4.0.9(@babel/core@7.27.1)
       base64-js: 1.5.1
       change-case: 4.1.2
       jsonp-retry: 1.0.3
       lodash-es: 4.17.21
-      query-string: 9.1.2
+      query-string: 9.2.0
       whatwg-fetch: 3.6.20
     transitivePeerDependencies:
       - '@babel/core'
@@ -6696,15 +6706,15 @@ snapshots:
       react: 18.3.1
       react-reconciler: 0.29.0(react@18.3.1)
 
-  '@tarojs/router@4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))':
+  '@tarojs/router@4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))':
     dependencies:
       '@tarojs/runtime': 4.0.9
       '@tarojs/shared': 4.0.9
-      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5)
+      '@tarojs/taro': 4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5)
       dingtalk-jsapi: 2.15.6
       history: 5.3.0
       mobile-detect: 1.4.5
-      query-string: 9.1.2
+      query-string: 9.2.0
       tslib: 2.8.1
       universal-router: 9.2.1
 
@@ -6739,11 +6749,11 @@ snapshots:
 
   '@tarojs/shared@4.0.9': {}
 
-  '@tarojs/taro-h5@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))':
+  '@tarojs/taro-h5@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))':
     dependencies:
       '@tarojs/api': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)
-      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
-      '@tarojs/router': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5))
+      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/router': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)(@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5))
       '@tarojs/runtime': 4.0.9
       '@tarojs/shared': 4.0.9
       abortcontroller-polyfill: 1.7.8
@@ -6753,26 +6763,26 @@ snapshots:
       jsonp-retry: 1.0.3
       lodash-es: 4.17.21
       platform: 1.3.6
-      query-string: 9.1.2
+      query-string: 9.2.0
       tslib: 2.8.1
       whatwg-fetch: 3.6.20
     transitivePeerDependencies:
       - '@tarojs/taro'
 
-  '@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(rollup@3.29.5)':
+  '@tarojs/taro@4.0.9(@tarojs/components@4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))(@tarojs/helper@4.0.9)(@tarojs/shared@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(rollup@3.29.5)':
     dependencies:
       '@tarojs/api': 4.0.9(@tarojs/runtime@4.0.9)(@tarojs/shared@4.0.9)
-      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      '@tarojs/components': 4.0.9(@tarojs/helper@4.0.9)(@types/react@18.3.22)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
       '@tarojs/helper': 4.0.9
       '@tarojs/runtime': 4.0.9
       '@tarojs/shared': 4.0.9
       '@types/postcss-url': 10.0.4
       postcss: 8.5.3
     optionalDependencies:
-      '@types/react': 18.3.21
+      '@types/react': 18.3.22
       rollup: 3.29.5
 
-  '@tarojs/vite-runner@4.0.9(@tarojs/runtime@4.0.9)(@types/babel__core@7.20.5)(postcss@8.5.3)(rollup@3.29.5)(terser@5.39.2)(typescript@5.4.5)(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
+  '@tarojs/vite-runner@4.0.9(@tarojs/runtime@4.0.9)(@types/babel__core@7.20.5)(postcss@8.5.3)(rollup@3.29.5)(terser@5.39.2)(typescript@5.8.3)(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@babel/core': 7.27.1
@@ -6785,7 +6795,7 @@ snapshots:
       '@tarojs/runner-utils': 4.0.9
       '@tarojs/runtime': 4.0.9
       '@tarojs/shared': 4.0.9
-      '@vitejs/plugin-legacy': 4.1.1(terser@5.39.2)(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
+      '@vitejs/plugin-legacy': 4.1.1(terser@5.39.2)(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
       acorn-walk: 8.3.4
       autoprefixer: 10.4.21(postcss@8.5.3)
       babel-plugin-transform-taroapi: 4.0.9(@babel/core@7.27.1)
@@ -6807,9 +6817,9 @@ snapshots:
       postcss-pxtransform: 4.0.9(postcss@8.5.3)
       regenerator-runtime: 0.11.1
       sax: 1.2.4
-      stylelint: 16.19.1(typescript@5.4.5)
-      vite: 4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
-      vite-plugin-static-copy: 0.17.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
+      stylelint: 16.19.1(typescript@5.8.3)
+      vite: 4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
+      vite-plugin-static-copy: 0.17.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))
     transitivePeerDependencies:
       - '@swc/helpers'
       - '@types/babel__core'
@@ -6851,12 +6861,12 @@ snapshots:
 
   '@types/fs-extra@8.1.5':
     dependencies:
-      '@types/node': 22.15.19
+      '@types/node': 22.15.21
 
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.15.19
+      '@types/node': 22.15.21
 
   '@types/json-schema@7.0.15': {}
 
@@ -6864,41 +6874,41 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 22.15.19
+      '@types/node': 22.15.21
 
   '@types/lodash-es@4.17.12':
     dependencies:
-      '@types/lodash': 4.17.16
+      '@types/lodash': 4.17.17
 
   '@types/lodash.debounce@4.0.9':
     dependencies:
-      '@types/lodash': 4.17.16
+      '@types/lodash': 4.17.17
 
-  '@types/lodash@4.17.16': {}
+  '@types/lodash@4.17.17': {}
 
   '@types/minimatch@5.1.2': {}
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@22.15.19':
+  '@types/node@22.15.21':
     dependencies:
       undici-types: 6.21.0
 
   '@types/postcss-url@10.0.4':
     dependencies:
-      '@types/node': 22.15.19
+      '@types/node': 22.15.21
       postcss: 8.5.3
 
   '@types/prop-types@15.7.14': {}
 
-  '@types/react@18.3.21':
+  '@types/react@18.3.22':
     dependencies:
       '@types/prop-types': 15.7.14
       csstype: 3.1.3
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 22.15.19
+      '@types/node': 22.15.21
 
   '@types/sass@1.45.0':
     dependencies:
@@ -6906,13 +6916,13 @@ snapshots:
 
   '@types/semver@7.7.0': {}
 
-  '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/scope-manager': 6.21.0
-      '@typescript-eslint/type-utils': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
-      '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/type-utils': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/visitor-keys': 6.21.0
       debug: 4.4.1
       eslint: 8.57.1
@@ -6920,39 +6930,51 @@ snapshots:
       ignore: 5.3.2
       natural-compare: 1.4.0
       semver: 7.7.2
-      ts-api-utils: 1.4.3(typescript@5.4.5)
+      ts-api-utils: 1.4.3(typescript@5.8.3)
     optionalDependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/eslint-plugin@8.32.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/eslint-plugin@8.32.1(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/parser': 8.32.1(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/scope-manager': 8.32.1
-      '@typescript-eslint/type-utils': 8.32.1(eslint@8.57.1)(typescript@5.4.5)
-      '@typescript-eslint/utils': 8.32.1(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/type-utils': 8.32.1(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/utils': 8.32.1(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/visitor-keys': 8.32.1
       eslint: 8.57.1
       graphemer: 1.4.0
       ignore: 7.0.4
       natural-compare: 1.4.0
-      ts-api-utils: 2.1.0(typescript@5.4.5)
-      typescript: 5.4.5
+      ts-api-utils: 2.1.0(typescript@5.8.3)
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.4.5)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.8.3)
       '@typescript-eslint/visitor-keys': 6.21.0
       debug: 4.4.1
       eslint: 8.57.1
     optionalDependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3)':
+    dependencies:
+      '@typescript-eslint/scope-manager': 8.32.1
+      '@typescript-eslint/types': 8.32.1
+      '@typescript-eslint/typescript-estree': 8.32.1(typescript@5.8.3)
+      '@typescript-eslint/visitor-keys': 8.32.1
+      debug: 4.4.1
+      eslint: 8.57.1
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -6966,26 +6988,26 @@ snapshots:
       '@typescript-eslint/types': 8.32.1
       '@typescript-eslint/visitor-keys': 8.32.1
 
-  '@typescript-eslint/type-utils@6.21.0(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/type-utils@6.21.0(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.4.5)
-      '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.8.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       debug: 4.4.1
       eslint: 8.57.1
-      ts-api-utils: 1.4.3(typescript@5.4.5)
+      ts-api-utils: 1.4.3(typescript@5.8.3)
     optionalDependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/type-utils@8.32.1(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/type-utils@8.32.1(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.32.1(typescript@5.4.5)
-      '@typescript-eslint/utils': 8.32.1(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/typescript-estree': 8.32.1(typescript@5.8.3)
+      '@typescript-eslint/utils': 8.32.1(eslint@8.57.1)(typescript@5.8.3)
       debug: 4.4.1
       eslint: 8.57.1
-      ts-api-utils: 2.1.0(typescript@5.4.5)
-      typescript: 5.4.5
+      ts-api-utils: 2.1.0(typescript@5.8.3)
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -6993,7 +7015,7 @@ snapshots:
 
   '@typescript-eslint/types@8.32.1': {}
 
-  '@typescript-eslint/typescript-estree@6.21.0(typescript@5.4.5)':
+  '@typescript-eslint/typescript-estree@6.21.0(typescript@5.8.3)':
     dependencies:
       '@typescript-eslint/types': 6.21.0
       '@typescript-eslint/visitor-keys': 6.21.0
@@ -7002,13 +7024,13 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.3
       semver: 7.7.2
-      ts-api-utils: 1.4.3(typescript@5.4.5)
+      ts-api-utils: 1.4.3(typescript@5.8.3)
     optionalDependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/typescript-estree@8.32.1(typescript@5.4.5)':
+  '@typescript-eslint/typescript-estree@8.32.1(typescript@5.8.3)':
     dependencies:
       '@typescript-eslint/types': 8.32.1
       '@typescript-eslint/visitor-keys': 8.32.1
@@ -7017,33 +7039,33 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.7.2
-      ts-api-utils: 2.1.0(typescript@5.4.5)
-      typescript: 5.4.5
+      ts-api-utils: 2.1.0(typescript@5.8.3)
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@6.21.0(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/utils@6.21.0(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@8.57.1)
       '@types/json-schema': 7.0.15
       '@types/semver': 7.7.0
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.4.5)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.8.3)
       eslint: 8.57.1
       semver: 7.7.2
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@typescript-eslint/utils@8.32.1(eslint@8.57.1)(typescript@5.4.5)':
+  '@typescript-eslint/utils@8.32.1(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@8.57.1)
       '@typescript-eslint/scope-manager': 8.32.1
       '@typescript-eslint/types': 8.32.1
-      '@typescript-eslint/typescript-estree': 8.32.1(typescript@5.4.5)
+      '@typescript-eslint/typescript-estree': 8.32.1(typescript@5.8.3)
       eslint: 8.57.1
-      typescript: 5.4.5
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -7066,7 +7088,7 @@ snapshots:
       '@use-gesture/core': 10.3.0
       react: 18.3.1
 
-  '@vitejs/plugin-legacy@4.1.1(terser@5.39.2)(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
+  '@vitejs/plugin-legacy@4.1.1(terser@5.39.2)(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
     dependencies:
       '@babel/core': 7.27.1
       '@babel/preset-env': 7.27.2(@babel/core@7.27.1)
@@ -7076,18 +7098,18 @@ snapshots:
       regenerator-runtime: 0.13.11
       systemjs: 6.15.1
       terser: 5.39.2
-      vite: 4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
+      vite: 4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@4.4.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
+  '@vitejs/plugin-react@4.4.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2))':
     dependencies:
       '@babel/core': 7.27.1
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.27.1)
       '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.27.1)
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
+      vite: 4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -7648,14 +7670,14 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig@9.0.0(typescript@5.4.5):
+  cosmiconfig@9.0.0(typescript@5.8.3):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
       js-yaml: 4.1.0
       parse-json: 5.2.0
     optionalDependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
 
   cross-spawn@7.0.6:
     dependencies:
@@ -8015,20 +8037,20 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 8.57.1
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)
       object.assign: 4.1.7
       object.entries: 1.1.9
       semver: 6.3.1
 
-  eslint-config-airbnb@19.0.4(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1))(eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.1))(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1):
+  eslint-config-airbnb@19.0.4(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.1))(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       eslint: 8.57.1
-      eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)
+      eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.1)
@@ -8039,13 +8061,13 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
-  eslint-config-taro@4.0.9(@babel/core@7.27.1)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.4.5):
+  eslint-config-taro@4.0.9(@babel/core@7.27.1)(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-react@7.37.5(eslint@8.57.1))(eslint@8.57.1)(typescript@5.8.3):
     dependencies:
       '@babel/eslint-parser': 7.27.1(@babel/core@7.27.1)(eslint@8.57.1)
-      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)(typescript@5.4.5)
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)
     optionalDependencies:
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.1)
@@ -8064,17 +8086,27 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1):
+    dependencies:
+      debug: 3.2.7
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.32.1(eslint@8.57.1)(typescript@5.8.3)
+      eslint: 8.57.1
+      eslint-import-resolver-node: 0.3.9
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -8085,7 +8117,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -8097,7 +8129,36 @@ snapshots:
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
+    transitivePeerDependencies:
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
+      - supports-color
+
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1):
+    dependencies:
+      '@rtsao/scc': 1.1.0
+      array-includes: 3.1.8
+      array.prototype.findlastindex: 1.2.6
+      array.prototype.flat: 1.3.3
+      array.prototype.flatmap: 1.3.3
+      debug: 3.2.7
+      doctrine: 2.1.0
+      eslint: 8.57.1
+      eslint-import-resolver-node: 0.3.9
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.32.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1)
+      hasown: 2.0.2
+      is-core-module: 2.16.1
+      is-glob: 4.0.3
+      minimatch: 3.1.2
+      object.fromentries: 2.0.8
+      object.groupby: 1.0.3
+      object.values: 1.2.1
+      semver: 6.3.1
+      string.prototype.trimend: 1.0.9
+      tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.32.1(eslint@8.57.1)(typescript@5.8.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -9519,7 +9580,7 @@ snapshots:
       object-assign: 4.1.1
       strict-uri-encode: 1.1.0
 
-  query-string@9.1.2:
+  query-string@9.2.0:
     dependencies:
       decode-uri-component: 0.4.1
       filter-obj: 5.1.0
@@ -10032,7 +10093,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 1.0.5
 
-  stylelint@16.19.1(typescript@5.4.5):
+  stylelint@16.19.1(typescript@5.8.3):
     dependencies:
       '@csstools/css-parser-algorithms': 3.0.4(@csstools/css-tokenizer@3.0.3)
       '@csstools/css-tokenizer': 3.0.3
@@ -10041,7 +10102,7 @@ snapshots:
       '@dual-bundle/import-meta-resolve': 4.1.0
       balanced-match: 2.0.0
       colord: 2.9.3
-      cosmiconfig: 9.0.0(typescript@5.4.5)
+      cosmiconfig: 9.0.0(typescript@5.8.3)
       css-functions-list: 3.2.3
       css-tree: 3.1.0
       debug: 4.4.1
@@ -10158,13 +10219,13 @@ snapshots:
     dependencies:
       escape-string-regexp: 1.0.5
 
-  ts-api-utils@1.4.3(typescript@5.4.5):
+  ts-api-utils@1.4.3(typescript@5.8.3):
     dependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
 
-  ts-api-utils@2.1.0(typescript@5.4.5):
+  ts-api-utils@2.1.0(typescript@5.8.3):
     dependencies:
-      typescript: 5.4.5
+      typescript: 5.8.3
 
   tsconfig-paths@3.15.0:
     dependencies:
@@ -10224,7 +10285,7 @@ snapshots:
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
 
-  typescript@5.4.5: {}
+  typescript@5.8.3: {}
 
   uglify-js@3.19.3: {}
 
@@ -10297,21 +10358,21 @@ snapshots:
 
   validate-npm-package-name@5.0.1: {}
 
-  vite-plugin-static-copy@0.17.1(vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)):
+  vite-plugin-static-copy@0.17.1(vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)):
     dependencies:
       chokidar: 3.6.0
       fast-glob: 3.3.3
       fs-extra: 11.3.0
       picocolors: 1.1.1
-      vite: 4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
+      vite: 4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)
 
-  vite@4.5.14(@types/node@22.15.19)(less@4.3.0)(sass@1.89.0)(terser@5.39.2):
+  vite@4.5.14(@types/node@22.15.21)(less@4.3.0)(sass@1.89.0)(terser@5.39.2):
     dependencies:
       esbuild: 0.18.20
       postcss: 8.5.3
       rollup: 3.29.5
     optionalDependencies:
-      '@types/node': 22.15.19
+      '@types/node': 22.15.21
       fsevents: 2.3.3
       less: 4.3.0
       sass: 1.89.0
@@ -10443,8 +10504,8 @@ snapshots:
       toposort: 2.0.2
       type-fest: 2.19.0
 
-  zustand@5.0.4(@types/react@18.3.21)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
+  zustand@5.0.5(@types/react@18.3.22)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
     optionalDependencies:
-      '@types/react': 18.3.21
+      '@types/react': 18.3.22
       react: 18.3.1
       use-sync-external-store: 1.5.0(react@18.3.1)

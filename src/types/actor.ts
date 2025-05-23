@@ -35,7 +35,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   shouyuan: number; // 寿元
   max_shouyuan: number;
   zhongzu: string; // 种族
-  lv: number; //等级
+  lv: number; // 等级
   xuanyuan: number; // 仙缘
   xiulianbeilv: number; // 修炼倍率
   cw: CuWuType;
@@ -54,7 +54,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   };
   xiulian: null | {
     time: number;
-  }; //修炼
+  }; // 修炼
   dongfu: null | {
     lv: number;
     lingchi: number; // 灵池

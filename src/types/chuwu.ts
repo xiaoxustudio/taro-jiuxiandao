@@ -2,7 +2,7 @@ import { ActorDataConfigForZhanDou } from './actor';
 
 export enum CWType {
   FB, // 法宝
-  DY, //丹药
+  DY, // 丹药
   QT // 其他
 }
 
@@ -31,8 +31,8 @@ export type NestedKeyOf<Obj> = Obj extends object
 export interface BaseType {
   name: string; // 名称
   isPile: boolean; // 可堆叠
-  desc?: string; //描述
-  type: CWType; //类型
+  desc?: string; // 描述
+  type: CWType; // 类型
   num?: number;
 }
 
@@ -56,5 +56,5 @@ export interface CuWuType {
   fb: FBItemType[]; // 法宝
   dy: DYItemType[]; // 丹药
   qt: QTItemType[]; // 其他
-  max: number; //容量
+  max: number; // 容量
 }
