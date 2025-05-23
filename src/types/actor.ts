@@ -59,4 +59,12 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     lv: number;
     lingchi: number; // 灵池
   }; // 洞府
+  liandan: {
+    time: number;
+    chenghao: string;
+    danyun: number;
+    danlu: { name: number; lv: number } | null;
+    shengyuTime: number;
+    danyao: { id: number; num: number } | null;
+  }; // 炼丹
 }

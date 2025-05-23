@@ -162,6 +162,14 @@ function Index() {
     zd: {
       time: 0,
       df: ''
+    },
+    liandan: {
+      chenghao: '初级炼丹师',
+      danlu: null,
+      danyao: null,
+      danyun: 0,
+      shengyuTime: 0,
+      time: 0
     }
   });
 

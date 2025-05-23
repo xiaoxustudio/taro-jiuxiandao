@@ -7,10 +7,8 @@ import { ActorDataConfig } from '@/types';
 
 type ActorOperater = {
   /** 删除角色 */
-  // eslint-disable-next-line no-unused-vars
   delete: (name: string) => void;
   /** 获取单个角色数据 */
-  // eslint-disable-next-line no-unused-vars
   get: <T = ActorDataConfig>(name: string) => T | null;
   /** 获取所有非受保护角色数据 */
   getAll: () => Record<string, ActorDataConfig>;

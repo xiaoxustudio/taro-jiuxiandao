@@ -24,7 +24,7 @@ function useActorController() {
    * @description: 获取属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
    */
   const get = useCallback(
-    (key: NestedKeyOf<ActorDataConfig>) => {
+    (key: NestedKeyOf<ActorDataConfig>, defaultValue: any = null) => {
       // 合法性校验
       if (/\s/.test(key)) {
         throw new Error('Key 包含非法空格');
@@ -36,12 +36,12 @@ function useActorController() {
       // eslint-disable-next-line no-restricted-syntax
       for (const part of pathParts) {
         if (currentValue === null || currentValue === undefined) {
-          return null;
+          return defaultValue;
         }
         currentValue = currentValue[part];
       }
 
-      return currentValue ?? null;
+      return currentValue ?? defaultValue;
     },
     [actor]
   );
