@@ -10,7 +10,8 @@ export const CreateUniqueIndex = () => {
 
 type NavigateOptions = Omit<
   (Taro.navigateTo.Option | Taro.redirectTo.Option) & {
-    replace?: boolean;
+    replace?: boolean; // 替换当前
+    all?: boolean; // 替换全部
   },
   'url'
 >;
@@ -22,6 +23,10 @@ type NavigateOptions = Omit<
  */
 export function navigateTo(url, options?: NavigateOptions) {
   if (options && options.replace) {
+    if (options.all) {
+      Taro.reLaunch({ url: `/pages/${url}` } as Taro.reLaunch.Option);
+      return;
+    }
     Taro.redirectTo({
       ...options,
       url: `/pages/${url}`

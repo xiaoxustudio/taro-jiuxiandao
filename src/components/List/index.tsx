@@ -27,6 +27,7 @@ function List({ list, noFlex }: ListProps) {
         <ListItem
           key={`list-item__${v.key}-${index}`}
           title={v.title}
+          value={v.value}
           click={() => v.click?.(v)}
         />
       ))}

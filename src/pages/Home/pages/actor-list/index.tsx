@@ -22,7 +22,7 @@ export default function ActorList() {
                 okText: '进入',
                 onOk() {
                   setStore(v);
-                  navigateTo('Main/index', { replace: true });
+                  navigateTo('Main/index', { replace: true, all: true });
                   c.close();
                 },
                 cancleText: '删除',

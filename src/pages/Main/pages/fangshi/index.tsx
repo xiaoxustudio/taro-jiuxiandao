@@ -35,7 +35,11 @@ export default function Fangshi() {
         }));
         break;
       case 5:
-        targetList = fsAssets.dy.map((v) => danfangData[v]);
+        targetList = fsAssets.dy.map((v) => ({
+          ...danfangData[v],
+          name: `${danfangData[v].name}丹方`,
+          id: v
+        }));
         break;
     }
     return targetList.map((v, index) => ({
@@ -50,7 +54,6 @@ export default function Fangshi() {
         </Box>
       ),
       key: `${v.name}-${index}`,
-      value: v.name,
       click() {
         const instance = JXModal.show({
           okText: '购买',
@@ -60,7 +63,13 @@ export default function Fangshi() {
                 {v.name}
               </Text>
               {v.pj && <Text>品阶：{v.pj}</Text>}
-              <Text>类型：{v.itype}</Text>
+              <Text>
+                {[1, 5].includes(v.type) ? (
+                  <>品阶：{v.itype}</>
+                ) : (
+                  <>类型：{v.itype}</>
+                )}
+              </Text>
               <Text>描述：{v.desc}</Text>
               <JXSpace direction='vertical' title='属性'>
                 {Object.keys(v.attr).map((item) => (
@@ -92,9 +101,17 @@ export default function Fangshi() {
               return;
             }
             if (chuwu.LingShiThan(v.ls)) {
-              chuwu.Add(v);
+              switch (type) {
+                case 0:
+                  chuwu.Add(v);
+                  JXToast(`购买物品：${v.name}`).show();
+                  break;
+                case 5:
+                  chuwu.AddDanFang(v.id);
+                  JXToast(`购买丹方：${v.name}`).show();
+                  break;
+              }
               chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
-              JXToast(`购买物品：${v.name}`).show();
             } else {
               const needLS = chuwu.Get({ name: '灵石', type: CWType.QT });
               JXToast(`灵石不足，还差${v.ls - needLS!.num!}`).show();

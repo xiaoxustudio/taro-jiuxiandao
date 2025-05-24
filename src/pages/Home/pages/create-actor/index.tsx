@@ -164,13 +164,16 @@ function Index() {
       df: ''
     },
     liandan: {
-      chenghao: '初级炼丹师',
+      chenghao: '丹徒',
+      exp: 0,
+      max_exp: 100,
       danlu: null,
       danyao: null,
       danyun: 0,
       shengyuTime: 0,
       time: 0
-    }
+    },
+    danfang: []
   });
 
   const handleRegister = useCallback(() => {

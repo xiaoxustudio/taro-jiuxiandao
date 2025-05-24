@@ -325,8 +325,14 @@ function Main() {
             </JXButton>
           </JXGrid.Item>
           <JXGrid.Item align='center'>
-            <JXButton size='mini' transparent>
-              <Text textShadow>社区</Text>
+            <JXButton
+              size='mini'
+              transparent
+              onClick={() => {
+                navigateTo('index/index', { replace: true });
+              }}
+            >
+              <Text textShadow>主页</Text>
             </JXButton>
           </JXGrid.Item>
           <JXGrid.Item align='center'>

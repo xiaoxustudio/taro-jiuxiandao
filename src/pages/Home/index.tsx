@@ -71,7 +71,7 @@ function Home() {
         >
           <JXButton
             onClick={() => {
-              navigateTo('Home/pages/actor-list/index', { replace: true });
+              navigateTo('Home/pages/actor-list/index');
             }}
           >
             进入游戏

@@ -63,8 +63,11 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     time: number;
     chenghao: string;
     danyun: number;
+    exp: number;
+    max_exp: number;
     danlu: { name: number; lv: number } | null;
     shengyuTime: number;
     danyao: { id: number; num: number } | null;
   }; // 炼丹
+  danfang: { id: string; exp: number }[]; // 已学习丹方列表
 }

@@ -181,6 +181,22 @@ function Add({
 }
 
 /**
+ * @description: 添加丹方
+ * @param {string} id
+ * @return {*}
+ */
+function AddDanFang(id: string) {
+  const { current } = useStore.getState();
+  const acData = getActor();
+  const { set } = useActorStore.getState();
+  if (acData.danfang.some((v) => v.id === id)) {
+    return;
+  }
+  acData.danfang.push({ id, exp: 0 });
+  set(current, acData);
+}
+
+/**
  * @description: 灵石是否大于等于
  * @param {number} num
  * @return {*}
@@ -196,4 +212,4 @@ function LingShiThan(num: number = 0) {
   return _num >= num;
 }
 
-export default { Add, Has, Get, Remove, getActor, TR, LingShiThan };
+export default { Add, AddDanFang, Has, Get, Remove, getActor, TR, LingShiThan };
