@@ -11,12 +11,15 @@ import {
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import danfangData from '@/assets/danfang.json';
-import { ActorDataConfigForZhanDou } from '@/types';
-import { AttrTransformChinese } from '@/utils';
+import chuwu from '@/utils/chuwu';
+import { CWType } from '@/types';
 import './index.less';
 
-function ModalContent({ name, itype, desc, attr }: any) {
+function ModalContent({ name, itype, desc, cl }: any) {
   const [num, setNum] = useState(1);
+  const getNum = (item: [string, number]) => {
+    return chuwu.Get({ name: item[0], type: CWType.QT }) || 0;
+  };
   return (
     <JXSpace direction='vertical'>
       <Text size={20} bold>
@@ -24,22 +27,16 @@ function ModalContent({ name, itype, desc, attr }: any) {
       </Text>
       <Text>品阶：{itype}</Text>
       <Text>描述：{desc}</Text>
-      <JXSpace direction='vertical' title='属性'>
-        {Object.keys(attr).map((item) => (
-          <Text key={attr[item]}>
-            {AttrTransformChinese(item as keyof ActorDataConfigForZhanDou)}：
-            {attr[item] >= 0 ? (
-              <Text color='green' inline>
-                + {attr[item]}
-              </Text>
-            ) : (
-              <Text color='red' inline>
-                {attr[item]}
-              </Text>
-            )}
+      <JXSpace direction='vertical' title='需要材料'>
+        {cl.map((item) => (
+          <Text key={item[0]}>
+            {item[0]} X &nbsp;
+            <Text color={getNum(item) >= item[1] ? 'green' : 'red'} inline>
+              {getNum(item)}/{item[1]}
+            </Text>
           </Text>
         ))}
-        <Text>
+        <Text bold>
           炼制数量：{num}
           <JXSpace direction='vertical'>
             <Box>
