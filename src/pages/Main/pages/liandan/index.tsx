@@ -18,7 +18,7 @@ import './index.less';
 function ModalContent({ name, itype, desc, cl }: any) {
   const [num, setNum] = useState(1);
   const getNum = (item: [string, number]) => {
-    return chuwu.Get({ name: item[0], type: CWType.QT }) || 0;
+    return chuwu.Get({ name: item[0], type: CWType.QT })?.num || 0;
   };
   return (
     <JXSpace direction='vertical'>
@@ -31,8 +31,11 @@ function ModalContent({ name, itype, desc, cl }: any) {
         {cl.map((item) => (
           <Text key={item[0]}>
             {item[0]} X &nbsp;
-            <Text color={getNum(item) >= item[1] ? 'green' : 'red'} inline>
-              {getNum(item)}/{item[1]}
+            <Text
+              color={getNum(item) >= item[1] * num ? 'green' : 'red'}
+              inline
+            >
+              {getNum(item)}/{item[1] * num}
             </Text>
           </Text>
         ))}
