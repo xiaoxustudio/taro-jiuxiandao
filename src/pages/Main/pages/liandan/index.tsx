@@ -1,23 +1,99 @@
-import { Text } from '@tarojs/components';
-import { useMemo } from 'react';
-import { Box, Container, JXSpace, List } from '@/components';
+import { useMemo, useState } from 'react';
+import {
+  Box,
+  Container,
+  JXButton,
+  JXModal,
+  JXSpace,
+  List,
+  ListItemData,
+  Text
+} from '@/components';
 import useActorController from '@/hooks/useActorController';
 import danfangData from '@/assets/danfang.json';
+import { ActorDataConfigForZhanDou } from '@/types';
+import { AttrTransformChinese } from '@/utils';
 import './index.less';
+
+function ModalContent({ name, itype, desc, attr }: any) {
+  const [num, setNum] = useState(1);
+  return (
+    <JXSpace direction='vertical'>
+      <Text size={20} bold>
+        {name}
+      </Text>
+      <Text>品阶：{itype}</Text>
+      <Text>描述：{desc}</Text>
+      <JXSpace direction='vertical' title='属性'>
+        {Object.keys(attr).map((item) => (
+          <Text key={attr[item]}>
+            {AttrTransformChinese(item as keyof ActorDataConfigForZhanDou)}：
+            {attr[item] >= 0 ? (
+              <Text color='green' inline>
+                + {attr[item]}
+              </Text>
+            ) : (
+              <Text color='red' inline>
+                {attr[item]}
+              </Text>
+            )}
+          </Text>
+        ))}
+        <Text>
+          炼制数量：{num}
+          <JXSpace direction='vertical'>
+            <Box>
+              <JXButton onClick={() => setNum(Math.max(num - 1, 1))}>
+                -1
+              </JXButton>
+              <JXButton onClick={() => setNum(Math.max(num - 10, 1))}>
+                -10
+              </JXButton>
+              <JXButton onClick={() => setNum(Math.max(num - 100, 1))}>
+                -100
+              </JXButton>
+            </Box>
+            <Box>
+              <JXButton onClick={() => setNum(num + 1)}>+1</JXButton>
+              <JXButton onClick={() => setNum(num + 10)}>+10</JXButton>
+              <JXButton onClick={() => setNum(num + 100)}>+100</JXButton>
+            </Box>
+          </JXSpace>
+        </Text>
+      </JXSpace>
+    </JXSpace>
+  );
+}
 
 export default function Liandan() {
   const { get } = useActorController();
   const list = useMemo(
     () =>
-      get('danfang').map((v) => ({
-        key: danfangData[v.id],
-        title: (
-          <Box>
-            {danfangData[v.id].name}（经验: {v.exp}）
-          </Box>
-        ),
-        value: danfangData[v.id].desc
-      })),
+      get('danfang').map(
+        (v) =>
+          ({
+            key: danfangData[v.id],
+            title: (
+              <Box>
+                {danfangData[v.id].name}（经验: {v.exp}）
+              </Box>
+            ),
+            value: danfangData[v.id].desc,
+            click() {
+              const data = danfangData[v.id];
+              const instance = JXModal.show({
+                content: <ModalContent {...data} />,
+                okText: '炼制',
+                onOk() {
+                  instance.close();
+                },
+                onCancel() {
+                  instance.close();
+                }
+              });
+            }
+          }) as ListItemData
+      ),
     [get]
   );
   return (
