@@ -47,6 +47,14 @@ function Has({ name, type = CWType.FB }: OperaterType) {
   });
   return index;
 }
+/**
+ * @description: 判断是否拥有该物品数组
+ * @param {OperaterType} items
+ * @return {*}
+ */
+function HasArr(items: OperaterType[]) {
+  return items.every((v) => Has(v) !== -1);
+}
 
 /**
  * @description: 获取该物品
@@ -212,4 +220,14 @@ function LingShiThan(num: number = 0) {
   return _num >= num;
 }
 
-export default { Add, AddDanFang, Has, Get, Remove, getActor, TR, LingShiThan };
+export default {
+  Add,
+  AddDanFang,
+  Has,
+  HasArr,
+  Get,
+  Remove,
+  getActor,
+  TR,
+  LingShiThan
+};
