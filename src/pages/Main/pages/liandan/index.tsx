@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Container,
@@ -65,6 +65,13 @@ export default function Liandan() {
     return chuwu.Get({ name: item[0], type: CWType.QT })?.num || 0;
   };
 
+  const reset = useCallback(() => {
+    set('liandan.danyao', null);
+    set('liandan.time', 0);
+    setData(null);
+    setNum(1);
+  }, [set]);
+
   return (
     <Container
       title='炼丹'
@@ -104,8 +111,6 @@ export default function Liandan() {
               if (dy) {
                 const { id, num: dNum } = dy;
                 const { name } = danfangData[id];
-                set('liandan.danyao', null);
-                set('liandan.time', 0);
                 chuwu.Add({
                   name,
                   type: CWType.DY,
@@ -113,6 +118,7 @@ export default function Liandan() {
                   isPile: true
                 });
                 JXToast().show(`获得丹药：${name} X ${dNum}`);
+                reset();
               } else {
                 JXToast().show('丹药尚未炼制完成！');
               }
@@ -189,8 +195,12 @@ export default function Liandan() {
             JXToast().show('丹药材料缺少！');
           }
           setData(null);
+          setNum(1);
         }}
-        onCancel={() => setData(null)}
+        onCancel={() => {
+          setNum(1);
+          setData(null);
+        }}
       />
     </Container>
   );
