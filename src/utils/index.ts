@@ -3,7 +3,10 @@ import { omit } from 'lodash-es';
 import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
 import { ActorDataConfigForZhanDou } from '@/types';
 
+export { default as TimeArray } from './TimeArray';
+
 let UniqueIndex = 0;
+
 export const CreateUniqueIndex = () => {
   return ++UniqueIndex;
 };
@@ -15,6 +18,9 @@ type NavigateOptions = Omit<
   },
   'url'
 >;
+
+export const currentTime = () => Date.now();
+
 /**
  * @description: 跳转路由（自动加顶层pages）
  * @param {*} url
@@ -176,8 +182,16 @@ export function generateActorAttributes(ratios: {
  * @param {*} limit 限制最大
  * @return {*}
  */
-export function ZhouTian(n: number, limit = 12): number {
-  return Math.min((Date.now() - n) / 3600000, limit);
+export function ZhouTian(
+  n: number,
+  limit = 12,
+  unit: 'h' | 'm' | 's' = 'h'
+): number {
+  const msDiff = Date.now() - n;
+  let divisor = 3600000; // 默认小时
+  if (unit === 'm') divisor = 60000; // 分钟
+  if (unit === 's') divisor = 1000; // 秒
+  return Math.min(msDiff / divisor, limit);
 }
 
 export function chineseToNumber(chineseNum: string): number {

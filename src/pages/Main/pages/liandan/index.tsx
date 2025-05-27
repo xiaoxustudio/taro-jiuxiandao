@@ -5,6 +5,7 @@ import {
   JXButton,
   JXModal,
   JXSpace,
+  JXToast,
   List,
   ListItemData,
   Text
@@ -13,6 +14,7 @@ import useActorController from '@/hooks/useActorController';
 import danfangData from '@/assets/danfang.json';
 import chuwu from '@/utils/chuwu';
 import { CWType } from '@/types';
+import { currentTime, TimeArray } from '@/utils';
 import './index.less';
 
 function ModalContent({ name, itype, desc, cl }: any) {
@@ -66,7 +68,8 @@ function ModalContent({ name, itype, desc, cl }: any) {
 }
 
 export default function Liandan() {
-  const { get } = useActorController();
+  const { get, set } = useActorController();
+  const [data, setData] = useState<any>(null);
   const list = useMemo(
     () =>
       get('danfang').map(
@@ -80,22 +83,32 @@ export default function Liandan() {
             ),
             value: danfangData[v.id].desc,
             click() {
-              const data = danfangData[v.id];
-              const instance = JXModal.show({
-                content: <ModalContent {...data} />,
-                okText: '炼制',
-                onOk() {
-                  instance.close();
-                },
-                onCancel() {
-                  instance.close();
-                }
-              });
+              setData({ ...danfangData[v.id], id: v.id });
             }
           }) as ListItemData
       ),
     [get]
   );
+
+  const isComplate = useMemo(() => {
+    if (!get('liandan.time')) return false;
+    const startTime = get('liandan.time') as number;
+    const danTimeArray = danfangData[get('liandan.danyao.id')].time as number[];
+
+    const totalNeededMs = new TimeArray(danTimeArray).milliseconds;
+    const endTime = startTime + totalNeededMs;
+
+    const remainingMs = endTime - currentTime();
+
+    if (remainingMs <= 0) {
+      return '已完成';
+    }
+
+    const last = new TimeArray(remainingMs);
+
+    return `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）`;
+  }, [get]);
+
   return (
     <Container
       title='炼丹'
@@ -109,12 +122,71 @@ export default function Liandan() {
         <Text>
           炼丹经验: {get('liandan.exp')}/{get('liandan.max_exp')}
         </Text>
-        <Text>剩余时间: {get('liandan.shengyuTime')}</Text>
         <Text>
-          预计收获: {get('liandan.danyao') ? get('liandan.danyao.num') : '无'}
+          剩余时间:
+          {isComplate || '无'}
+        </Text>
+        <Text>
+          预计收获:
+          {get('liandan.danyao') ? (
+            <Text color='green' bold inline>
+              {danfangData[get('liandan.danyao.id')].name} X
+              {get('liandan.danyao.num')}
+            </Text>
+          ) : (
+            '无'
+          )}
         </Text>
       </JXSpace>
+      <JXSpace style={{ margin: '.5em 0.25em' }} align='center' gap={5}>
+        <JXButton>称号</JXButton>
+        <JXButton>升阶丹炉</JXButton>
+        <JXButton
+          onClick={() => {
+            if (isComplate) {
+              const dy = get('liandan.danyao');
+              if (dy) {
+                const { id, num } = dy;
+                const { name } = danfangData[id];
+                set('liandan.danyao', null);
+                set('liandan.time', 0);
+                chuwu.Add({
+                  name,
+                  type: CWType.DY,
+                  num,
+                  isPile: true
+                });
+                JXToast().show(`获得丹药：${name} X ${num}`);
+              } else {
+                JXToast().show('丹药尚未炼制完成！');
+              }
+            }
+          }}
+        >
+          起炉收丹
+        </JXButton>
+      </JXSpace>
       <List list={list} />
+      <JXModal
+        visible={!!data}
+        okText='炼制'
+        content={data ? <ModalContent {...data} /> : null}
+        onOk={() => {
+          const dy = get('liandan.danyao');
+          if (dy) {
+            set('liandan.danyao', null);
+            set('liandan.time', 0);
+            JXToast().show('正则炼制丹药，不可重复炼制！');
+          } else {
+            set('liandan.danyao.id', data.id);
+            set('liandan.danyao.num', 1);
+            set('liandan.time', currentTime());
+            JXToast().show(`开始炼制丹药：${data.name}`);
+          }
+          setData(null);
+        }}
+        onCancel={() => setData(null)}
+      />
     </Container>
   );
 }

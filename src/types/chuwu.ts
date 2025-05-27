@@ -30,7 +30,7 @@ export type NestedKeyOf<Obj> = Obj extends object
  */
 export interface BaseType {
   name: string; // 名称
-  isPile: boolean; // 可堆叠
+  isPile?: boolean; // 可堆叠
   desc?: string; // 描述
   type: CWType; // 类型
   num?: number;

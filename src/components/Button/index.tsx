@@ -32,6 +32,7 @@ function JXButton({
       )}
       style={{
         ...style,
+        // eslint-disable-next-line no-nested-ternary
         width: width
           ? typeof width === 'number'
             ? `${width}px`

@@ -36,7 +36,7 @@ function JXModal({
   useEffect(() => {
     if (!disableOk) {
       setAction((v) => [
-        ...v,
+        ...v.filter((a) => a.key !== 'confirm'),
         {
           key: 'confirm',
           text: okText,
@@ -48,7 +48,7 @@ function JXModal({
     }
     if (!disableCancle) {
       setAction((v) => [
-        ...v,
+        ...v.filter((a) => a.key !== 'cancle'),
         {
           key: 'cancle',
           text: cancleText,
@@ -58,7 +58,7 @@ function JXModal({
         }
       ]);
     }
-  }, [cancleText, disableCancle, disableOk, okText]); //eslint-disable-line
+  }, [cancleText, disableCancle, disableOk, okText, onCancel, onOk]); //eslint-disable-line
   return (
     <Modal
       className={classNames(styles.JSXButton, className)}
@@ -75,7 +75,7 @@ function JXModal({
 JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
   const action: Action[] = [];
 
-  if (props.disableOk != true) {
+  if (props.disableOk !== true) {
     action.push({
       key: 'confirm',
       text: props.okText || '确认',
@@ -84,7 +84,7 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
       onClick: props.onOk
     });
   }
-  if (props.disableCancle != true) {
+  if (props.disableCancle !== true) {
     action.push({
       key: 'cancle',
       text: props.cancleText || '取消',
