@@ -117,6 +117,17 @@ function Remove(item: OperaterType) {
 }
 
 /**
+ * @description: 删除物品数组
+ * @param {OperaterType[]} items
+ * @return {*}
+ */
+function RemoveArr(items: OperaterType[]) {
+  items.forEach((element) => {
+    Remove(element);
+  });
+}
+
+/**
  * @description: 添加物品
  * @param {AddProps} param1
  * @return {*}
@@ -227,6 +238,7 @@ export default {
   HasArr,
   Get,
   Remove,
+  RemoveArr,
   getActor,
   TR,
   LingShiThan

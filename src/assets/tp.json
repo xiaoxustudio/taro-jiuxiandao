@@ -1,0 +1,44 @@
+{
+  "练气": {
+    "cl": [
+      {
+        "name": "筑基丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 100,
+      "gongji": 10,
+      "shouyuan": 100
+    }
+  },
+  "筑基": {
+    "cl": [
+      {
+        "name": "结金丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 500,
+      "gongji": 50,
+      "shouyuan": 500
+    }
+  },
+  "结丹": {
+    "cl": [
+      {
+        "name": "元婴丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 1000,
+      "gongji": 100,
+      "shouyuan": 1000
+    }
+  }
+}

@@ -23,6 +23,8 @@ import {
   JingJie2Transform,
   JingJieTransform
 } from '@/utils/actor';
+import TpData from '@/assets/tp.json';
+import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
 
 function Main() {
@@ -80,10 +82,8 @@ function Main() {
         // 气血和物理
         // 阶段境界
         if (get('jingjie2') === '大圆满') {
-          set('jingjie1', JingJie1Transform(get('jingjie1')));
-          if (JingJie1ToNumber(get('jingjie2')) === getJingJieMaxDep()) {
-            set('jingjie', JingJieTransform(get('jingjie'))); // 大境界转换
-          }
+          JXToast().show(`目前已达到大圆满，请寻找机缘突破！`);
+          return;
         }
         set('jingjie2', JingJie2Transform(get('jingjie2')));
         const calcGongji = get('gongji') + 10 * lv1;
@@ -99,7 +99,42 @@ function Main() {
     },
     {
       name: '突破',
-      click() {}
+      click() {
+        const tpdata = TpData[get('jingjie')];
+        // 大阶段境界
+        if (
+          get('jingjie2') === '大圆满' &&
+          JingJie1ToNumber(get('jingjie2')) === getJingJieMaxDep()
+        ) {
+          if (!tpdata) {
+            JXToast().show(`天道压制，无法突破更高境界！`);
+            return;
+          }
+          const isCl = chuwu.HasArr(tpdata.cl);
+          // 判断突破材料，todo
+          if (isCl) {
+            const jj = JingJieTransform(get('jingjie'));
+            set('jingjie1', JingJie1Transform(get('jingjie1')));
+            set('jingjie', jj); // 大境界转换
+            const lv1 = get('lv') / 20 + 1;
+            const calcGongji =
+              get('gongji') + 10 * lv1 + tpdata.add.gongji * 0.5;
+            const calcQixue = get('qixue') + 100 * lv1 + tpdata.add.qixue * 0.5;
+            set('gongji', calcGongji);
+            set('qixue', calcQixue);
+            chuwu.RemoveArr(tpdata.cl);
+            const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
+            set('max_shouyuan', addShouyuan);
+            JXToast().show(
+              `突破至：${jj}，寿元：${addShouyuan}\n目前气血：${calcQixue}，攻击：${calcGongji}`
+            );
+          } else {
+            JXToast().show(`材料不足，无法突破！`);
+          }
+        } else {
+          JXToast().show(`未达到大圆满，请先提升小境界！`);
+        }
+      }
     },
     {
       name: '法术',
