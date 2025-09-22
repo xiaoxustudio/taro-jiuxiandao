@@ -1,4 +1,5 @@
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
+import { GongFaType } from './gongfa';
 
 /**
  * @description:战斗属性
@@ -69,4 +70,8 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     danyao: { id: number; num: number } | null;
   }; // 炼丹
   danfang: { id: string; exp: number }[]; // 已学习丹方列表
+  gongfa: {
+    ls: GongFaType[];
+    current: GongFaType | null;
+  }; // 功法列表
 }

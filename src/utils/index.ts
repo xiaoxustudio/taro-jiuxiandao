@@ -53,7 +53,7 @@ export function navigateBack(option?: Parameters<typeof Taro.navigateBack>[0]) {
  * @description: 生成uuid
  * @return {*}
  */
-export function generateUUID() {
+export function UUID(): string {
   // 使用密码学安全的随机数生成器
   const buffer = new Uint8Array(16);
   crypto.getRandomValues(buffer);

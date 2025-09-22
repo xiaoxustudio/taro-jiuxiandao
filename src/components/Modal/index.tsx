@@ -103,7 +103,10 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
 };
 
 JXModal.confirm = (props: ModalConfirmProps) => {
-  return Modal.confirm({ ...props, closeOnMaskClick: true });
+  return Modal.confirm({
+    ...props,
+    closeOnMaskClick: true
+  });
 };
 
 JXModal.alert = (props: ModalAlertProps) => {

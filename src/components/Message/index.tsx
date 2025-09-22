@@ -1,6 +1,6 @@
 import { Toast, ToastShowProps } from 'antd-mobile';
 import { ToastHandler } from 'antd-mobile/es/components/toast';
-import { omit } from 'lodash-es';
+import omit from 'lodash-es/omit';
 import './index.less';
 import ContentToast from './message';
 

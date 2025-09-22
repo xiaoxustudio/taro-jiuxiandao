@@ -95,7 +95,9 @@ function Main() {
     },
     {
       name: '功法',
-      click() {}
+      click() {
+        navigateTo('Main/pages/gongfa/index');
+      }
     },
     {
       name: '突破',

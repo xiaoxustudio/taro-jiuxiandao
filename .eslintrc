@@ -41,6 +41,7 @@
     "max-classes-per-file": "off",
     "no-restricted-syntax": "off",
     "@typescript-eslint/no-explicit-any": "off",
+    "no-underscore-dangle": "off",
     "import/no-unresolved": [
       2,
       {

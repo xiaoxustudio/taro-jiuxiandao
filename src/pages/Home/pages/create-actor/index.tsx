@@ -6,9 +6,10 @@ import { JXButton, JXInput, JXSpace, JXToast, Text } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { ActorDataConfig, CWType } from '@/types';
-import { generateUUID } from '@/utils';
+import { UUID } from '@/utils';
 import { HasActor } from '@/utils/actor';
 import chuwu from '@/utils/chuwu';
+import { GongFaPinJie } from '@/types/gongfa';
 import styles from './index.module.less';
 
 const options = [
@@ -101,7 +102,7 @@ function Index() {
   const { set: setStore } = useStore();
   const { set: setActorStore } = useActorStore();
   const [actor, setActor] = useState<ActorDataConfig>({
-    uuid: generateUUID(),
+    uuid: UUID(),
     daohao: '',
     linggen: '金',
     zhongzu: '人',
@@ -170,10 +171,26 @@ function Index() {
       danlu: null,
       danyao: null,
       danyun: 0,
-      shengyuTime: 0,
       time: 0
     },
-    danfang: []
+    danfang: [],
+    gongfa: {
+      ls: [
+        {
+          id: UUID(),
+          name: '锻体诀',
+          pj: GongFaPinJie.一品, // 品阶
+          lv: '0', // 层级
+          exp: '0', // 进度
+          max_exp: '1000', // 最大进度
+          lg: '0', // 灵根
+          limit: '0', // 限制
+          xl: '0', // 修炼增益
+          attr: {} // 其他属性
+        }
+      ],
+      current: null
+    }
   });
 
   const handleRegister = useCallback(() => {
