@@ -1,7 +1,7 @@
 <div align="center">
 <img src="src/assets/logo.png" />
 </div>
-
+<p />
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge&color=#4fc08d" />
 </p>
@@ -17,7 +17,7 @@
 
 # 历史
 
-九仙道始于 2016年，22年停止更新
+九仙道始于 2016年（可能更早，我加入的时候差不多就是这个点），22年停止更新
 
 # 使用
 
@@ -93,6 +93,11 @@ pnpm build
 联系方式：[xugame@qq.com](emailto://xugame@qq.com)
 
 欢迎提出您宝贵的 **issue**，我们将会处理。
+
+QQ群聊：  
+群1：**562435313**  
+群2：**722310054**  
+群3：**467303733**  
 
 # LICENSE
 
