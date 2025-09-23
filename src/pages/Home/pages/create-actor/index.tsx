@@ -186,7 +186,9 @@ function Index() {
           lg: '0', // 灵根
           limit: '0', // 限制
           xl: '0', // 修炼增益
-          attr: {} // 其他属性
+          attr: {
+            gongji: 10
+          } // 其他属性
         }
       ],
       current: null

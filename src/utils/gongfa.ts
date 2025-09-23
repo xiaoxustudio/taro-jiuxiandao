@@ -69,6 +69,17 @@ function setCurrentGongFa(id: string): void {
   remove(gf);
   gf.time = Date.now();
   acData.gongfa.current = gf;
+  // 增加或减少属性
+  const adds = gf.attr;
+  if (adds) {
+    Object.keys(adds).forEach((key) => {
+      if (adds[key] >= 0) {
+        acData.addAttr[key] += adds[key];
+      } else {
+        acData.addAttr[key] -= adds[key];
+      }
+    });
+  }
   set(current, acData);
 }
 
@@ -86,7 +97,19 @@ function putCurrentGongfa(): Promise<boolean> {
     add(currentGongFa);
     acData.gongfa.current = null;
     state = true;
+    // 增加或减少属性（+就是-，-就是+）
+    const adds = currentGongFa.attr;
+    if (adds) {
+      Object.keys(adds).forEach((key) => {
+        if (adds[key] >= 0) {
+          acData.addAttr[key] -= adds[key];
+        } else {
+          acData.addAttr[key] += adds[key];
+        }
+      });
+    }
   }
+
   set(current, acData);
   return Promise.resolve(state);
 }

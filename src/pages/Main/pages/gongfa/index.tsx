@@ -124,13 +124,13 @@ export default function Gongfa() {
           攻击：<Text inline>{current?.attr?.gongji || '无'}</Text>
         </Box>
         <Box>
-          防御：<Text inline>{current?.attr?.gongji || '无'}</Text>
+          防御：<Text inline>{current?.attr?.fangyu || '无'}</Text>
         </Box>
         <Box>
-          气血：<Text inline>{current?.attr?.gongji || '无'}</Text>
+          气血：<Text inline>{current?.attr?.qixue || '无'}</Text>
         </Box>
         <Box>
-          攻速：<Text inline>{current?.attr?.gongji || '无'}</Text>
+          攻速：<Text inline>{current?.attr?.sudu || '无'}</Text>
         </Box>
       </JXSpace>
     </Container>

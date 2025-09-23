@@ -1,3 +1,5 @@
+import { ActorDataConfigForZhanDou } from '.';
+
 export enum GongFaPinJie {
   一品 = '一品',
   二品 = '二品',
@@ -26,6 +28,6 @@ export interface GongFaType {
   lg: string; // 灵根
   limit: string; // 限制
   xl: string; // 修炼增益
-  attr: Record<string, number>; // 其他属性
+  attr: Partial<ActorDataConfigForZhanDou>; // 其他属性
   time?: number; // 开始时间
 }
