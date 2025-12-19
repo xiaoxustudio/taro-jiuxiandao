@@ -1,5 +1,10 @@
+/**
+ * 游戏时间数组，表示 [天, 小时, 分钟]
+ */
 class TimeArray {
   milliseconds: number;
+
+  static Map = { day: 86400000, hour: 3600000, minute: 60000 };
 
   constructor(timeArrayOrMs: number[] | number) {
     if (Array.isArray(timeArrayOrMs)) {
@@ -14,33 +19,44 @@ class TimeArray {
    * 将 [天, 小时, 分钟] 转换为毫秒
    */
   static convertToMilliseconds([days, hours, minutes]: number[]) {
-    return days * 86400000 + hours * 3600000 + minutes * 60000;
+    return (
+      days * TimeArray.Map.day +
+      hours * TimeArray.Map.hour +
+      minutes * TimeArray.Map.minute
+    );
   }
 
   toZhouTian(limit = 12): number {
-    return Math.min(Math.max(0, this.milliseconds / 3600000), limit);
+    return (
+      Math.round(
+        Math.min(
+          Math.max(0, this.getSubDateTimestamp() / TimeArray.Map.day),
+          limit
+        ) * 100
+      ) / 100
+    );
   }
 
   /**
    * 加法：支持与 TimeArray 实例或数组相加
    */
   add(time: TimeArray | number[]) {
-    const ms =
+    const msToAdd =
       time instanceof TimeArray
-        ? this.milliseconds
+        ? time.milliseconds
         : new TimeArray(time).milliseconds;
-    return new TimeArray(this.milliseconds + ms);
+    return new TimeArray(this.milliseconds + msToAdd);
   }
 
   /**
    * 减法：支持与 TimeArray 实例或数组相减
    */
   subtract(time: TimeArray | number[]) {
-    const ms =
+    const msToSubtract =
       time instanceof TimeArray
-        ? this.milliseconds
+        ? time.milliseconds
         : new TimeArray(time).milliseconds;
-    return new TimeArray(this.milliseconds - ms);
+    return new TimeArray(this.milliseconds - msToSubtract);
   }
 
   /**
@@ -100,19 +116,33 @@ class TimeArray {
    */
   getTimeArray() {
     let ms = this.milliseconds;
-    const days = Math.floor(ms / 86400000);
-    ms %= 86400000;
-    const hours = Math.floor(ms / 3600000);
-    ms %= 3600000;
-    const minutes = ms / 60000;
+    const days = Math.floor(ms / TimeArray.Map.day);
+    ms %= TimeArray.Map.day;
+    const hours = Math.floor(ms / TimeArray.Map.hour);
+    ms %= TimeArray.Map.hour;
+    const minutes = ms / TimeArray.Map.minute;
     return [days, hours, minutes];
   }
 
   /**
-   * 获取当前时间加上此时间间隔后的时间戳
+   * 获取对象时间加上当前时间间隔后的时间戳
    */
-  getFutureTimestamp() {
+  getAddDateTimestamp() {
     return Date.now() + this.milliseconds;
+  }
+
+  /**
+   * 获取对象时间减去当前时间间隔后的时间戳
+   */
+  getSubDateTimestamp() {
+    return Date.now() - this.milliseconds;
+  }
+
+  /**
+   * 获取实际过了多少天
+   */
+  getRealDays() {
+    return Math.floor(Date.now() - this.milliseconds) / 1000 / 60 / 60 / 24;
   }
 }
 export default TimeArray;
