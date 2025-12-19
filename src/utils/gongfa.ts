@@ -3,6 +3,7 @@ import { GongFaType } from '@/types/gongfa';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { getActor } from './actor';
+import TimeArray from './TimeArray';
 
 /* 功法相关 */
 
@@ -94,6 +95,11 @@ function putCurrentGongfa(): Promise<boolean> {
   const currentGongFa = acData.gongfa.current;
   let state = false;
   if (currentGongFa) {
+    const timeArr = currentGongFa?.time
+      ? new TimeArray(currentGongFa.time)
+      : new TimeArray(Date.now());
+    const addExp = timeArr.toZhouTian() * 1000;
+    currentGongFa.exp += addExp;
     add(currentGongFa);
     acData.gongfa.current = null;
     state = true;

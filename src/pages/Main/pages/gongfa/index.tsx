@@ -13,6 +13,7 @@ import { GongFaType } from '@/types/gongfa';
 import useActorController from '@/hooks/useActorController';
 import useValue, { IUseValueNotState } from '@/hooks/useValue';
 import { putCurrentGongfa, setCurrentGongFa } from '@/utils/gongfa';
+import { TimeArray } from '@/utils';
 import './index.less';
 
 function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
@@ -56,6 +57,7 @@ export default function Gongfa() {
     () => get('gongfa.current'),
     [get, selectState] // eslint-disable-line
   );
+
   const xiuxi = () => {
     JXModal.confirm({
       title: '修习功法',
@@ -66,6 +68,13 @@ export default function Gongfa() {
       }
     });
   };
+
+  const shouldGetExp = useMemo(() => {
+    const timeArr = current?.time
+      ? new TimeArray(current.time)
+      : new TimeArray(Date.now());
+    return timeArr.toZhouTian() * 1000;
+  }, [current]);
 
   return (
     <Container
@@ -131,6 +140,9 @@ export default function Gongfa() {
         </Box>
         <Box>
           攻速：<Text inline>{current?.attr?.sudu || '无'}</Text>
+        </Box>
+        <Box>
+          累计经验：<Text inline>{shouldGetExp}</Text>
         </Box>
       </JXSpace>
     </Container>
