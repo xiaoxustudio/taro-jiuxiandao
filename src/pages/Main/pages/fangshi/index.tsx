@@ -25,22 +25,31 @@ export default function Fangshi() {
     let targetList: any;
     switch (type) {
       case 0:
+        // 法宝
         targetList = fsAssets.fb;
         break;
       case 1:
+        // 丹药
         targetList = fsAssets.dy.map((v) => ({
           ...danfangData[v],
           type: 1,
           ls: danfangData[v].ls * 0.9
         }));
         break;
+      case 2:
+        // 材料
+        targetList = fsAssets.cl;
+        break;
       case 5:
+        // 丹方
         targetList = fsAssets.dy.map((v) => ({
           ...danfangData[v],
           name: `${danfangData[v].name}丹方`,
           id: v
         }));
         break;
+      default:
+        targetList = [];
     }
     return targetList.map((v, index) => ({
       ...v,
@@ -71,26 +80,30 @@ export default function Fangshi() {
                 )}
               </Text>
               <Text>描述：{v.desc}</Text>
-              <JXSpace direction='vertical' title='属性'>
-                {Object.keys(v.attr).map((item) => (
-                  <Text key={v.attr[item]}>
-                    {AttrTransformChinese(
-                      item as keyof ActorDataConfigForZhanDou
-                    )}
-                    ：
-                    {v.attr[item] >= 0 ? (
-                      <Text color='green' inline>
-                        + {v.attr[item]}
-                      </Text>
-                    ) : (
-                      <Text color='red' inline>
-                        {v.attr[item]}
-                      </Text>
-                    )}
-                  </Text>
-                ))}
+              {v?.attr ? (
+                <JXSpace direction='vertical' title='属性'>
+                  {Object.keys(v.attr).map((item) => (
+                    <Text key={v.attr[item]}>
+                      {AttrTransformChinese(
+                        item as keyof ActorDataConfigForZhanDou
+                      )}
+                      ：
+                      {v.attr[item] >= 0 ? (
+                        <Text color='green' inline>
+                          + {v.attr[item]}
+                        </Text>
+                      ) : (
+                        <Text color='red' inline>
+                          {v.attr[item]}
+                        </Text>
+                      )}
+                    </Text>
+                  ))}
+                  <Text>售价：{v.ls}</Text>
+                </JXSpace>
+              ) : (
                 <Text>售价：{v.ls}</Text>
-              </JXSpace>
+              )}
             </JXSpace>
           ),
           onOk() {
@@ -103,6 +116,7 @@ export default function Fangshi() {
             if (chuwu.LingShiThan(v.ls)) {
               switch (type) {
                 case 0:
+                case 2:
                   chuwu.Add(v);
                   JXToast(`购买物品：${v.name}`).show();
                   break;
@@ -151,7 +165,7 @@ export default function Fangshi() {
           丹方
         </JXButton>
       </JXSpace>
-      {[0, 1, 5].includes(type) && (
+      {[0, 1, 2, 5].includes(type) && (
         <Scroll calc={container.calcHeight + 50}>
           <List list={list} noFlex />
         </Scroll>

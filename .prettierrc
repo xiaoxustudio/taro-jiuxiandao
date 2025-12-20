@@ -10,8 +10,10 @@
   "trailingComma": "none",
 
   "singleQuote": true,
+
   "jsxSingleQuote": true,
+
+  "printWidth": 80,
 
   "vueIndentScriptAndStyle": true
 }
-
