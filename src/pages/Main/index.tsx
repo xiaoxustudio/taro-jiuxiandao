@@ -12,7 +12,7 @@ import {
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
-import { navigateTo, ZhouTian } from '@/utils';
+import { navigateTo, TimeArray, ZhouTian } from '@/utils';
 import {
   getJingJieMaxDep,
   getLingQiForJingJie,
@@ -229,7 +229,7 @@ function Main() {
   useEffect(() => {
     // 寿元计算
     const time1 = get('time1');
-    const calcShouYuan = (Date.now() - time1) / 3600000;
+    const calcShouYuan = (Date.now() - time1) / TimeArray.Map.hour;
     if (calcShouYuan >= 24) {
       const calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
       set('shouyuan', Math.round(calcCache));
@@ -238,14 +238,14 @@ function Main() {
         JXToast().show('寿元已到极限');
         // 后续处理todo
       } else {
-        const needAdd = time1 + (calcShouYuan / 24) * 3600000 * 24;
+        const needAdd = time1 + (calcShouYuan / 24) * TimeArray.Map.hour * 24;
         // 计算应增加的时间
         set('time1', Math.round(needAdd));
       }
     }
     // 神识计算
     const shenshiTime = get('shenshiTime');
-    const calcShenShi = (Date.now() - shenshiTime) / 3600000;
+    const calcShenShi = (Date.now() - shenshiTime) / TimeArray.Map.hour;
     if (calcShenShi >= 1) {
       // 计算神识恢复程度
       const maxShenShi = get('max_shenshi');
@@ -254,6 +254,7 @@ function Main() {
         data = maxShenShi;
       }
       set('shenshi', Math.round(data));
+      set('shenshiTime', Date.now());
     }
   }, []); //eslint-disable-line
 

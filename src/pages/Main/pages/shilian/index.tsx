@@ -257,13 +257,15 @@ export default function Shilian() {
   return (
     <Container className={styles.container} title={df.name} desc={df.desc}>
       <JXSpace gap={5} between>
-        <JXButton onClick={handleSearchYaoShou}>探索</JXButton>
+        <JXButton onClick={handleSearchYaoShou}>
+          探索({get('shenshi')})
+        </JXButton>
         <JXButton>挂机</JXButton>
         <JXButton>挂机详情</JXButton>
         <JXButton>停挂</JXButton>
         <JXButton
           onClick={() => {
-            navigateTo('Main/index', { replace: true });
+            navigateTo('Main/index', { all: true });
           }}
         >
           主页

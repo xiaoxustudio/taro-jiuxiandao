@@ -62,26 +62,26 @@ function useActorController() {
       // 深拷贝当前角色数据
       const newActor = cloneDeep(currentActor) as ActorDataConfig;
       const pathParts = key.split('.');
-      let target: any = newActor;
+      let copyActorTarget = newActor;
 
       // 逐层处理路径
       for (let i = 0; i < pathParts.length - 1; i++) {
         const part = pathParts[i];
 
-        if (!target[part]) {
-          target[part] = {};
-        } else if (typeof target[part] !== 'object') {
+        if (!copyActorTarget[part]) {
+          copyActorTarget[part] = {};
+        } else if (typeof copyActorTarget[part] !== 'object') {
           throw new Error(
             `路径 ${pathParts.slice(0, i + 1).join('.')} 不是对象`
           );
         }
 
-        target = target[part];
+        copyActorTarget = copyActorTarget[part];
       }
 
       // 设置最终值
       const lastKey = pathParts[pathParts.length - 1];
-      target[lastKey] = val;
+      copyActorTarget[lastKey] = val;
 
       // 更新整个角色数据
       return {
