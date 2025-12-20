@@ -59,9 +59,6 @@ importers:
       antd-mobile:
         specifier: ^5.38.1
         version: 5.39.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      antd-mobile-icons:
-        specifier: ^0.3.0
-        version: 0.3.0
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
