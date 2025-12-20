@@ -22,9 +22,9 @@ export interface GongFaType {
   id: string;
   name: string;
   pj: GongFaPinJie; // 品阶
-  lv: string; // 层级
+  lv: number; // 层级
   exp: number; // 进度
-  max_exp: number; //
+  max_exp: number; // 上限
   lg: string; // 灵根
   limit: string; // 限制
   xl: string; // 修炼增益

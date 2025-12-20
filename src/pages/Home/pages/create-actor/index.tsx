@@ -180,7 +180,7 @@ function Index() {
           id: UUID(),
           name: '锻体诀',
           pj: GongFaPinJie.一品, // 品阶
-          lv: '0', // 层级
+          lv: 0, // 层级
           exp: 0, // 进度
           max_exp: 1000, // 最大进度
           lg: '0', // 灵根

@@ -58,6 +58,13 @@ export default function Gongfa() {
     [get, selectState] // eslint-disable-line
   );
 
+  const shouldGetExp = useMemo(() => {
+    const timeArr = current?.time
+      ? new TimeArray(current.time)
+      : new TimeArray(Date.now());
+    return timeArr.toZhouTian() * 1000;
+  }, [current]);
+
   const xiuxi = () => {
     JXModal.confirm({
       title: '修习功法',
@@ -69,12 +76,27 @@ export default function Gongfa() {
     });
   };
 
-  const shouldGetExp = useMemo(() => {
-    const timeArr = current?.time
-      ? new TimeArray(current.time)
-      : new TimeArray(Date.now());
-    return timeArr.toZhouTian() * 1000;
-  }, [current]);
+  const chongji = () => {
+    if (!current) {
+      JXToast('未穿戴功法').show();
+      return;
+    }
+    current.exp += shouldGetExp;
+    if (current.exp >= current.max_exp) {
+      current.exp = current.max_exp;
+      current.lv += 1;
+      current.max_exp += 1000;
+      const keys = Object.keys(current.attr);
+      keys.forEach((key) => {
+        if (current.attr[key]) current.attr[key] += 0.1 * current.lv;
+      });
+      current.time = Date.now();
+    }
+    putCurrentGongfa().finally(() => {
+      JXToast(`冲击功法${current.name}：+${shouldGetExp}`).show();
+      setCurrentGongFa(current.id);
+    });
+  };
 
   return (
     <Container
@@ -93,8 +115,8 @@ export default function Gongfa() {
         >
           卸下
         </JXButton>
-        <JXButton>冲击</JXButton>
-        <JXButton>经脉</JXButton>
+        <JXButton onClick={chongji}>冲击</JXButton>
+        <JXButton disabled>经脉</JXButton>
       </JXSpace>
       <JXDivider />
       <JXSpace
@@ -115,9 +137,7 @@ export default function Gongfa() {
         <Box>
           功法进度：
           <Text inline>
-            {current?.exp && current?.max_exp
-              ? `${current?.exp}/${current?.max_exp}`
-              : '无'}
+            {current ? `${current?.exp}/${current?.max_exp}` : '无'}
           </Text>
         </Box>
         <Box>
