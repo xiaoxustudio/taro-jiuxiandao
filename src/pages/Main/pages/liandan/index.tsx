@@ -8,7 +8,8 @@ import {
   JXToast,
   List,
   ListItemData,
-  Text
+  Text,
+  ItemCounter
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import danfangData from '@/assets/danfang.json';
@@ -154,26 +155,7 @@ export default function Liandan() {
                 ))}
                 <Text bold>
                   炼制数量：{num}
-                  <JXSpace direction='vertical'>
-                    <Box>
-                      <JXButton onClick={() => setNum(Math.max(num - 1, 1))}>
-                        -1
-                      </JXButton>
-                      <JXButton onClick={() => setNum(Math.max(num - 10, 1))}>
-                        -10
-                      </JXButton>
-                      <JXButton onClick={() => setNum(Math.max(num - 100, 1))}>
-                        -100
-                      </JXButton>
-                    </Box>
-                    <Box>
-                      <JXButton onClick={() => setNum(num + 1)}>+1</JXButton>
-                      <JXButton onClick={() => setNum(num + 10)}>+10</JXButton>
-                      <JXButton onClick={() => setNum(num + 100)}>
-                        +100
-                      </JXButton>
-                    </Box>
-                  </JXSpace>
+                  <ItemCounter count={num} setCount={setNum} />
                 </Text>
               </JXSpace>
             </JXSpace>
