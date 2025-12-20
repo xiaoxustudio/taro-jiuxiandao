@@ -192,25 +192,39 @@ function Main() {
 
   // 打开修炼弹窗
   const handleOpenXiuLian = () => {
-    let need = getLingQiForJingJie();
-    if (get('zhongzu') === '灵族') {
-      need *= 1.8; // 灵族1.8倍
-    }
-    const add = get('lv') + need;
-    const cwcalc = Math.round(
-      getLingQiForRate() * ZhouTian(xiulian.time) + add
-    );
+    const need = getLingQiForJingJie();
+
+    const zhongzuRate = get('zhongzu') === '灵' ? 0.2 : 0; // 种族增益系数
+
+    const rateOfLing = getLingQiForRate();
+
+    const lvRate = 1 + (get('lv') / 10) * 0.05;
+
+    const jjRate = 1 + (getLingQiToNumber() - 1) * 0.15;
+
+    const dfRate = get('dongfu') ? get('dongfu').lingchi : 0;
+
+    const zhoutian = ZhouTian(xiulian.time);
+
+    const shouldGetXiu = rateOfLing * lvRate * jjRate + dfRate;
+
+    const calcXiu = (
+      Math.round(shouldGetXiu + need) *
+      (0.15 + zhongzuRate) *
+      zhoutian
+    ).toFixed(2);
+
     const content = (
       <>
-        阶段增益：{get('lv') / 10}
+        等级增益系数：{lvRate}
         <br />
-        境界增益：{getLingQiToNumber() / 10}
+        境界增益系数：{jjRate}
         <br />
-        洞府增益：{get('dongfu') ? get('dongfu').lingchi : 0}
+        洞府增益：{dfRate}
         <br />
-        总修炼小周天合计：{ZhouTian(xiulian.time).toFixed(2)}
+        已修炼小周天：{ZhouTian(xiulian.time).toFixed(2)}
         <br />
-        总获取修为合计：{cwcalc}
+        总获取修为合计：{calcXiu}
       </>
     );
     const c = JXModal.show({
@@ -220,7 +234,7 @@ function Main() {
       okText: '收功',
       onOk() {
         c.close();
-        set('xiuwei', get('xiuwei') + cwcalc);
+        set('xiuwei', get('xiuwei') + calcXiu);
         set('xiulian', null);
       }
     });
