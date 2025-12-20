@@ -12,9 +12,13 @@ function QianDao() {
     () => get('qiandao') as ActorDataConfig['qiandao'],
     [get]
   );
+  const isSigned = useMemo(
+    () => qiandao.time === getCurrentDate(),
+    [qiandao.time]
+  );
   const handleQianDao = useCallback(() => {
     const currentDate = getCurrentDate();
-    if (qiandao.time === currentDate) {
+    if (isSigned) {
       JXToast().show('今天已经签到过了！');
       return;
     }
@@ -24,15 +28,16 @@ function QianDao() {
     set('qiandao.count', get('qiandao.count') + 1);
     chuwu.Add({ name: '灵石', type: CWType.QT, isPile: true, num: ls });
     JXToast().show(`签到成功，获得灵石：${ls}`);
-  }, [get, qiandao.time, set]);
+  }, [get, isSigned, set]);
+
   return (
     <Container title='签到'>
       <JXSpace direction='vertical' style={{ width: '100%' }}>
         <Text>累计签到天数：{qiandao.count} 天</Text>
         <Text>上次签到日期：{qiandao.last || ''}</Text>
         <JXSpace center style={{ width: '100%' }}>
-          <JXButton width={200} onClick={handleQianDao}>
-            签到
+          <JXButton disabled={isSigned} width={200} onClick={handleQianDao}>
+            {!isSigned ? '签到' : '已签到'}
           </JXButton>
         </JXSpace>
       </JXSpace>

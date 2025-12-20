@@ -20,6 +20,7 @@ export default function Fabao() {
   useEffect(() => {
     updateInfo();
   }, [type, updateInfo]);
+
   return (
     <Container
       title='法宝'
@@ -85,9 +86,17 @@ export default function Fabao() {
         </Text>
       </JXSpace>
       <JXSpace flexOne>
-        <JXButton width='100%'>强化</JXButton>
-        <JXButton width='100%'>升阶</JXButton>
-        <JXButton width='100%' onClick={handleTakeOffFaBao}>
+        <JXButton disabled={!targetFB} width='100%'>
+          强化
+        </JXButton>
+        <JXButton disabled={!targetFB} width='100%'>
+          升阶
+        </JXButton>
+        <JXButton
+          disabled={!targetFB}
+          width='100%'
+          onClick={handleTakeOffFaBao}
+        >
           卸下
         </JXButton>
       </JXSpace>

@@ -106,6 +106,7 @@ export default function Gongfa() {
       <JXSpace gap={10} center>
         <JXButton onClick={xiuxi}>修习</JXButton>
         <JXButton
+          disabled={!current}
           onClick={() => {
             putCurrentGongfa().then((s) =>
               s ? JXToast('卸下成功').show() : JXToast('未穿戴功法').show()
@@ -115,7 +116,9 @@ export default function Gongfa() {
         >
           卸下
         </JXButton>
-        <JXButton onClick={chongji}>冲击</JXButton>
+        <JXButton disabled={!current} onClick={chongji}>
+          冲击
+        </JXButton>
         <JXButton disabled>经脉</JXButton>
       </JXSpace>
       <JXDivider />
