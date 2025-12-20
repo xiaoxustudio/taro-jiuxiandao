@@ -12,8 +12,7 @@ export default function ShilianList() {
     navigateTo('Main/pages/shilian/index', {
       events: {
         loader: item
-      },
-      url: ''
+      }
     });
   };
   return (

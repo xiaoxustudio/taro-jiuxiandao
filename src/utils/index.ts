@@ -12,7 +12,7 @@ export const CreateUniqueIndex = () => {
 };
 
 type NavigateOptions = Omit<
-  (Taro.navigateTo.Option | Taro.redirectTo.Option) & {
+  (Taro.navigateTo.Option & Taro.redirectTo.Option) & {
     replace?: boolean; // 替换当前
     all?: boolean; // 替换全部
   },
@@ -27,21 +27,25 @@ export const currentTime = () => Date.now();
  * @param {Taro} options
  * @return {*}
  */
-export function navigateTo(url, options?: NavigateOptions) {
-  if (options && options.replace) {
-    if (options.all) {
-      Taro.reLaunch({ url: `/pages/${url}` } as Taro.reLaunch.Option);
+export function navigateTo(url: string, options: NavigateOptions = {}) {
+  const opts = omit(options, ['url']);
+  if (opts && opts.replace) {
+    if (opts.all) {
+      Taro.reLaunch({
+        ...opts,
+        url: `/pages/${url}`
+      } as Taro.reLaunch.Option);
       return;
     }
     Taro.redirectTo({
-      ...options,
+      ...opts,
       url: `/pages/${url}`
     } as Taro.redirectTo.Option);
     return;
   }
   Taro.navigateTo({
     url: `/pages/${url}`,
-    ...(options ? omit(options, ['url']) : {})
+    ...opts
   });
 }
 
