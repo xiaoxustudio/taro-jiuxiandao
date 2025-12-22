@@ -51,11 +51,11 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 }
 
 export default function Gongfa() {
-  const { get } = useActorController();
+  const { get, set } = useActorController();
   const [selectState, select] = useValue('', true);
   const current = useMemo<GongFaType | null>(
     () => get('gongfa.current'),
-    [get, selectState] // eslint-disable-line
+    [get, set, selectState] // eslint-disable-line
   );
 
   const shouldGetExp = useMemo(() => {
@@ -93,6 +93,7 @@ export default function Gongfa() {
       current.time = Date.now();
     }
     putCurrentGongfa().finally(() => {
+      set('gongfa.current', current);
       JXToast(`冲击功法${current.name}：+${shouldGetExp}`).show();
       setCurrentGongFa(current.id);
     });
@@ -116,7 +117,7 @@ export default function Gongfa() {
         >
           卸下
         </JXButton>
-        <JXButton disabled={!current} onClick={chongji}>
+        <JXButton disabled={!current || !shouldGetExp} onClick={chongji}>
           冲击
         </JXButton>
         <JXButton disabled>经脉</JXButton>
