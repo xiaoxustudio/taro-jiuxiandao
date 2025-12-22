@@ -234,7 +234,7 @@ function Main() {
       okText: '收功',
       onOk() {
         c.close();
-        set('xiuwei', get('xiuwei') + calcXiu);
+        set('xiuwei', get('xiuwei') + Number.parseFloat(calcXiu));
         set('xiulian', null);
       }
     });
