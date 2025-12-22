@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Container,
@@ -76,7 +76,7 @@ export default function Gongfa() {
     });
   };
 
-  const chongji = () => {
+  const chongji = useCallback(async () => {
     if (!current) {
       JXToast('未穿戴功法').show();
       return;
@@ -92,12 +92,9 @@ export default function Gongfa() {
       });
       current.time = Date.now();
     }
-    putCurrentGongfa().finally(() => {
-      set('gongfa.current', current);
-      JXToast(`冲击功法${current.name}：+${shouldGetExp}`).show();
-      setCurrentGongFa(current.id);
-    });
-  };
+    set('gongfa.current', current);
+    JXToast(`冲击功法${current.name}：+${shouldGetExp}`).show();
+  }, [current, shouldGetExp, set]);
 
   return (
     <Container
@@ -108,8 +105,8 @@ export default function Gongfa() {
         <JXButton onClick={xiuxi}>修习</JXButton>
         <JXButton
           disabled={!current}
-          onClick={() => {
-            putCurrentGongfa().then((s) =>
+          onClick={async () => {
+            await putCurrentGongfa().then((s) =>
               s ? JXToast('卸下成功').show() : JXToast('未穿戴功法').show()
             );
             select.set('');
