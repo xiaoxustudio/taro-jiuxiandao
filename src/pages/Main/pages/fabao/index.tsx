@@ -26,7 +26,7 @@ export default function Fabao() {
       title='法宝'
       desc='修仙之道，在于内外，内修元神，外修法宝！法宝有灵，以元神之火锻造，可撼天地…'
     >
-      <JXSpace gap={10} style={{ width: '100%' }} hscroll>
+      <JXSpace gap={10} style={{ width: '100%', marginBottom: '10px' }} hscroll>
         <JXButton width='100px' onClick={() => setType(FabaoType.手持武器)}>
           手持武器
         </JXButton>

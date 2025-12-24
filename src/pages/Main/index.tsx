@@ -50,6 +50,7 @@ function Main() {
     },
     {
       name: '炼器',
+      disabeld: true,
       click() {}
     },
     {
@@ -140,6 +141,7 @@ function Main() {
     },
     {
       name: '法术',
+      disabeld: true,
       click() {}
     }
   ];
@@ -158,26 +160,32 @@ function Main() {
     },
     {
       name: '灵兽',
+      disabeld: true,
       click() {}
     },
     {
       name: '门派',
+      disabeld: true,
       click() {}
     },
     {
       name: '药园',
+      disabeld: true,
       click() {}
     },
     {
       name: '洞府',
+      disabeld: true,
       click() {}
     },
     {
       name: '成就',
+      disabeld: true,
       click() {}
     },
     {
       name: '赌场',
+      disabeld: true,
       click() {}
     }
   ];
@@ -335,7 +343,12 @@ function Main() {
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
           {operaterOptions.map((v) => (
             <JXGrid.Item key={v.name} align='center'>
-              <JXButton size='mini' transparent onClick={v.click}>
+              <JXButton
+                disabled={v.disabeld}
+                size='mini'
+                transparent
+                onClick={v.click}
+              >
                 <Text
                   color={canRed && v.name === '升阶' ? 'red' : undefined}
                   textShadow
@@ -347,7 +360,11 @@ function Main() {
           ))}
         </JXGrid>
         {/* 动态 */}
-        <JXSpace className={styles.ContentBox} direction='vertical'>
+        <JXSpace
+          className={styles.ContentBox}
+          direction='vertical'
+          style={{ paddingLeft: '5px' }}
+        >
           <Text color='orange' bold>
             动态
           </Text>
@@ -357,7 +374,12 @@ function Main() {
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
           {operaterOptions2.map((v, index) => (
             <JXGrid.Item key={v.name + index} align='center'>
-              <JXButton size='mini' transparent onClick={v.click}>
+              <JXButton
+                disabled={v.disabeld}
+                size='mini'
+                transparent
+                onClick={v.click}
+              >
                 <Text textShadow>{v.name}</Text>
               </JXButton>
             </JXGrid.Item>
@@ -388,7 +410,7 @@ function Main() {
             </JXButton>
           </JXGrid.Item>
           <JXGrid.Item align='center'>
-            <JXButton size='mini' transparent>
+            <JXButton disabled size='mini' transparent>
               <Text textShadow>CDK</Text>
             </JXButton>
           </JXGrid.Item>
