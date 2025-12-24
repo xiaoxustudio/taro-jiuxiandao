@@ -138,6 +138,11 @@ export default function Fangshi() {
       }
     }));
   }, [type]);
+  const lsMemo = useMemo(
+    () => chuwu.Get({ name: '灵石', type: CWType.QT }),
+    []
+  );
+
   return (
     <Container
       title='坊市'
@@ -145,6 +150,9 @@ export default function Fangshi() {
       context={container}
       scroll
     >
+      <Text style={{ width: '100%', marginBottom: '10px' }}>
+        灵石：{lsMemo?.num || 0}
+      </Text>
       <JXSpace gap={10} style={{ width: '100%' }} hscroll>
         <JXButton width='100px' onClick={() => setType(0)}>
           法宝
