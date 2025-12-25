@@ -9,6 +9,7 @@ import {
   Text
 } from '@/components';
 import { navigateTo } from '@/utils';
+import { isMobile } from '@/utils/tool';
 import styles from './index.module.less';
 
 function Home() {
@@ -86,7 +87,7 @@ function Home() {
           </JXButton>
           <JXButton
             onClick={() => {
-              window.JXApi.GoToSetting();
+              isMobile() && window.JXApi.GoToSetting();
             }}
           >
             设置
