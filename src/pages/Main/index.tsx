@@ -175,8 +175,9 @@ function Main() {
     },
     {
       name: '洞府',
-      disabeld: true,
-      click() {}
+      click() {
+        navigateTo('Main/pages/dongfu/index');
+      }
     },
     {
       name: '成就',

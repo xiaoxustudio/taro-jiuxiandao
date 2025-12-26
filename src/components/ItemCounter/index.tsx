@@ -1,3 +1,4 @@
+import { IUseValueNotState } from '@/hooks/useValue';
 import Box from '../Box';
 import JXButton from '../Button';
 import JXSpace from '../Space';
@@ -5,7 +6,9 @@ import styles from './index.module.less';
 
 interface ItemCounterProps {
   count: number;
-  setCount: React.Dispatch<React.SetStateAction<number>>;
+  setCount:
+    | React.Dispatch<React.SetStateAction<number>>
+    | IUseValueNotState<number>;
   indicator?: number[];
 }
 
@@ -21,7 +24,11 @@ function ItemCounter({
           <JXButton
             className={styles.JXItemCounterButton}
             key={item}
-            onClick={() => setCount(Math.max(count - item, 1))}
+            onClick={() =>
+              typeof setCount === 'function'
+                ? setCount(Math.max(count - item, 1))
+                : setCount.set(Math.max(count - item, 1))
+            }
           >
             -{item}
           </JXButton>
@@ -32,7 +39,11 @@ function ItemCounter({
           <JXButton
             className={styles.JXItemCounterButton}
             key={item}
-            onClick={() => setCount(count + item)}
+            onClick={() =>
+              typeof setCount === 'function'
+                ? setCount(count + item)
+                : setCount.set(count + item)
+            }
           >
             +{item}
           </JXButton>

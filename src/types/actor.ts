@@ -59,6 +59,9 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   dongfu: null | {
     lv: number;
     lingchi: number; // 灵池
+    daolv: null | {
+      affinity: number;
+    };
   }; // 洞府
   liandan: {
     time: number;

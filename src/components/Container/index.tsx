@@ -47,6 +47,7 @@ function Container({
         setHeight(res.height);
       });
   });
+
   return (
     <View className={classNames(styles.Container, className)} {...props}>
       <View id={id.current}>

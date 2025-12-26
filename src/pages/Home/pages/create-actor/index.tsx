@@ -159,7 +159,12 @@ function Index() {
       time: ''
     },
     xiulian: null,
-    dongfu: null,
+    dongfu: {
+      lingchi: 1000,
+      lv: 1,
+      daolv: null
+    },
+    // dongfu: null,
     zd: {
       time: 0,
       df: ''

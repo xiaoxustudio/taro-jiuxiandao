@@ -12,7 +12,8 @@ export default defineAppConfig({
     'pages/Main/pages/shilian-list/index',
     'pages/Main/pages/shilian/index',
     'pages/Main/pages/liandan/index',
-    'pages/Main/pages/gongfa/index'
+    'pages/Main/pages/gongfa/index',
+    'pages/Main/pages/dongfu/index'
   ],
 
   window: {
