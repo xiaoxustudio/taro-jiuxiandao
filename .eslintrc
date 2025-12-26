@@ -47,6 +47,7 @@
       {
         "ignore": ["^@/"] // @ 是设置的路径别名
       }
-    ]
+    ],
+    "no-useless-return": "off"
   }
 }

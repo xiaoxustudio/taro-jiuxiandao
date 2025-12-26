@@ -29,13 +29,14 @@ export default function Dongfu() {
       Toast.show('请加注数量');
       return;
     }
-    setIsModalVisible(false);
     if (lingshi >= blNum) {
       chuwu.Remove({ name: '灵石', type: CWType.QT, num: blNum });
       set('dongfu.lingchi', Math.floor(blNum / 10) + get('dongfu.lingchi'));
     } else {
       Toast.show('灵石不足');
+      return;
     }
+    setIsModalVisible(false);
   }, [blNum, get, lingshi, set]);
 
   return (

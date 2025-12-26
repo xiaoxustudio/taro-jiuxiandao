@@ -201,7 +201,7 @@ function Main() {
 
   // 打开修炼弹窗
   const handleOpenXiuLian = () => {
-    const need = getLingQiForJingJie();
+    const needAddXiuWei = getLingQiForJingJie();
 
     const zhongzuRate = get('zhongzu') === '灵' ? 0.2 : 0; // 种族增益系数
 
@@ -217,11 +217,10 @@ function Main() {
 
     const shouldGetXiu = rateOfLing * lvRate * jjRate + dfRate;
 
-    const calcXiu = (
-      Math.round(shouldGetXiu + need) *
-      (0.15 + zhongzuRate) *
-      zhoutian
-    ).toFixed(2);
+    const zhotianByzhoutian =
+      Math.round(shouldGetXiu + needAddXiuWei) * (0.5 + zhongzuRate); // 每小周天能获取修为
+
+    const calcXiu = (zhotianByzhoutian * zhoutian).toFixed(2);
 
     const content = (
       <>
@@ -244,6 +243,7 @@ function Main() {
       onOk() {
         c.close();
         set('xiuwei', get('xiuwei') + Number.parseFloat(calcXiu));
+        set('dongfu.lingchi', 0);
         set('xiulian', null);
       }
     });
