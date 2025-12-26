@@ -7,7 +7,7 @@ import {
 } from 'antd-mobile';
 import { Action } from 'antd-mobile/es/components/modal';
 import classNames from 'classnames';
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useMemo } from 'react';
 import styles from './index.module.less';
 
 export interface JXModalProps extends ModalProps {
@@ -32,33 +32,35 @@ function JXModal({
   onCancel = () => {},
   ...props
 }: PropsWithChildren<Partial<JXModalProps>>) {
-  const [action, setAction] = useState<Action[]>([]);
-  useEffect(() => {
+  const action = useMemo(() => {
+    const defaultActions: Action[] = [];
+
     if (!disableOk) {
-      setAction((v) => [
-        ...v.filter((a) => a.key !== 'confirm'),
-        {
-          key: 'confirm',
-          text: okText,
-          disabled: false,
-          className: styles.MadalConfirm,
-          onClick: onOk
-        }
-      ]);
+      defaultActions.push({
+        key: 'confirm',
+        text: okText,
+        disabled: false,
+        className: styles.MadalConfirm,
+        onClick: onOk
+      });
     }
     if (!disableCancle) {
-      setAction((v) => [
-        ...v.filter((a) => a.key !== 'cancle'),
-        {
-          key: 'cancle',
-          text: cancleText,
-          disabled: false,
-          className: styles.MadalCancle,
-          onClick: onCancel
-        }
-      ]);
+      defaultActions.push({
+        key: 'cancle',
+        text: cancleText,
+        disabled: false,
+        className: styles.MadalCancle,
+        onClick: onCancel
+      });
     }
-  }, [cancleText, disableCancle, disableOk, okText, onCancel, onOk]); //eslint-disable-line
+
+    if (Array.isArray(actions)) {
+      return [...defaultActions, ...actions];
+    }
+
+    return defaultActions;
+  }, [cancleText, disableCancle, disableOk, okText, onOk, onCancel, actions]);
+
   return (
     <Modal
       className={classNames(styles.JSXButton, className)}
