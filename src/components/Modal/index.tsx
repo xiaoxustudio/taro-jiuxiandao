@@ -8,6 +8,7 @@ import {
 import { Action } from 'antd-mobile/es/components/modal';
 import classNames from 'classnames';
 import { PropsWithChildren, useMemo } from 'react';
+import useModal from '@/hooks/useModal';
 import styles from './index.module.less';
 
 export interface JXModalProps extends ModalProps {
@@ -18,11 +19,13 @@ export interface JXModalProps extends ModalProps {
   onCancel: () => void;
   disableOk: boolean;
   disableCancle: boolean;
+  controller: ReturnType<typeof useModal>['state'];
 }
 
 function JXModal({
   children,
   className,
+  visible,
   actions,
   okText = '确认',
   cancleText = '取消',
@@ -30,8 +33,17 @@ function JXModal({
   disableCancle = false,
   onOk = () => {},
   onCancel = () => {},
+  controller,
   ...props
 }: PropsWithChildren<Partial<JXModalProps>>) {
+  const visibleMemo = useMemo(() => {
+    const v =
+      controller?.visiableModal !== undefined
+        ? controller?.visiableModal
+        : visible;
+    return v;
+  }, [controller?.visiableModal, visible]);
+
   const action = useMemo(() => {
     const defaultActions: Action[] = [];
 
@@ -69,6 +81,7 @@ function JXModal({
       closeOnMaskClick
       closeOnAction
       actions={Array.isArray(actions) ? [...action, ...actions] : action}
+      visible={visibleMemo}
       {...props}
     />
   );
