@@ -1,3 +1,4 @@
+import { round } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -201,13 +202,13 @@ function Main() {
 
   // 打开修炼弹窗
   const handleOpenXiuLian = () => {
-    const needAddXiuWei = getLingQiForJingJie();
+    const needAddXiuWeiJJ = getLingQiForJingJie();
 
     const zhongzuRate = get('zhongzu') === '灵' ? 0.2 : 0; // 种族增益系数
 
     const rateOfLing = getLingQiForRate();
 
-    const lvRate = 1 + (get('lv') / 10) * 0.05;
+    const lvRate = round((get('lv') / 10) * 0.05, 2);
 
     const jjRate = 1 + (getLingQiToNumber() - 1) * 0.15;
 
@@ -215,10 +216,10 @@ function Main() {
 
     const zhoutian = ZhouTian(xiulian.time);
 
-    const shouldGetXiu = rateOfLing * lvRate * jjRate + dfRate;
+    const shouldGetXiu =
+      needAddXiuWeiJJ * 0.05 * rateOfLing * lvRate * jjRate + dfRate;
 
-    const zhotianByzhoutian =
-      Math.round(shouldGetXiu + needAddXiuWei) * (0.5 + zhongzuRate); // 每小周天能获取修为
+    const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate); // 每小周天能获取修为
 
     const calcXiu = (zhotianByzhoutian * zhoutian).toFixed(2);
 
