@@ -1,6 +1,20 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { chineseToNumber, numberToChinese } from '.';
+
+const MAJOR_REALMS = [
+  '练气',
+  '筑基',
+  '结丹',
+  '元婴',
+  '化神',
+  '返虚',
+  '合体',
+  '大乘'
+] as const;
+const BASE_XIUWEI_BY_REALM = [800, 1200, 1600, 2000, 2500, 3000, 3600, 4200];
+const RATE_OF_LING_BY_REALM = [600, 800, 1200, 1500, 1800, 2200, 2500, 3000];
+const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
 /* 角色相关操作 */
 
 /**
@@ -31,37 +45,10 @@ function HasActor(name: string) {
  */
 function getLingQiToNumber() {
   const actor = getActor();
-  let dj = 0;
-  switch (actor.jingjie) {
-    case '练气':
-      dj = 0;
-      break;
-    case '筑基':
-      dj = 1;
-      break;
-    case '结丹':
-      dj = 2;
-      break;
-    case '元婴':
-      dj = 3;
-      break;
-    case '化神':
-      dj = 4;
-      break;
-    case '返虚':
-      dj = 5;
-      break;
-    case '合体':
-      dj = 6;
-      break;
-    case '大乘':
-      dj = 7;
-      break;
-    default:
-      dj = 0;
-      break;
-  }
-  return dj;
+  const idx = MAJOR_REALMS.indexOf(
+    actor.jingjie as (typeof MAJOR_REALMS)[number]
+  );
+  return idx >= 0 ? idx : 0;
 }
 
 /**
@@ -70,37 +57,11 @@ function getLingQiToNumber() {
  */
 function getLingQiForJingJie() {
   const actor = getActor();
-  let xw = 0;
-  switch (actor.jingjie) {
-    case '练气':
-      xw = 1000;
-      break;
-    case '筑基':
-      xw = 500;
-      break;
-    case '结丹':
-      xw = 800;
-      break;
-    case '元婴':
-      xw = 1200;
-      break;
-    case '化神':
-      xw = 1400;
-      break;
-    case '返虚':
-      xw = 1600;
-      break;
-    case '合体':
-      xw = 1800;
-      break;
-    case '大乘':
-      xw = 1800;
-      break;
-    default:
-      xw = 1000;
-      break;
-  }
-  return xw;
+  const idx = MAJOR_REALMS.indexOf(
+    actor.jingjie as (typeof MAJOR_REALMS)[number]
+  );
+  const i = idx >= 0 ? idx : 0;
+  return BASE_XIUWEI_BY_REALM[i];
 }
 
 /**
@@ -109,37 +70,11 @@ function getLingQiForJingJie() {
  */
 function getLingQiForRate() {
   const actor = getActor();
-  let xw = 0;
-  switch (actor.jingjie) {
-    case '练气':
-      xw = 600;
-      break;
-    case '筑基':
-      xw = 800;
-      break;
-    case '结丹':
-      xw = 1200;
-      break;
-    case '元婴':
-      xw = 1500;
-      break;
-    case '化神':
-      xw = 1800;
-      break;
-    case '返虚':
-      xw = 2200;
-      break;
-    case '合体':
-      xw = 2500;
-      break;
-    case '大乘':
-      xw = 3000;
-      break;
-    default:
-      xw = 600;
-      break;
-  }
-  return xw;
+  const idx = MAJOR_REALMS.indexOf(
+    actor.jingjie as (typeof MAJOR_REALMS)[number]
+  );
+  const i = idx >= 0 ? idx : 0;
+  return RATE_OF_LING_BY_REALM[i];
 }
 
 /**
@@ -148,20 +83,11 @@ function getLingQiForRate() {
  */
 export const getJingJieMaxDep = () => {
   const actor = getActor();
-  switch (actor.jingjie) {
-    case '练气':
-      return 12;
-    case '筑基':
-    case '结丹':
-    case '元婴':
-    case '化神':
-    case '返虚':
-    case '合体':
-    case '大乘':
-      return 9;
-    default:
-      return 9;
-  }
+  const idx = MAJOR_REALMS.indexOf(
+    actor.jingjie as (typeof MAJOR_REALMS)[number]
+  );
+  const i = idx >= 0 ? idx : 0;
+  return MAX_MINOR_BY_REALM[i] ?? 9;
 };
 
 /**
