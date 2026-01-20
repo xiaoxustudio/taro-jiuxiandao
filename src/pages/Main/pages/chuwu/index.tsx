@@ -24,7 +24,7 @@ export default function Chuwu() {
   const { get } = useActorController();
   const [list, setList] = useState<BaseType[]>([]); // 列表
   const scrollHook = useScroll();
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const [select, setSelect] = useState<BaseType | null>(null);
   const [type, setType] = useState<CWType>(CWType.FB);
 

@@ -1,6 +1,7 @@
 import { round } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
+import Taro from '@tarojs/taro';
 import { useCallback, useEffect, useMemo } from 'react';
 import title from '@/assets/logo.png';
 import {
@@ -30,6 +31,13 @@ import styles from './index.module.less';
 
 function Main() {
   const { get, set, actor } = useActorController();
+  useEffect(() => {
+    const pages =
+      typeof Taro.getCurrentPages === 'function' ? Taro.getCurrentPages() : [];
+    if (pages.length > 1) {
+      Taro.reLaunch({ url: '/pages/Main/index' });
+    }
+  }, []);
   const xiulian = useMemo(() => get('xiulian') as any, [get]);
   const canRed = useMemo(
     () => get('xiuwei') >= get('max_xiuwei'),

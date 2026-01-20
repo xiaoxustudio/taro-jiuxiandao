@@ -29,14 +29,14 @@ export const currentTime = () => Date.now();
  */
 export function navigateTo(url: string, options: NavigateOptions = {}) {
   const opts = omit(options, ['url']);
+  if (opts && opts.all) {
+    Taro.reLaunch({
+      ...opts,
+      url: `/pages/${url}`
+    } as Taro.reLaunch.Option);
+    return;
+  }
   if (opts && opts.replace) {
-    if (opts.all) {
-      Taro.reLaunch({
-        ...opts,
-        url: `/pages/${url}`
-      } as Taro.reLaunch.Option);
-      return;
-    }
     Taro.redirectTo({
       ...opts,
       url: `/pages/${url}`
