@@ -94,7 +94,7 @@ export default function Gongfa() {
     }
     set('gongfa.current', current);
     JXToast(`冲击功法${current.name}：+${shouldGetExp}`).show();
-  }, [current, shouldGetExp, set]);
+  }, [current, shouldGetExp, set, get]); // eslint-disable-line
 
   return (
     <Container

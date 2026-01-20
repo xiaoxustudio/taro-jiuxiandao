@@ -1,7 +1,6 @@
 import { random } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import difangData from '@/assets/df.json';
-import ysData from '@/assets/ys.json';
 import {
   Container,
   JXButton,
@@ -22,7 +21,7 @@ import {
 } from '@/types';
 import useScroll from '@/hooks/useScroll';
 import chuwu from '@/utils/chuwu';
-import { navigateTo } from '@/utils';
+import { navigateTo, numberToChinese } from '@/utils';
 import styles from './index.module.less';
 
 export default function Shilian() {
@@ -34,7 +33,70 @@ export default function Shilian() {
     () => difangData.find((v) => v.name === get('zd.df')) as DiFangType,
     [get]
   );
-  const ysList = useMemo(() => ysData[df.name] as any[], [df.name]);
+  const genYaoShou = useCallback((): YaoShouZDType => {
+    const tierMap: Record<string, number> = {
+      练气: 1,
+      筑基: 2,
+      结丹: 3,
+      元婴: 4,
+      化神: 5,
+      返虚: 6,
+      合体: 7,
+      大乘: 8
+    };
+    const tier = tierMap[df.jingjie] || 1;
+    const namesA = ['凶', '烈', '青', '赤', '玄', '金', '灵', '幽', '噬', '炎'];
+    const namesB = ['狼', '虎', '蛛', '蟒', '狮', '猿', '鳄', '蝎', '熊', '雕'];
+    const na = namesA[random(0, namesA.length - 1)];
+    const nb = namesB[random(0, namesB.length - 1)];
+    const jj1Max = df.jingjie === '练气' ? 12 : 9;
+    const jj1 = random(1, jj1Max);
+    const jj2Arr = ['初期', '中期', '后期', '圆满', '大圆满'];
+    const jj2 = jj2Arr[random(0, jj2Arr.length - 1)];
+    const dropPools: Record<string, string[]> = {
+      练气: ['妖丹', '千叶草', '草灵', '魔晶'],
+      筑基: ['百灵血竹', '枯木灵藤', '木之精华', '彳果', '柔水', '妖丹'],
+      结丹: ['灵氩液', '木之精华', '草灵', '妖丹', '柔水'],
+      元婴: ['残·龙魂', '灵氩液', '木之精华', '妖丹'],
+      化神: ['灵氩液', '木之精华', '妖丹'],
+      返虚: ['灵氩液', '妖丹'],
+      合体: ['灵氩液', '妖丹'],
+      大乘: ['灵氩液', '妖丹']
+    };
+    const clPool = dropPools[df.jingjie] || dropPools['练气'];
+    const clName = clPool[random(0, clPool.length - 1)];
+    const stageCoefMap: Record<string, number> = {
+      初期: 1.0,
+      中期: 1.1,
+      后期: 1.2,
+      圆满: 1.3,
+      大圆满: 1.4
+    };
+    const j1Coef = 1 + (jj1 - 1) * 0.05;
+    const stageCoef = stageCoefMap[jj2] || 1.0;
+    const scale = tier * j1Coef * stageCoef;
+    const qixue = Math.round(random(600, 1000) * scale);
+    const gongji = Math.round(random(50, 120) * scale);
+    const fangyu = Math.round(random(25, 70) * scale);
+    const sudu = Math.round(
+      (20 + random(0, 15) + tier) * (1 + (jj1 - 1) * 0.01)
+    );
+    const baoji = Math.min(50, random(3, 10 + tier));
+    const xw = Math.round(
+      random(80, 200) * tier * (1 + (jj1 - 1) * 0.03) * stageCoef
+    );
+    return {
+      name: `${na}${nb}(${df.jingjie}${numberToChinese(jj1)}阶${jj2})`,
+      qixue,
+      gongji,
+      fangyu,
+      sudu,
+      baoji,
+      cl: clName,
+      xw,
+      df: df.name
+    };
+  }, [df]);
   const [YaoShouInstance, setYaoShouInstance] = useState<YaoShouZDType | null>(
     null
   ); // 妖兽实例
@@ -56,15 +118,15 @@ export default function Shilian() {
     zd2: YaoShouZDType | ActorZDType
   ) => {
     let b = false;
-    // 暴击
     const bj = random(1, 100);
-    if (bj <= zd1.baoji) {
-      zd1.gongji *= 2;
-      b = true;
-    }
-    // 破防
-    zd1.gongji = zd2.fangyu - zd1.gongji < 0 ? 0 : zd2.fangyu - zd1.gongji;
-    zd2.qixue = zd1.qixue - zd1.gongji;
+    const isCrit = bj <= zd1.baoji;
+    const critMul = isCrit ? 1.5 : 1;
+    const baseAtk = Math.max(0, Math.round(zd1.gongji * critMul));
+    const def = Math.max(0, zd2.fangyu);
+    const damage = Math.max(1, Math.round(baseAtk * (100 / (100 + def))));
+    b = isCrit;
+    const newHp = Math.max(0, Math.round(zd2.qixue - damage));
+    const defender = { ...zd2, qixue: newHp };
     setHuiheState((v) => ({
       ...v,
       logs: [
@@ -81,18 +143,18 @@ export default function Shilian() {
               </Text>
               发动攻击，造成：
               <Text color='red' inline bold={b}>
-                {zd1.gongji}
+                {damage}
               </Text>
               ，剩余血量：
               <Text color='red' inline>
-                {zd2.qixue}
+                {defender.qixue}
               </Text>
             </>
           )
         }
       ]
     }));
-    return zd1;
+    return defender;
   };
 
   const zhandou = useCallback(() => {
@@ -133,25 +195,27 @@ export default function Shilian() {
                   你获得材料：{clData.name}X{clData.num}
                 </>
               )
+            },
+            {
+              text: <>你获得修为：{YaoShouInstance.xw}</>
             }
           ]
         }));
         clearTimeout(timer.current);
         chuwu.Add(clData);
+        set('xiuwei', get('xiuwei') + YaoShouInstance.xw);
         setHuiheState((v) => ({ ...v, start: false, end: true }));
         setActorInstance(null);
         return;
       }
       // 战斗计算
       if (!HuiheState.target) {
-        // 我方出手
-        const actor = zhandouLogic(ActorInstance, YaoShouInstance);
-        setActorInstance(actor);
+        const ys = zhandouLogic(ActorInstance, YaoShouInstance);
+        setYaoShouInstance(ys as YaoShouZDType);
         setHuiheState((v) => ({ ...v, target: 1 }));
       } else {
-        // 敌方出手
-        const yaoshou = zhandouLogic(YaoShouInstance, ActorInstance);
-        setYaoShouInstance(yaoshou as YaoShouZDType);
+        const ac = zhandouLogic(YaoShouInstance, ActorInstance);
+        setActorInstance(ac as ActorZDType);
         setHuiheState((v) => ({ ...v, target: 0 }));
       }
       setHuiheState((v) => ({ ...v, huihe: v.huihe + 1 }));
@@ -169,29 +233,17 @@ export default function Shilian() {
       return;
     }
 
-    // 直接生成妖兽数据
-    const parse = ysList[random(0, ysList.length - 1)].split(';');
-    const newYaoShou = {
-      name: parse[0],
-      qixue: parse[1],
-      gongji: parse[2],
-      fangyu: parse[3],
-      sudu: parse[4],
-      baoji: parse[5],
-      cl: parse[6],
-      xw: parse[7],
-      df: parse[8]
-    };
+    const newYaoShou = genYaoShou();
 
     // 立即更新状态
     setYaoShouInstance(newYaoShou);
     setActorInstance({
       name: get('daohao'),
-      qixue: get('qixue'),
-      gongji: get('gongji'),
-      fangyu: get('fangyu'),
-      sudu: get('sudu'),
-      baoji: get('baoji')
+      qixue: get('qixue') + get('addAttr.qixue'),
+      gongji: get('gongji') + get('addAttr.gongji'),
+      fangyu: get('fangyu') + get('addAttr.fangyu'),
+      sudu: get('sudu') + get('addAttr.sudu'),
+      baoji: get('baoji') + get('addAttr.baoji')
     });
 
     // 使用同步生成的妖兽名称
@@ -204,7 +256,7 @@ export default function Shilian() {
       end: false
     }));
     set('shenshi', get('shenshi') - 1);
-  }, [HuiheState.end, get, set, ysList]);
+  }, [HuiheState.end, genYaoShou, get, set]);
 
   /**
    * @description: 开始战斗
@@ -212,16 +264,23 @@ export default function Shilian() {
    * @return {*}
    */
   const handleStartZD = useCallback(() => {
+    if (!ActorInstance || !YaoShouInstance) {
+      JXToast('请先探索妖兽！').show();
+      return;
+    }
     if (!HuiheState.can) {
+      const first =
+        (ActorInstance?.sudu || 0) >= (YaoShouInstance?.sudu || 0) ? 0 : 1;
       setHuiheState({
         ...HuiheState,
-        can: true
+        can: true,
+        target: first
       });
       zhandou();
     } else {
       JXToast('妖兽死亡，请继续探索！').show();
     }
-  }, [HuiheState, zhandou]);
+  }, [ActorInstance, YaoShouInstance, HuiheState, zhandou]);
 
   const handleSeeYaoShou = useCallback(() => {
     JXModal.show({

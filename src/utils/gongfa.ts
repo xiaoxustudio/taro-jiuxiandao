@@ -74,11 +74,7 @@ function setCurrentGongFa(id: string): void {
   const adds = gf.attr;
   if (adds) {
     Object.keys(adds).forEach((key) => {
-      if (adds[key] >= 0) {
-        acData.addAttr[key] += adds[key];
-      } else {
-        acData.addAttr[key] -= adds[key];
-      }
+      acData.addAttr[key] += adds[key];
     });
   }
   set(current, acData);
@@ -107,11 +103,7 @@ function putCurrentGongfa(): Promise<boolean> {
     const adds = currentGongFa.attr;
     if (adds) {
       Object.keys(adds).forEach((key) => {
-        if (adds[key] >= 0) {
-          acData.addAttr[key] -= adds[key];
-        } else {
-          acData.addAttr[key] += adds[key];
-        }
+        acData.addAttr[key] -= adds[key];
       });
     }
   }
