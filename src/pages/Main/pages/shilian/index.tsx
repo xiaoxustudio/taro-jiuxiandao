@@ -113,6 +113,7 @@ export default function Shilian() {
   });
   const endRef = useRef(HuiheState.end);
   const guajiLockRef = useRef(false);
+  const autoBattleTimer = useRef<NodeJS.Timeout | number>(-1);
   /**
    * @description: 一次攻击
    * @return {*}
@@ -367,8 +368,18 @@ export default function Shilian() {
       ActorInstance &&
       YaoShouInstance
     ) {
-      handleStartZD();
+      if (typeof autoBattleTimer.current === 'number') {
+        clearTimeout(autoBattleTimer.current as number);
+      }
+      autoBattleTimer.current = setTimeout(() => {
+        handleStartZD();
+      }, 800);
     }
+    return () => {
+      if (typeof autoBattleTimer.current === 'number') {
+        clearTimeout(autoBattleTimer.current as number);
+      }
+    };
   }, [
     isGuaji,
     HuiheState.can,
