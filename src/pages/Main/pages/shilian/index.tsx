@@ -115,6 +115,7 @@ export default function Shilian() {
   const guajiLockRef = useRef(false);
   const autoBattleTimer = useRef<NodeJS.Timeout | number>(-1);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
+  const fightSeqRef = useRef(0);
   /**
    * @description: 一次攻击
    * @return {*}
@@ -176,11 +177,11 @@ export default function Shilian() {
             }
           ]
         }));
-        clearTimeout(timer.current);
+        clearInterval(timer.current as number);
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
-        const lastName = YaoShouInstance.name;
+        const seq = fightSeqRef.current;
         setTimeout(() => {
-          if (YaoShouInstance?.name === lastName) {
+          if (fightSeqRef.current === seq) {
             setYaoShouInstance(null);
           }
         }, 1200);
@@ -213,7 +214,7 @@ export default function Shilian() {
             }
           ]
         }));
-        clearTimeout(timer.current);
+        clearInterval(timer.current as number);
         chuwu.Add(clData);
         set('xiuwei', get('xiuwei') + YaoShouInstance.xw);
         setSessionLoot((prev) => ({
@@ -221,9 +222,9 @@ export default function Shilian() {
           [clData.name]: (prev[clData.name] || 0) + clData.num!
         }));
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
-        const lastName2 = YaoShouInstance.name;
+        const seq2 = fightSeqRef.current;
         setTimeout(() => {
-          if (YaoShouInstance?.name === lastName2) {
+          if (fightSeqRef.current === seq2) {
             setYaoShouInstance(null);
           }
         }, 1200);
@@ -258,6 +259,7 @@ export default function Shilian() {
     const newYaoShou = genYaoShou();
 
     // 立即更新状态
+    fightSeqRef.current += 1;
     setYaoShouInstance(newYaoShou);
     setActorInstance({
       name: get('daohao'),
@@ -341,16 +343,25 @@ export default function Shilian() {
     });
   }, [sessionLoot]);
   useEffect(() => {
-    if (HuiheState.can && YaoShouInstance) {
-      timer.current = setTimeout(zhandou, 800);
-    }
-    scrollHook.scrollTo(scrollHook.dom?.scrollHeight || 0);
-    return () => {
+    const cleanup = () => {
       if (typeof timer.current === 'number') {
-        clearTimeout(timer.current);
+        clearInterval(timer.current as number);
       }
     };
-  }, [HuiheState, YaoShouInstance, scrollHook]); //eslint-disable-line
+    if (HuiheState.can && ActorInstance && YaoShouInstance) {
+      cleanup();
+      timer.current = setInterval(() => {
+        zhandou();
+      }, 800);
+    } else {
+      cleanup();
+    }
+    return cleanup;
+  }, [HuiheState.can, ActorInstance, YaoShouInstance, zhandou]);
+
+  useEffect(() => {
+    scrollHook.scrollTo(scrollHook.dom?.scrollHeight || 0);
+  }, [HuiheState.logs.length, scrollHook]);
 
   useEffect(() => {
     endRef.current = HuiheState.end;
