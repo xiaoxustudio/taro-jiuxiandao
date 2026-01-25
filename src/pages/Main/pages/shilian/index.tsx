@@ -116,6 +116,22 @@ export default function Shilian() {
   const autoBattleTimer = useRef<NodeJS.Timeout | number>(-1);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
   const fightSeqRef = useRef(0);
+  const [guajiStats, setGuajiStats] = useState<{
+    totalRounds: number;
+    wins: number;
+    losses: number;
+    history: Array<{
+      name: string;
+      df: string;
+      rounds: number;
+      result: string;
+    }>;
+  }>({ totalRounds: 0, wins: 0, losses: 0, history: [] });
+  const isGuajiRef = useRef(isGuaji);
+  const currentGuajiFightRoundsRef = useRef(0);
+  useEffect(() => {
+    isGuajiRef.current = isGuaji;
+  }, [isGuaji]);
   /**
    * @description: 一次攻击
    * @return {*}
@@ -179,6 +195,24 @@ export default function Shilian() {
         }));
         clearInterval(timer.current as number);
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+        if (isGuajiRef.current) {
+          const rounds = currentGuajiFightRoundsRef.current;
+          setGuajiStats((s) => ({
+            totalRounds: s.totalRounds + rounds,
+            wins: s.wins,
+            losses: s.losses + 1,
+            history: [
+              ...s.history,
+              {
+                name: YaoShouInstance.name,
+                df: YaoShouInstance.df,
+                rounds,
+                result: '负'
+              }
+            ]
+          }));
+          currentGuajiFightRoundsRef.current = 0;
+        }
         const seq = fightSeqRef.current;
         setTimeout(() => {
           if (fightSeqRef.current === seq) {
@@ -221,6 +255,24 @@ export default function Shilian() {
           ...prev,
           [clData.name]: (prev[clData.name] || 0) + clData.num!
         }));
+        if (isGuajiRef.current) {
+          const rounds = currentGuajiFightRoundsRef.current;
+          setGuajiStats((s) => ({
+            totalRounds: s.totalRounds + rounds,
+            wins: s.wins + 1,
+            losses: s.losses,
+            history: [
+              ...s.history,
+              {
+                name: YaoShouInstance.name,
+                df: YaoShouInstance.df,
+                rounds,
+                result: '胜'
+              }
+            ]
+          }));
+          currentGuajiFightRoundsRef.current = 0;
+        }
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
         const seq2 = fightSeqRef.current;
         setTimeout(() => {
@@ -241,6 +293,9 @@ export default function Shilian() {
         setActorInstance(ac as ActorZDType);
         setHuiheState((v) => ({ ...v, target: 0 }));
       }
+      if (isGuajiRef.current) {
+        currentGuajiFightRoundsRef.current += 1;
+      }
       setHuiheState((v) => ({ ...v, huihe: v.huihe + 1 }));
     }
   }, [ActorInstance, HuiheState.target, YaoShouInstance, get, set]);
@@ -251,6 +306,10 @@ export default function Shilian() {
    * @return {*}
    */
   const handleSearchYaoShou = useCallback(() => {
+    if (get('shenshi') <= 0) {
+      JXToast('你没有足够的精神！').show();
+      return;
+    }
     if (!HuiheState.end) {
       JXToast('请先解决当前的妖兽！').show();
       return;
@@ -342,6 +401,33 @@ export default function Shilian() {
       closeOnMaskClick: true
     });
   }, [sessionLoot]);
+  const handleSeeGuajiDetail = useCallback(() => {
+    JXModal.show({
+      title: '挂机详情',
+      content: (
+        <>
+          <Text>总回合数：{guajiStats.totalRounds}</Text>
+          <Text>
+            胜：{guajiStats.wins}，负：{guajiStats.losses}
+          </Text>
+          {guajiStats.history.length ? (
+            <>
+              {guajiStats.history.map((it, idx) => (
+                <Text key={`${it.name}-${idx}`}>
+                  {it.name}（{it.df}）{it.result}，回合数：{it.rounds}
+                </Text>
+              ))}
+            </>
+          ) : (
+            <Text>暂无挂机战斗记录</Text>
+          )}
+        </>
+      ),
+      disableCancle: true,
+      disableOk: true,
+      closeOnMaskClick: true
+    });
+  }, [guajiStats]);
   useEffect(() => {
     const cleanup = () => {
       if (typeof timer.current === 'number') {
@@ -446,7 +532,7 @@ export default function Shilian() {
         >
           挂机
         </JXButton>
-        <JXButton>挂机详情</JXButton>
+        <JXButton onClick={handleSeeGuajiDetail}>挂机详情</JXButton>
         <JXButton disabled={!isGuaji} onClick={() => setGuaji(false)}>
           停挂
         </JXButton>
