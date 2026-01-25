@@ -10,7 +10,7 @@ export interface JXGridItemProps extends GridItemProps {
   style: CSSProperties;
 }
 
-JXGrid.Item = function ({
+JXGrid.Item = function Item({
   children,
   align,
   style,

@@ -27,8 +27,10 @@ import styles from './index.module.less';
 export default function Shilian() {
   const scrollHook = useScroll();
   const { get, set } = useActorController();
+  const [isGuaji, setGuaji] = useState(false);
   // eslint-disable-next-line no-undef
   const timer = useRef<NodeJS.Timeout | number>(-1);
+  const guajiTimer = useRef<NodeJS.Timeout | number>(-1);
   const df = useMemo(
     () => difangData.find((v) => v.name === get('zd.df')) as DiFangType,
     [get]
@@ -109,6 +111,8 @@ export default function Shilian() {
     end: true, // 是否战斗结束
     can: false // 是否可以开始战斗
   });
+  const endRef = useRef(HuiheState.end);
+  const guajiLockRef = useRef(false);
   /**
    * @description: 一次攻击
    * @return {*}
@@ -303,7 +307,7 @@ export default function Shilian() {
 
   useEffect(() => {
     if (HuiheState.can && YaoShouInstance) {
-      timer.current = setTimeout(zhandou, 1);
+      timer.current = setTimeout(zhandou, 800);
     }
     scrollHook.scrollTo(scrollHook.dom?.scrollHeight || 0);
     return () => {
@@ -313,15 +317,80 @@ export default function Shilian() {
     };
   }, [HuiheState, YaoShouInstance, scrollHook]); //eslint-disable-line
 
+  useEffect(() => {
+    endRef.current = HuiheState.end;
+  }, [HuiheState.end]);
+
+  const handleSearchYaoShouRef = useRef(handleSearchYaoShou);
+  const getRef = useRef(get);
+  useEffect(() => {
+    handleSearchYaoShouRef.current = handleSearchYaoShou;
+  }, [handleSearchYaoShou]);
+  useEffect(() => {
+    getRef.current = get;
+  }, [get]);
+
+  useEffect(() => {
+    const cleanup = () => {
+      if (typeof guajiTimer.current === 'number') {
+        clearInterval(guajiTimer.current as number);
+      }
+    };
+    if (!isGuaji) {
+      cleanup();
+      return cleanup;
+    }
+    const run = () => {
+      if (guajiLockRef.current) return;
+      if (!endRef.current) return;
+      const shen = getRef.current('shenshi');
+      if (shen <= 0) {
+        setGuaji(false);
+        JXToast('神识不足，已停止挂机').show();
+        return;
+      }
+      guajiLockRef.current = true;
+      endRef.current = false;
+      handleSearchYaoShouRef.current();
+      guajiLockRef.current = false;
+    };
+    run();
+    guajiTimer.current = setInterval(run, 1500);
+    return cleanup;
+  }, [isGuaji]);
+
+  useEffect(() => {
+    if (
+      isGuaji &&
+      !HuiheState.can &&
+      !HuiheState.end &&
+      ActorInstance &&
+      YaoShouInstance
+    ) {
+      handleStartZD();
+    }
+  }, [
+    isGuaji,
+    HuiheState.can,
+    HuiheState.end,
+    ActorInstance,
+    YaoShouInstance,
+    handleStartZD
+  ]);
+
   return (
     <Container className={styles.container} title={df.name} desc={df.desc}>
       <JXSpace gap={5} between>
-        <JXButton onClick={handleSearchYaoShou}>
+        <JXButton onClick={handleSearchYaoShou} disabled={HuiheState.can}>
           探索({get('shenshi')})
         </JXButton>
-        <JXButton>挂机</JXButton>
+        <JXButton disabled={isGuaji} onClick={() => setGuaji(true)}>
+          挂机
+        </JXButton>
         <JXButton>挂机详情</JXButton>
-        <JXButton>停挂</JXButton>
+        <JXButton disabled={!isGuaji} onClick={() => setGuaji(false)}>
+          停挂
+        </JXButton>
         <JXButton
           onClick={() => {
             navigateTo('Main/index', { all: true });
@@ -331,7 +400,9 @@ export default function Shilian() {
         </JXButton>
       </JXSpace>
       <JXSpace gap={5} between>
-        <JXButton onClick={handleStartZD}>战斗</JXButton>
+        <JXButton onClick={handleStartZD} disabled={HuiheState.can}>
+          战斗
+        </JXButton>
         <JXButton onClick={handleSeeYaoShou}>查看</JXButton>
         <JXButton>副本</JXButton>
         <JXButton>材料</JXButton>
