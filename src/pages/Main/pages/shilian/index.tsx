@@ -176,7 +176,13 @@ export default function Shilian() {
           ]
         }));
         clearTimeout(timer.current);
-        setHuiheState((v) => ({ ...v, start: false, end: true }));
+        setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+        const lastName = YaoShouInstance.name;
+        setTimeout(() => {
+          if (YaoShouInstance?.name === lastName) {
+            setYaoShouInstance(null);
+          }
+        }, 1200);
         setActorInstance(null);
         return;
       }
@@ -209,7 +215,13 @@ export default function Shilian() {
         clearTimeout(timer.current);
         chuwu.Add(clData);
         set('xiuwei', get('xiuwei') + YaoShouInstance.xw);
-        setHuiheState((v) => ({ ...v, start: false, end: true }));
+        setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+        const lastName2 = YaoShouInstance.name;
+        setTimeout(() => {
+          if (YaoShouInstance?.name === lastName2) {
+            setYaoShouInstance(null);
+          }
+        }, 1200);
         setActorInstance(null);
         return;
       }
@@ -283,7 +295,7 @@ export default function Shilian() {
       });
       zhandou();
     } else {
-      JXToast('妖兽死亡，请继续探索！').show();
+      JXToast('战斗进行中，请稍候！').show();
     }
   }, [ActorInstance, YaoShouInstance, HuiheState, zhandou]);
 
@@ -395,7 +407,10 @@ export default function Shilian() {
         <JXButton onClick={handleSearchYaoShou} disabled={HuiheState.can}>
           探索({get('shenshi')})
         </JXButton>
-        <JXButton disabled={isGuaji} onClick={() => setGuaji(true)}>
+        <JXButton
+          disabled={isGuaji || HuiheState.can}
+          onClick={() => setGuaji(true)}
+        >
           挂机
         </JXButton>
         <JXButton>挂机详情</JXButton>
