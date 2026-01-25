@@ -251,7 +251,7 @@ function Main() {
       okText: '收功',
       onOk() {
         c.close();
-        set('xiuwei', get('xiuwei') + Number.parseFloat(calcXiu));
+        set('xiuwei', round(get('xiuwei') + Number.parseFloat(calcXiu), 2));
         set('dongfu.lingchi', 0);
         set('xiulian', null);
       }

@@ -220,7 +220,7 @@ export default function Shilian() {
       }
       setHuiheState((v) => ({ ...v, huihe: v.huihe + 1 }));
     }
-  }, [ActorInstance, HuiheState.target, YaoShouInstance]);
+  }, [ActorInstance, HuiheState.target, YaoShouInstance, get, set]);
 
   /**
    * @description: 探索
