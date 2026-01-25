@@ -114,6 +114,7 @@ export default function Shilian() {
   const endRef = useRef(HuiheState.end);
   const guajiLockRef = useRef(false);
   const autoBattleTimer = useRef<NodeJS.Timeout | number>(-1);
+  const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
   /**
    * @description: 一次攻击
    * @return {*}
@@ -215,6 +216,10 @@ export default function Shilian() {
         clearTimeout(timer.current);
         chuwu.Add(clData);
         set('xiuwei', get('xiuwei') + YaoShouInstance.xw);
+        setSessionLoot((prev) => ({
+          ...prev,
+          [clData.name]: (prev[clData.name] || 0) + clData.num!
+        }));
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
         const lastName2 = YaoShouInstance.name;
         setTimeout(() => {
@@ -267,9 +272,7 @@ export default function Shilian() {
     setHuiheState((prev) => ({
       ...prev,
       can: false,
-      logs: [
-        { text: `你发现了${newYaoShou.name}，它似乎也发现了你` } // 直接使用newYaoShou
-      ],
+      logs: [{ text: `你发现了${newYaoShou.name}，它似乎也发现了你` }],
       end: false
     }));
     set('shenshi', get('shenshi') - 1);
@@ -318,6 +321,25 @@ export default function Shilian() {
     });
   }, [YaoShouInstance]);
 
+  const handleSeeCailiao = useCallback(() => {
+    JXModal.show({
+      title: '材料清单',
+      content: Object.keys(sessionLoot).length ? (
+        <>
+          {Object.entries(sessionLoot).map(([n, c]) => (
+            <Text key={n}>
+              {n}X{c}
+            </Text>
+          ))}
+        </>
+      ) : (
+        <Text>暂无材料</Text>
+      ),
+      disableCancle: true,
+      disableOk: true,
+      closeOnMaskClick: true
+    });
+  }, [sessionLoot]);
   useEffect(() => {
     if (HuiheState.can && YaoShouInstance) {
       timer.current = setTimeout(zhandou, 800);
@@ -431,7 +453,7 @@ export default function Shilian() {
         </JXButton>
         <JXButton onClick={handleSeeYaoShou}>查看</JXButton>
         <JXButton>副本</JXButton>
-        <JXButton>材料</JXButton>
+        <JXButton onClick={handleSeeCailiao}>材料</JXButton>
         <JXButton>战况</JXButton>
       </JXSpace>
       <Scroll className={styles.content} Scroll={scrollHook}>
