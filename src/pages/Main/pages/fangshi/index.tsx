@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import fsAssets from '@/assets/fs.json';
-import danfangData from '@/assets/danfang.json';
+import { fangshiCategories, FangshiCategoryKey } from '@/assets/fangshi';
 import {
   Box,
   Container,
@@ -19,38 +18,17 @@ import useContainer from '@/hooks/useContainer';
 import './index.less';
 
 export default function Fangshi() {
-  const [type, setType] = useState(0);
+  const [type, setType] = useState<FangshiCategoryKey>(
+    fangshiCategories[0].key
+  );
   const container = useContainer();
+  const currentCategory = useMemo(
+    () => fangshiCategories.find((item) => item.key === type),
+    [type]
+  );
   const list = useMemo(() => {
-    let targetList: any;
-    switch (type) {
-      case 0:
-        // 法宝
-        targetList = fsAssets.fb;
-        break;
-      case 1:
-        // 丹药
-        targetList = fsAssets.dy.map((v) => ({
-          ...danfangData[v],
-          type: 1,
-          ls: danfangData[v].ls * 0.9
-        }));
-        break;
-      case 2:
-        // 材料
-        targetList = fsAssets.cl;
-        break;
-      case 5:
-        // 丹方
-        targetList = fsAssets.dy.map((v) => ({
-          ...danfangData[v],
-          name: `${danfangData[v].name}丹方`,
-          id: v
-        }));
-        break;
-      default:
-        targetList = [];
-    }
+    const targetList = currentCategory?.list() ?? [];
+    const action = currentCategory?.action;
     return targetList.map((v, index) => ({
       ...v,
       title: (
@@ -62,8 +40,11 @@ export default function Fangshi() {
           </JXSpace>
         </Box>
       ),
+      value: '',
       key: `${v.name}-${index}`,
       click() {
+        const attr = v.attr ?? {};
+        const attrKeys = Object.keys(attr);
         const instance = JXModal.show({
           okText: '购买',
           content: (
@@ -80,21 +61,21 @@ export default function Fangshi() {
                 )}
               </Text>
               <Text>描述：{v.desc}</Text>
-              {v?.attr ? (
+              {attrKeys.length ? (
                 <JXSpace direction='vertical' title='属性'>
-                  {Object.keys(v.attr).map((item) => (
-                    <Text key={v.attr[item]}>
+                  {attrKeys.map((item) => (
+                    <Text key={attr[item]}>
                       {AttrTransformChinese(
                         item as keyof ActorDataConfigForZhanDou
                       )}
                       ：
-                      {v.attr[item] >= 0 ? (
+                      {attr[item] >= 0 ? (
                         <Text color='green' inline>
-                          + {v.attr[item]}
+                          + {attr[item]}
                         </Text>
                       ) : (
                         <Text color='red' inline>
-                          {v.attr[item]}
+                          {attr[item]}
                         </Text>
                       )}
                     </Text>
@@ -114,16 +95,17 @@ export default function Fangshi() {
               return;
             }
             if (chuwu.LingShiThan(v.ls)) {
-              switch (type) {
-                case 0:
-                case 2:
-                  chuwu.Add(v);
-                  JXToast(`购买物品：${v.name}`).show();
-                  break;
-                case 5:
+              if (action === 'danfang') {
+                if (v.id) {
                   chuwu.AddDanFang(v.id);
                   JXToast(`购买丹方：${v.name}`).show();
-                  break;
+                } else {
+                  JXToast('丹方数据异常').show();
+                  return;
+                }
+              } else {
+                chuwu.Add(v);
+                JXToast(`购买物品：${v.name}`).show();
               }
               chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
             } else {
@@ -137,7 +119,7 @@ export default function Fangshi() {
         });
       }
     }));
-  }, [type]);
+  }, [currentCategory]);
   const lsMemo = useMemo(
     () => chuwu.Get({ name: '灵石', type: CWType.QT }),
     []
@@ -154,26 +136,17 @@ export default function Fangshi() {
         灵石：{lsMemo?.num || 0}
       </Text>
       <JXSpace gap={10} style={{ width: '100%' }} hscroll>
-        <JXButton width='100px' onClick={() => setType(0)}>
-          法宝
-        </JXButton>
-        <JXButton width='100px' onClick={() => setType(1)}>
-          丹药
-        </JXButton>
-        <JXButton width='100px' onClick={() => setType(2)}>
-          材料
-        </JXButton>
-        <JXButton width='100px' onClick={() => setType(3)}>
-          道具
-        </JXButton>
-        <JXButton width='100px' onClick={() => setType(4)}>
-          其他
-        </JXButton>
-        <JXButton width='100px' onClick={() => setType(5)}>
-          丹方
-        </JXButton>
+        {fangshiCategories.map((item) => (
+          <JXButton
+            key={item.key}
+            width='100px'
+            onClick={() => setType(item.key)}
+          >
+            {item.label}
+          </JXButton>
+        ))}
       </JXSpace>
-      {[0, 1, 2, 5].includes(type) && (
+      {currentCategory && (
         <Scroll calc={container.calcHeight + 50}>
           <List list={list} noFlex />
         </Scroll>

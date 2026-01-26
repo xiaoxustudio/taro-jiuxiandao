@@ -24,8 +24,6 @@ export default function Chuwu() {
   const { get } = useActorController();
   const [list, setList] = useState<BaseType[]>([]); // 列表
   const scrollHook = useScroll();
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const [select, setSelect] = useState<BaseType | null>(null);
   const [type, setType] = useState<CWType>(CWType.FB);
 
   const updateChuWu = useCallback(() => {
@@ -58,7 +56,6 @@ export default function Chuwu() {
           width='100%'
           onClick={() => {
             setType(CWType.FB);
-            setSelect(null);
           }}
         >
           法宝
@@ -67,7 +64,6 @@ export default function Chuwu() {
           width='100%'
           onClick={() => {
             setType(CWType.DY);
-            setSelect(null);
           }}
         >
           丹药
@@ -76,7 +72,6 @@ export default function Chuwu() {
           width='100%'
           onClick={() => {
             setType(CWType.QT);
-            setSelect(null);
           }}
         >
           其他
@@ -132,7 +127,6 @@ export default function Chuwu() {
                       }
                     });
                   }
-                  setSelect(v);
                 }}
                 shadow
               >
