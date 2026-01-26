@@ -17,6 +17,18 @@ export enum FabaoType {
   本名法宝 = '本名法宝'
 }
 
+// 法宝品级
+export enum FabaoPinjie {
+  练气 = '法器',
+  筑基 = '灵器',
+  结丹 = '法宝',
+  元婴 = '古宝',
+  化神 = '灵宝',
+  返虚 = '后天灵宝',
+  合体 = '先天灵宝',
+  大乘 = '通天灵宝'
+}
+
 // 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
 export type NestedKeyOf<Obj> = Obj extends object
   ? {
