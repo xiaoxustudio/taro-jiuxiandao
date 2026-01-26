@@ -22,6 +22,7 @@ import {
 import useScroll from '@/hooks/useScroll';
 import chuwu from '@/utils/chuwu';
 import { navigateTo, numberToChinese } from '@/utils';
+import { JingJie1ToNumber } from '@/utils/actor';
 import styles from './index.module.less';
 
 export default function Shilian() {
@@ -47,14 +48,72 @@ export default function Shilian() {
       大乘: 8
     };
     const tier = tierMap[df.jingjie] || 1;
+    const playerMajor = get('jingjie');
+    const playerMinorNum = JingJie1ToNumber(get('jingjie1'));
+    const playerStage = get('jingjie2');
+    const playerTier = tierMap[playerMajor] || 1;
     const namesA = ['凶', '烈', '青', '赤', '玄', '金', '灵', '幽', '噬', '炎'];
     const namesB = ['狼', '虎', '蛛', '蟒', '狮', '猿', '鳄', '蝎', '熊', '雕'];
     const na = namesA[random(0, namesA.length - 1)];
     const nb = namesB[random(0, namesB.length - 1)];
     const jj1Max = df.jingjie === '练气' ? 12 : 9;
-    const jj1 = random(1, jj1Max);
+    let jj1: number;
+    if (tier === playerTier) {
+      const offsets = [-1, 0, 1, 2, 3];
+      const weights = [1, 3, 3, 2, 1];
+      const sum = weights.reduce((a, b) => a + b, 0);
+      const r = random(1, sum);
+      let acc = 0;
+      let pick = 0;
+      for (let i = 0; i < weights.length; i++) {
+        acc += weights[i];
+        if (r <= acc) {
+          pick = offsets[i];
+          break;
+        }
+      }
+      jj1 = Math.max(1, Math.min(jj1Max, playerMinorNum + pick));
+    } else if (tier > playerTier) {
+      jj1 = random(Math.max(1, Math.floor(jj1Max * 0.5)), jj1Max);
+    } else {
+      jj1 = random(
+        Math.max(1, playerMinorNum - 2),
+        Math.max(1, playerMinorNum)
+      );
+    }
     const jj2Arr = ['初期', '中期', '后期', '圆满', '大圆满'];
-    const jj2 = jj2Arr[random(0, jj2Arr.length - 1)];
+    const stageIndexMap: Record<string, number> = {
+      初期: 0,
+      中期: 1,
+      后期: 2,
+      圆满: 3,
+      大圆满: 4
+    };
+    const pStageIdx = stageIndexMap[playerStage] ?? 0;
+    const stageCandidates: number[] = [];
+    const stageWeights: number[] = [];
+    for (let i = 0; i < jj2Arr.length; i++) {
+      const diff = i - pStageIdx;
+      let w = 1;
+      if (diff === 0) w = 4;
+      else if (diff === 1) w = 3;
+      else if (diff === 2) w = 2;
+      else if (diff === -1) w = 2;
+      stageCandidates.push(i);
+      stageWeights.push(w);
+    }
+    const totalW = stageWeights.reduce((a, b) => a + b, 0);
+    const rw = random(1, totalW);
+    let accw = 0;
+    let sPick = 0;
+    for (let i = 0; i < stageWeights.length; i++) {
+      accw += stageWeights[i];
+      if (rw <= accw) {
+        sPick = stageCandidates[i];
+        break;
+      }
+    }
+    const jj2 = jj2Arr[sPick];
     const dropPools: Record<string, string[]> = {
       练气: ['妖丹', '千叶草', '草灵', '魔晶'],
       筑基: ['百灵血竹', '枯木灵藤', '木之精华', '彳果', '柔水', '妖丹'],
@@ -69,23 +128,25 @@ export default function Shilian() {
     const clName = clPool[random(0, clPool.length - 1)];
     const stageCoefMap: Record<string, number> = {
       初期: 1.0,
-      中期: 1.1,
-      后期: 1.2,
-      圆满: 1.3,
-      大圆满: 1.4
+      中期: 1.12,
+      后期: 1.25,
+      圆满: 1.38,
+      大圆满: 1.5
     };
-    const j1Coef = 1 + (jj1 - 1) * 0.05;
+    const j1Coef = 1 + (jj1 - 1) * 0.12;
     const stageCoef = stageCoefMap[jj2] || 1.0;
     const scale = tier * j1Coef * stageCoef;
-    const qixue = Math.round(random(600, 1000) * scale);
-    const gongji = Math.round(random(50, 120) * scale);
-    const fangyu = Math.round(random(25, 70) * scale);
+    const qixue = Math.round(random(700, 900) * scale);
+    const gongji = Math.round(random(60, 110) * scale);
+    const fangyu = Math.round(random(30, 80) * scale);
     const sudu = Math.round(
-      (20 + random(0, 15) + tier) * (1 + (jj1 - 1) * 0.01)
+      (22 + random(0, 14) + tier) *
+        (1 + (jj1 - 1) * 0.04) *
+        (1 + (stageCoef - 1) * 0.5)
     );
-    const baoji = Math.min(50, random(3, 10 + tier));
+    const baoji = Math.min(50, random(4, 10 + tier + Math.floor(jj1 / 3)));
     const xw = Math.round(
-      random(80, 200) * tier * (1 + (jj1 - 1) * 0.03) * stageCoef
+      random(100, 220) * tier * (1 + (jj1 - 1) * 0.07) * stageCoef
     );
     return {
       name: `${na}${nb}(${df.jingjie}${numberToChinese(jj1)}阶${jj2})`,
@@ -98,7 +159,7 @@ export default function Shilian() {
       xw,
       df: df.name
     };
-  }, [df]);
+  }, [df.jingjie, df.name, get]);
   const [YaoShouInstance, setYaoShouInstance] = useState<YaoShouZDType | null>(
     null
   ); // 妖兽实例
@@ -150,6 +211,10 @@ export default function Shilian() {
     b = isCrit;
     const newHp = Math.max(0, Math.round(zd2.qixue - damage));
     const defender = { ...zd2, qixue: newHp };
+    const isEnemyAttacker = 'df' in zd1;
+    const isEnemyDefender = 'df' in zd2;
+    const attackerColor = isEnemyAttacker ? 'orange' : 'blue';
+    const defenderColor = isEnemyDefender ? 'orange' : 'blue';
     setHuiheState((v) => ({
       ...v,
       logs: [
@@ -157,18 +222,30 @@ export default function Shilian() {
         {
           text: (
             <>
-              <Text color='black' inline>
-                {zd1.name}
+              <Text color={attackerColor} inline>
+                【{isEnemyAttacker ? '敌' : '我'}】{zd1.name}
               </Text>
-              突然{b && '使出全力一击'}向
-              <Text color='black' inline>
-                {zd2.name}
+              {b ? (
+                <>
+                  乘隙爆发，重拳落下，造成
+                  <Text color='red' inline bold>
+                    {damage}
+                  </Text>
+                  点伤害；
+                </>
+              ) : (
+                <>
+                  抓住空档一击，造成
+                  <Text color='red' inline>
+                    {damage}
+                  </Text>
+                  点伤害；
+                </>
+              )}
+              <Text color={defenderColor} inline>
+                【{isEnemyDefender ? '敌' : '我'}】{zd2.name}
               </Text>
-              发动攻击，造成：
-              <Text color='red' inline bold={b}>
-                {damage}
-              </Text>
-              ，剩余血量：
+              气血仅余
               <Text color='red' inline>
                 {defender.qixue}
               </Text>
@@ -189,7 +266,7 @@ export default function Shilian() {
           logs: [
             ...v.logs,
             {
-              text: <>你阵亡了</>
+              text: <>势尽力竭，你踉跄后退终究倒下。眼前一黑，此战以败收场…</>
             }
           ]
         }));
@@ -229,12 +306,27 @@ export default function Shilian() {
           type: CWType.QT,
           num: random(1, 4)
         } as QTItemType;
+        const reward = random(
+          Math.max(1, Math.round(YaoShouInstance.xw * 0.7)),
+          Math.max(1, Math.round(YaoShouInstance.xw * 1.2))
+        );
         setHuiheState((v) => ({
           ...v,
           logs: [
             ...v.logs,
             {
-              text: <>{YaoShouInstance.name}阵亡了</>
+              text: (
+                <>
+                  <Text color='black' inline>
+                    {YaoShouInstance.name}
+                  </Text>
+                  倒地不起，你收剑而立，心神一清，悟得一缕斗法之理（修为+
+                  <Text color='red' inline>
+                    {reward}
+                  </Text>
+                  ）
+                </>
+              )
             },
             {
               text: (
@@ -244,13 +336,13 @@ export default function Shilian() {
               )
             },
             {
-              text: <>你获得修为：{YaoShouInstance.xw}</>
+              text: <>战斗结束</>
             }
           ]
         }));
         clearInterval(timer.current as number);
         chuwu.Add(clData);
-        set('xiuwei', get('xiuwei') + YaoShouInstance.xw);
+        set('xiuwei', get('xiuwei') + reward);
         setSessionLoot((prev) => ({
           ...prev,
           [clData.name]: (prev[clData.name] || 0) + clData.num!
