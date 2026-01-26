@@ -493,6 +493,73 @@ export default function Shilian() {
       closeOnMaskClick: true
     });
   }, [sessionLoot]);
+  const handleEscape = useCallback(() => {
+    const noBattle = HuiheState.end || (!ActorInstance && !YaoShouInstance);
+    if (noBattle) {
+      JXToast('当前未与妖兽交手，无需遁逃').show();
+      return;
+    }
+    const shen = get('shenshi');
+    if (shen <= 0) {
+      JXToast('神识不足，无法遁逃').show();
+      return;
+    }
+    if (typeof timer.current === 'number') {
+      clearInterval(timer.current as number);
+    }
+    const cost = Math.min(2, shen);
+    set('shenshi', shen - cost);
+    setHuiheState((v) => ({
+      ...v,
+      can: false,
+      end: true,
+      target: 0,
+      logs: [
+        ...v.logs,
+        {
+          text: (
+            <>
+              <Text color='blue' inline>
+                【我】{get('daohao')}
+              </Text>
+              遁光一闪，脱离战圈（神识-
+              <Text color='red' inline>
+                {cost}
+              </Text>
+              ）
+            </>
+          )
+        }
+      ]
+    }));
+    const seq = fightSeqRef.current;
+    setTimeout(() => {
+      if (fightSeqRef.current === seq) {
+        setYaoShouInstance(null);
+      }
+    }, 800);
+    setActorInstance(null);
+    if (isGuajiRef.current) {
+      setGuaji(false);
+    }
+  }, [ActorInstance, HuiheState.end, YaoShouInstance, get, set]);
+  const handleSeeHistory = useCallback(() => {
+    JXModal.show({
+      title: '战况',
+      content: HuiheState.logs.length ? (
+        <>
+          {HuiheState.logs.map((v, idx) => (
+            <Text key={`log-${idx}`}>{v.text}</Text>
+          ))}
+        </>
+      ) : (
+        <Text>暂无战况记录</Text>
+      ),
+      disableCancle: true,
+      disableOk: true,
+      closeOnMaskClick: true
+    });
+  }, [HuiheState.logs]);
   const handleSeeGuajiDetail = useCallback(() => {
     JXModal.show({
       title: '挂机详情',
@@ -506,7 +573,18 @@ export default function Shilian() {
             <>
               {guajiStats.history.map((it, idx) => (
                 <Text key={`${it.name}-${idx}`}>
-                  {it.name}（{it.df}）{it.result}，回合数：{it.rounds}
+                  {it.name}（{it.df}）
+                  {it.result === '胜' ? (
+                    <Text color='green' inline>
+                      胜利
+                    </Text>
+                  ) : (
+                    <Text color='red' inline>
+                      失败
+                    </Text>
+                  )}
+                  ，回合数：
+                  {it.rounds}
                 </Text>
               ))}
             </>
@@ -641,9 +719,9 @@ export default function Shilian() {
           战斗
         </JXButton>
         <JXButton onClick={handleSeeYaoShou}>查看</JXButton>
-        <JXButton>副本</JXButton>
+        <JXButton onClick={handleEscape}>遁逃</JXButton>
         <JXButton onClick={handleSeeCailiao}>材料</JXButton>
-        <JXButton>战况</JXButton>
+        <JXButton onClick={handleSeeHistory}>战况</JXButton>
       </JXSpace>
       <Scroll className={styles.content} Scroll={scrollHook}>
         {!HuiheState.logs.length && (
