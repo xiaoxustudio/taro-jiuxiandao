@@ -507,7 +507,11 @@ export default function Shilian() {
     if (typeof timer.current === 'number') {
       clearInterval(timer.current as number);
     }
-    const cost = Math.min(2, shen);
+    const baseCost = Math.max(
+      2,
+      Math.min(10, Math.round(((YaoShouInstance?.xw || 0) as number) / 150))
+    );
+    const cost = Math.min(baseCost, shen);
     set('shenshi', shen - cost);
     setHuiheState((v) => ({
       ...v,
