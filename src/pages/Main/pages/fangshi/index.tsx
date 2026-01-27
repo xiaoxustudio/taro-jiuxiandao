@@ -1,5 +1,11 @@
-import { useMemo, useState } from 'react';
-import { fangshiCategories, FangshiCategoryKey } from '@/assets/fangshi';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  fangshiCategories,
+  FangshiCategoryKey,
+  FangshiSnapshot,
+  FANGSHI_REFRESH_INTERVAL,
+  resolveFangshiSnapshot
+} from '@/assets/fangshi';
 import {
   Box,
   Container,
@@ -15,6 +21,7 @@ import { ActorDataConfigForZhanDou, CWType } from '@/types';
 import { AttrTransformChinese } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
+import useActorController from '@/hooks/useActorController';
 import './index.less';
 
 export default function Fangshi() {
@@ -22,12 +29,25 @@ export default function Fangshi() {
     fangshiCategories[0].key
   );
   const container = useContainer();
+  const { get, set } = useActorController();
+  const [snapshot, setSnapshot] = useState<FangshiSnapshot | null>(() =>
+    get('fangshi')
+  );
+  const [refreshLeft, setRefreshLeft] = useState<number>(() => {
+    const current = get('fangshi') as FangshiSnapshot | null;
+    const updatedAt = current?.updatedAt ?? Date.now();
+    return Math.max(0, FANGSHI_REFRESH_INTERVAL - (Date.now() - updatedAt));
+  });
   const currentCategory = useMemo(
     () => fangshiCategories.find((item) => item.key === type),
     [type]
   );
+  const currentList = useMemo(
+    () => snapshot?.items[type] ?? [],
+    [snapshot, type]
+  );
   const list = useMemo(() => {
-    const targetList = currentCategory?.list() ?? [];
+    const targetList = currentList;
     const action = currentCategory?.action;
     return targetList.map((v, index) => ({
       ...v,
@@ -119,11 +139,49 @@ export default function Fangshi() {
         });
       }
     }));
-  }, [currentCategory]);
+  }, [currentCategory, currentList]);
   const lsMemo = useMemo(
     () => chuwu.Get({ name: '灵石', type: CWType.QT }),
     []
   );
+  const refreshLeftText = useMemo(() => {
+    const total = Math.max(0, Math.ceil(refreshLeft / 1000));
+    const mins = Math.floor(total / 60);
+    const secs = total % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }, [refreshLeft]);
+
+  useEffect(() => {
+    const refresh = () => {
+      const realm = get('jingjie') as string;
+      const current = get('fangshi') as FangshiSnapshot | null;
+      const next = resolveFangshiSnapshot(current, realm);
+      if (current !== next) {
+        set('fangshi', next);
+      }
+      setSnapshot(next);
+    };
+    refresh();
+    const timer = setInterval(refresh, 60 * 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [get, set]);
+  useEffect(() => {
+    const tick = () => {
+      const updatedAt = snapshot?.updatedAt ?? Date.now();
+      const left = Math.max(
+        0,
+        FANGSHI_REFRESH_INTERVAL - (Date.now() - updatedAt)
+      );
+      setRefreshLeft(left);
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [snapshot?.updatedAt]);
 
   return (
     <Container
@@ -132,9 +190,10 @@ export default function Fangshi() {
       context={container}
       scroll
     >
-      <Text style={{ width: '100%', marginBottom: '10px' }}>
-        灵石：{lsMemo?.num || 0}
-      </Text>
+      <JXSpace between style={{ width: '100%', marginBottom: '10px' }}>
+        <Text>灵石：{lsMemo?.num || 0}</Text>
+        <Text align='right'>刷新：{refreshLeftText}</Text>
+      </JXSpace>
       <JXSpace gap={10} style={{ width: '100%' }} hscroll>
         {fangshiCategories.map((item) => (
           <JXButton

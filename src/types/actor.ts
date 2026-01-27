@@ -1,3 +1,4 @@
+import type { FangshiSnapshot } from '@/assets/fangshi';
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
 import { GongFaType } from './gongfa';
 
@@ -77,4 +78,5 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     ls: GongFaType[];
     current: GongFaType | null;
   }; // 功法列表
+  fangshi?: FangshiSnapshot;
 }
