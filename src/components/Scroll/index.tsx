@@ -22,13 +22,18 @@ function Scroll({
   const id = useRef(`Conatiner-Header-${CreateUniqueIndex()}`);
   const [height, setHeight] = useState(0);
 
+  const computeHeight = (used: number) => {
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+    return Math.max(0, vh - used - 30);
+  };
+
   useEffect(() => {
-    if (calc) setHeight(window.screen.height - calc);
+    if (calc) setHeight(computeHeight(calc));
   }, [calc]);
 
   useReady(() => {
     if (calc) {
-      setHeight(window.screen.height - calc);
+      setHeight(computeHeight(calc));
       return;
     }
     if (ScrollRef.current && ScrollHook) {
@@ -36,9 +41,33 @@ function Scroll({
     }
     const select = createSelectorQuery().select(`#${id.current}`);
     select.boundingClientRect().exec(([res]) => {
-      setHeight(res.height);
+      const top = (res?.top as number) || 0;
+      setHeight(computeHeight(top));
     });
   });
+
+  useEffect(() => {
+    const handler = () => {
+      if (calc) {
+        setHeight(computeHeight(calc));
+        return;
+      }
+      const select = createSelectorQuery().select(`#${id.current}`);
+      select.boundingClientRect().exec(([res]) => {
+        const top = (res?.top as number) || 0;
+        setHeight(computeHeight(top));
+      });
+    };
+    handler();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handler);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handler);
+      }
+    };
+  }, [calc]);
   return (
     <View
       ref={ScrollRef}
