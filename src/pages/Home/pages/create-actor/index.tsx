@@ -5,11 +5,13 @@ import { useCallback, useState } from 'react';
 import { JXButton, JXInput, JXSpace, JXToast, Text } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { ActorDataConfig, CWType } from '@/types';
+import { ActorDataConfig, CWType, QTItemType } from '@/types';
 import { UUID } from '@/utils';
 import { HasActor } from '@/utils/actor';
 import chuwu from '@/utils/chuwu';
 import { GongFaPinJie } from '@/types/gongfa';
+import danfangData from '@/assets/danfang.json';
+import { createDanFangList, getRealmIndex } from '@/assets/fangshi';
 import styles from './index.module.less';
 
 const options = [
@@ -209,8 +211,42 @@ function Index() {
       JXToast('已有该道号的角色').show();
       return;
     }
-    setStore(actor.daohao);
-    setActorStore(actor.daohao, actor);
+    const allDF = createDanFangList(getRealmIndex(actor.jingjie));
+    const sorted = [...allDF].sort((a, b) => a.ls - b.ls);
+    const baseCount = 3;
+    const ids = sorted
+      .slice(0, Math.min(baseCount, sorted.length))
+      .map((v) => v.id!);
+    const matMap = new Map<string, number>();
+    const learned = ids.map((id) => {
+      const cl = (danfangData as any)[id]?.cl as [string, number][];
+      if (Array.isArray(cl)) {
+        const mul = Math.max(1, Math.floor(1 + Math.random() * 3));
+        cl.forEach(([name, base]) => {
+          const cur = matMap.get(name) || 0;
+          matMap.set(name, cur + base * mul);
+        });
+      }
+      return { id, exp: 0 };
+    });
+    const materials = Array.from(matMap.entries()).map(
+      ([name, num]): QTItemType => ({
+        name,
+        type: CWType.QT,
+        isPile: true,
+        num
+      })
+    );
+    const nextActor: ActorDataConfig = {
+      ...actor,
+      danfang: learned,
+      cw: {
+        ...actor.cw,
+        qt: [...actor.cw.qt, ...materials]
+      }
+    };
+    setStore(nextActor.daohao);
+    setActorStore(nextActor.daohao, nextActor);
     chuwu.Add({ name: '灵石', type: CWType.QT, isPile: true, num: 30000 });
     JXToast().show('创建角色成功');
     setTimeout(() => {

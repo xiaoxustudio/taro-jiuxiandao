@@ -6,6 +6,7 @@ import {
   FANGSHI_REFRESH_INTERVAL,
   resolveFangshiSnapshot
 } from '@/assets/fangshi';
+import danfangData from '@/assets/danfang.json';
 import {
   Box,
   Container,
@@ -117,6 +118,33 @@ export default function Fangshi() {
             if (chuwu.LingShiThan(v.ls)) {
               if (action === 'danfang') {
                 if (v.id) {
+                  if (!(danfangData as Record<string, any>)[v.id]) {
+                    if (v.cl && v.time) {
+                      const baseName = v.name.endsWith('丹方')
+                        ? v.name.slice(0, -2)
+                        : v.name;
+                      const current = (get('danfangData') ?? {}) as Record<
+                        string,
+                        any
+                      >;
+                      if (!current[v.id]) {
+                        set('danfangData', {
+                          ...current,
+                          [v.id]: {
+                            name: baseName,
+                            type: v.type,
+                            attr: v.attr ?? {},
+                            cl: v.cl,
+                            time: v.time,
+                            itype: v.itype,
+                            isPile: true,
+                            desc: v.desc,
+                            ls: v.baseLs ?? v.ls
+                          }
+                        });
+                      }
+                    }
+                  }
                   chuwu.AddDanFang(v.id);
                   JXToast(`购买丹方：${v.name}`).show();
                 } else {

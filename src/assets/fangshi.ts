@@ -1,3 +1,4 @@
+import { random } from 'lodash-es';
 import danfangData from '@/assets/danfang.json';
 import { CWType, FabaoPinjie } from '@/types';
 
@@ -10,10 +11,13 @@ export type FangshiItem = {
   desc?: string;
   itype?: string;
   ls: number;
+  baseLs?: number;
   attr?: Record<string, number>;
   lv?: number;
   pj?: string;
   id?: string;
+  cl?: [string, number][];
+  time?: number[];
 };
 
 export type FangshiSnapshot = {
@@ -24,10 +28,7 @@ export type FangshiSnapshot = {
 
 type FaBaoBaseItem = Omit<FangshiItem, 'type' | 'lv' | 'isPile'>;
 
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-
-const pick = <T>(list: T[]) => list[rand(0, list.length - 1)];
+const pick = <T>(list: T[]) => list[random(0, list.length - 1)];
 
 const buildName = (parts: string[][]) => parts.map(pick).join('');
 
@@ -219,6 +220,9 @@ export const FANGSHI_CONFIG = {
   dfBaseCount: 10,
   dyPriceScale: 0.25,
   dfPriceScale: 0.25,
+  randDyCount: 10,
+  randClCount: 10,
+  randDfCount: 10,
   negChanceMain: 0.2,
   negChanceExtra: 0.3,
   baojiNegChance: 0.15,
@@ -252,10 +256,10 @@ const createFaBaoBaseList = (): FaBaoBaseItem[] => {
           guard += 1;
         }
         if (usedNames.has(name)) {
-          name = `${name}${rand(1, 99)}`;
+          name = `${name}${random(1, 99)}`;
         }
         usedNames.add(name);
-        const mainBase = rand(tier.attrRange[0], tier.attrRange[1]);
+        const mainBase = random(tier.attrRange[0], tier.attrRange[1]);
         const mainValue = Math.round(
           mainBase * (mainAttrMultiplier[type.mainAttr] ?? 1)
         );
@@ -279,13 +283,13 @@ const createFaBaoBaseList = (): FaBaoBaseItem[] => {
           const extraKey = pick(type.extraAttrs);
           if (extraKey === 'baoji') {
             const maxB = Math.max(2, Math.round(tier.extraRange[1] / 20)) || 2;
-            const bVal = rand(1, maxB);
+            const bVal = random(1, maxB);
             attrs.baoji =
               Math.random() < FANGSHI_CONFIG.baojiNegChance
-                ? -rand(1, Math.max(1, Math.floor(maxB / 2)))
+                ? -random(1, Math.max(1, Math.floor(maxB / 2)))
                 : bVal;
           } else {
-            const extraBase = rand(tier.extraRange[0], tier.extraRange[1]);
+            const extraBase = random(tier.extraRange[0], tier.extraRange[1]);
             const exVal = Math.round(
               extraBase * (extraAttrMultiplier[extraKey] ?? 1)
             );
@@ -311,7 +315,7 @@ const createFaBaoBaseList = (): FaBaoBaseItem[] => {
           pj: tier.pj,
           itype: type.itype,
           desc: `${pick(faBaoLocationPool)}·${buildName(tier.descParts)}炼制`,
-          ls: rand(tier.lsRange[0], tier.lsRange[1])
+          ls: random(tier.lsRange[0], tier.lsRange[1])
         });
       }
     });
@@ -369,22 +373,348 @@ const createCaiLiaoList = (): FangshiItem[] =>
     isPile: true
   }));
 
-const danfangIds = ['10001', '10002', '10003', '10004', '20001', '20002'];
+const clNameParts = [
+  ['灵', '玄', '玉', '雪', '苍', '赤', '紫', '青', '黑', '金'],
+  ['心', '魄', '魂', '元', '神', '华', '纹', '影', '痕', '息'],
+  ['草', '花', '藤', '木', '液', '砂', '石', '晶', '萃', '页']
+] as const;
 
-const createDanYaoList = (): FangshiItem[] =>
-  danfangIds.map((id) => ({
-    ...danfangData[id],
-    type: CWType.DY,
-    ls: Math.round(danfangData[id].ls * FANGSHI_CONFIG.dyPriceScale)
-  }));
+// 练气 （一品）、筑基（二品） 、结丹（三品） 、元婴（四品） 、化神（五品） 、返虚（六品） 、合体（七品） 、大乘（八品）
+const clGrades = [
+  '一品',
+  '二品',
+  '三品',
+  '四品',
+  '五品',
+  '六品',
+  '七品',
+  '八品'
+] as const;
+const clGradePrice: Record<(typeof clGrades)[number], [number, number]> = {
+  一品: [6, 30],
+  二品: [50, 200],
+  三品: [300, 1200],
+  四品: [2000, 6000],
+  五品: [8000, 20000],
+  六品: [16000, 40000],
+  七品: [32000, 80000],
+  八品: [64000, 160000]
+};
+const createRandomCaiLiaoList = (count: number): FangshiItem[] => {
+  const list: FangshiItem[] = [];
+  const used = new Set<string>();
+  for (let i = 0; i < count; i += 1) {
+    let name = buildName(clNameParts as unknown as string[][]);
+    let guard = 0;
+    while (used.has(name) && guard < 5) {
+      name = buildName(clNameParts as unknown as string[][]);
+      guard += 1;
+    }
+    if (used.has(name)) {
+      name = `${name}${random(1, 99)}`;
+    }
+    used.add(name);
+    const grade = clGrades[random(0, clGrades.length - 1)];
+    const [minP, maxP] = clGradePrice[grade];
+    list.push({
+      name,
+      desc: '材料，用于炼制丹药',
+      itype: grade,
+      ls: random(minP, maxP),
+      type: CWType.QT,
+      isPile: true
+    });
+  }
+  return list;
+};
 
-const createDanFangList = (): FangshiItem[] =>
-  danfangIds.map((id) => ({
-    ...danfangData[id],
-    name: `${danfangData[id].name}丹方`,
-    id,
-    ls: Math.round(danfangData[id].ls * FANGSHI_CONFIG.dfPriceScale)
-  }));
+export const danfangIds = [
+  '10001',
+  '10002',
+  '10003',
+  '10004',
+  '20001',
+  '20002',
+  '10005',
+  '10006',
+  '10007',
+  '10008',
+  '10009',
+  '10010',
+  '20003',
+  '20004',
+  '20005',
+  '20006',
+  '20007'
+] as const;
+const dfGrades = [
+  '一品',
+  '二品',
+  '三品',
+  '四品',
+  '五品',
+  '六品',
+  '七品',
+  '八品'
+] as const;
+
+export const createDanYaoList = (): FangshiItem[] =>
+  danfangIds.map((id) => {
+    const base = danfangData[id] as any;
+    const cl = (base?.cl ?? []) as [string, number][];
+    const time = (base?.time ?? []) as number[];
+    return {
+      ...base,
+      cl,
+      time,
+      type: CWType.DY,
+      ls: Math.round(base.ls * FANGSHI_CONFIG.dyPriceScale)
+    };
+  });
+
+const dyNameParts = [
+  ['清', '养', '凝', '回', '复', '镇', '冲', '通', '启', '宁', '淬', '固'],
+  ['神', '元', '气', '脉', '识', '灵', '身', '魂'],
+  ['丹']
+] as const;
+const dyGrades = [
+  '一品',
+  '二品',
+  '三品',
+  '四品',
+  '五品',
+  '六品',
+  '七品',
+  '八品'
+] as const;
+const dyGradeMultipliers: Record<(typeof dyGrades)[number], number> = {
+  一品: 1.0,
+  二品: 1.2,
+  三品: 1.5,
+  四品: 1.9,
+  五品: 2.4,
+  六品: 2.9,
+  七品: 3.5,
+  八品: 4.2
+};
+const dyRarityLevels = ['普通', '稀有', '罕见', '史诗', '传说'] as const;
+const dyRarityMultipliers: Record<(typeof dyRarityLevels)[number], number> = {
+  普通: 1.0,
+  稀有: 1.15,
+  罕见: 1.35,
+  史诗: 1.65,
+  传说: 2.0
+};
+const pickRarity = (p: number) => {
+  if (p < 0.5) return dyRarityLevels[0];
+  if (p < 0.75) return dyRarityLevels[1];
+  if (p < 0.9) return dyRarityLevels[2];
+  if (p < 0.97) return dyRarityLevels[3];
+  return dyRarityLevels[4];
+};
+const DY_EFFECT_SCALE: Record<
+  (typeof dyGrades)[number],
+  {
+    shenshi: [number, number];
+    xiuwei: [number, number];
+    price: [number, number];
+  }
+> = {
+  一品: { shenshi: [4, 6], xiuwei: [1, 2], price: [4000, 8000] },
+  二品: { shenshi: [8, 12], xiuwei: [2, 3], price: [8000, 15000] },
+  三品: { shenshi: [12, 18], xiuwei: [4, 6], price: [15000, 30000] },
+  四品: { shenshi: [20, 28], xiuwei: [8, 12], price: [30000, 60000] },
+  五品: { shenshi: [35, 50], xiuwei: [15, 25], price: [60000, 120000] },
+  六品: { shenshi: [60, 80], xiuwei: [25, 35], price: [120000, 220000] },
+  七品: { shenshi: [90, 120], xiuwei: [40, 55], price: [220000, 400000] },
+  八品: { shenshi: [130, 170], xiuwei: [60, 80], price: [400000, 700000] }
+};
+const createRandomDanYaoList = (
+  count: number,
+  realmIndex: number
+): FangshiItem[] => {
+  const list: FangshiItem[] = [];
+  const used = new Set<string>();
+  const maxGradeIndex = Math.min(dyGrades.length - 1, realmIndex);
+  const allowedGrades = dyGrades.slice(0, maxGradeIndex + 1);
+  for (let i = 0; i < count; i += 1) {
+    let name = buildName(dyNameParts as unknown as string[][]);
+    let guard = 0;
+    while (used.has(name) && guard < 5) {
+      name = buildName(dyNameParts as unknown as string[][]);
+      guard += 1;
+    }
+    if (used.has(name)) {
+      name = `${name}${random(1, 99)}`;
+    }
+    used.add(name);
+    const grade = allowedGrades[random(0, allowedGrades.length - 1)];
+    const isShen = Math.random() < 0.5;
+    const scale = DY_EFFECT_SCALE[grade];
+    const valRange = isShen ? scale.shenshi : scale.xiuwei;
+    const baseVal = random(valRange[0], valRange[1]);
+    const attr: Record<string, number> = isShen
+      ? { shenshi: baseVal }
+      : { xiuwei: baseVal };
+    const priceRange = scale.price;
+    const t =
+      valRange[1] === valRange[0]
+        ? 0
+        : (baseVal - valRange[0]) / (valRange[1] - valRange[0]);
+    const priceBase = Math.round(
+      priceRange[0] + t * (priceRange[1] - priceRange[0])
+    );
+    const rarity = pickRarity(Math.random());
+    const gradeMul = dyGradeMultipliers[grade];
+    const rarityMul = dyRarityMultipliers[rarity];
+    list.push({
+      name,
+      type: CWType.DY,
+      isPile: true,
+      itype: grade,
+      desc: isShen ? '恢复神识的丹药' : '增加修为的丹药',
+      attr,
+      ls: Math.round(
+        priceBase * gradeMul * rarityMul * FANGSHI_CONFIG.dyPriceScale
+      )
+    });
+  }
+  return list;
+};
+
+const buildRandomDanfangId = (seed: string, index: number) =>
+  `r${seed}${index}${random(1000, 9999)}`;
+
+const getGradeIndex = (
+  grade: string | undefined,
+  grades: readonly string[]
+) => {
+  const idx = grades.indexOf(grade ?? '');
+  return idx === -1 ? 0 : idx;
+};
+
+const createRandomDanFangList = (
+  count: number,
+  realmIndex: number,
+  materialPool: FangshiItem[]
+): FangshiItem[] => {
+  const list: FangshiItem[] = [];
+  const used = new Set<string>();
+  const maxGradeIndex = Math.min(dfGrades.length - 1, realmIndex);
+  const allowedGrades = dfGrades.slice(0, maxGradeIndex + 1);
+  const seed = Date.now().toString(36);
+  for (let i = 0; i < count; i += 1) {
+    let name = buildName(dyNameParts as unknown as string[][]);
+    let guard = 0;
+    while (used.has(name) && guard < 5) {
+      name = buildName(dyNameParts as unknown as string[][]);
+      guard += 1;
+    }
+    if (used.has(name)) {
+      name = `${name}${random(1, 99)}`;
+    }
+    used.add(name);
+    const grade = allowedGrades[random(0, allowedGrades.length - 1)];
+    const gradeIndex = getGradeIndex(grade, dfGrades);
+    const isShen = Math.random() < 0.5;
+    const scale = DY_EFFECT_SCALE[grade];
+    const valRange = isShen ? scale.shenshi : scale.xiuwei;
+    const baseVal = random(valRange[0], valRange[1]);
+    const attr: Record<string, number> = isShen
+      ? { shenshi: baseVal }
+      : { xiuwei: baseVal };
+    const priceRange = scale.price;
+    const t =
+      valRange[1] === valRange[0]
+        ? 0
+        : (baseVal - valRange[0]) / (valRange[1] - valRange[0]);
+    const priceBase = Math.round(
+      priceRange[0] + t * (priceRange[1] - priceRange[0])
+    );
+    const rarity = pickRarity(Math.random());
+    const gradeMul = dyGradeMultipliers[grade];
+    const rarityMul = dyRarityMultipliers[rarity];
+    const baseLs = Math.round(priceBase * gradeMul * rarityMul);
+    const filteredPool = materialPool.filter(
+      (item) => getGradeIndex(item.itype, clGrades) <= gradeIndex && item.name
+    );
+    const pool = filteredPool.length ? filteredPool : materialPool;
+    const pickCount = Math.min(
+      pool.length,
+      Math.max(2, 2 + Math.floor(gradeIndex / 2) + random(0, 1))
+    );
+    const picked: FangshiItem[] = [];
+    const mutablePool = [...pool];
+    for (let j = 0; j < pickCount && mutablePool.length; j += 1) {
+      const idx = random(0, mutablePool.length - 1);
+      picked.push(mutablePool.splice(idx, 1)[0]);
+    }
+    const cl = picked.map((item): [string, number] => {
+      const clGradeIndex = getGradeIndex(item.itype, clGrades);
+      const minNum = 1 + Math.max(0, gradeIndex - clGradeIndex);
+      const maxNum = 3 + gradeIndex + Math.max(0, gradeIndex - clGradeIndex);
+      return [item.name, random(minNum, maxNum)];
+    });
+    const time = [
+      Math.max(0, Math.floor(gradeIndex / 3)),
+      Math.min(12, gradeIndex * 2),
+      random(5, 15 + gradeIndex * 3)
+    ];
+    const id = buildRandomDanfangId(seed, i);
+    list.push({
+      id,
+      name: `${name}丹方`,
+      type: 5,
+      isPile: true,
+      itype: grade,
+      desc: isShen ? '恢复神识的丹药' : '增加修为的丹药',
+      attr,
+      cl,
+      time,
+      baseLs,
+      ls: Math.round(baseLs * FANGSHI_CONFIG.dfPriceScale)
+    });
+  }
+  return list;
+};
+
+export const createDanFangList = (realmIndex?: number): FangshiItem[] => {
+  const list = danfangIds.map((id) => {
+    const base = danfangData[id] as any;
+    const cl = (base?.cl ?? []) as [string, number][];
+    const time = (base?.time ?? []) as number[];
+    return {
+      ...base,
+      cl,
+      time,
+      name: `${base.name}丹方`,
+      id,
+      baseLs: base.ls,
+      ls: Math.round(base.ls * FANGSHI_CONFIG.dfPriceScale)
+    };
+  });
+  if (realmIndex === undefined) return list;
+  const maxGradeIndex = Math.min(dfGrades.length - 1, Math.max(0, realmIndex));
+  return list.filter((item) => {
+    const idx = dfGrades.indexOf(item.itype as (typeof dfGrades)[number]);
+    return idx !== -1 && idx <= maxGradeIndex;
+  });
+};
+
+export const DANFANG_CATEGORY_CONFIG = {
+  恢复神识类: {
+    ids: ['10001', '10002', '10005', '10006', '10007'],
+    count: 1
+  },
+  增加修为类: {
+    ids: ['10003', '10004', '10008', '10009', '10010'],
+    count: 1
+  },
+  突破类: {
+    ids: ['20001', '20002', '20003', '20004', '20005', '20006', '20007'],
+    count: 1
+  }
+} as const;
 
 export const fangshiCategories = [
   {
@@ -435,7 +765,7 @@ const PJ_BY_REALM = [
   FabaoPinjie.大乘
 ];
 
-const getRealmIndex = (realm: string) => {
+export const getRealmIndex = (realm: string) => {
   const idx = REALM_ORDER.indexOf(realm);
   return idx === -1 ? 0 : idx;
 };
@@ -457,10 +787,10 @@ const pickByRealm = <T extends { ls: number }>(
   if (!list.length) return [];
   const sorted = [...list].sort((a, b) => a.ls - b.ls);
   const realmRate = (realmIndex + 1) / REALM_ORDER.length;
-  const poolSize = Math.max(2, Math.ceil(sorted.length * realmRate));
+  const desiredCount = Math.min(sorted.length, baseCount + realmIndex);
+  const poolSize = Math.max(desiredCount, Math.ceil(sorted.length * realmRate));
   const pool = sorted.slice(0, Math.min(sorted.length, poolSize));
-  const count = Math.min(pool.length, baseCount + realmIndex);
-  return shuffle(pool).slice(0, count);
+  return shuffle(pool).slice(0, desiredCount);
 };
 
 export const FANGSHI_REFRESH_INTERVAL = 10 * 60 * 1000;
@@ -484,9 +814,20 @@ export const createFangshiSnapshot = (
 ): FangshiSnapshot => {
   const realmIndex = getRealmIndex(realm);
   const fbList = createFaBaoList();
-  const dyList = createDanYaoList();
-  const clList = createCaiLiaoList();
-  const dfList = createDanFangList();
+  const dyList = [
+    ...createDanYaoList(),
+    ...createRandomDanYaoList(FANGSHI_CONFIG.randDyCount, realmIndex)
+  ];
+  const randomClList = createRandomCaiLiaoList(FANGSHI_CONFIG.randClCount);
+  const clList = [...createCaiLiaoList(), ...randomClList];
+  const dfList = [
+    ...createDanFangList(realmIndex),
+    ...createRandomDanFangList(
+      FANGSHI_CONFIG.randDfCount,
+      realmIndex,
+      randomClList
+    )
+  ];
   return {
     updatedAt,
     realm,

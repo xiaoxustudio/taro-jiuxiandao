@@ -26,6 +26,8 @@ import {
   JingJieTransform
 } from '@/utils/actor';
 import TpData from '@/assets/tp.json';
+import danfangData from '@/assets/danfang.json';
+import { CWType } from '@/types';
 import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
 
@@ -113,6 +115,15 @@ function Main() {
       name: '突破',
       click() {
         const tpdata = TpData[get('jingjie')];
+        const dfIdMap: Record<string, string> = {
+          练气: '20001',
+          筑基: '20002',
+          结丹: '20003',
+          元婴: '20004'
+          // 化神: '20005',
+          // 返虚: '20006',
+          // 合体: '20007'
+        };
         // 大阶段境界
         if (
           get('jingjie2') === '大圆满' &&
@@ -122,8 +133,18 @@ function Main() {
             JXToast().show(`天道压制，无法突破更高境界！`);
             return;
           }
-          const isCl = chuwu.HasArr(tpdata.cl);
-          // 判断突破材料，todo
+          const cur = get('jingjie');
+          const dfId = dfIdMap[cur];
+          const df = dfId ? (danfangData as any)[dfId] : null;
+          const need = df
+            ? (df.cl as [string, number][]).map((v) => ({
+                name: v[0],
+                type: CWType.QT,
+                num: v[1],
+                isPile: true
+              }))
+            : [];
+          const isCl = need.length > 0 && chuwu.HasArr(need);
           if (isCl) {
             const jj = JingJieTransform(get('jingjie'));
             set('jingjie1', JingJie1Transform(get('jingjie1')));
@@ -134,7 +155,7 @@ function Main() {
             const calcQixue = get('qixue') + 100 * lv1 + tpdata.add.qixue * 0.5;
             set('gongji', calcGongji);
             set('qixue', calcQixue);
-            chuwu.RemoveArr(tpdata.cl);
+            chuwu.RemoveArr(need);
             const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
             set('max_shouyuan', addShouyuan);
             JXToast().show(

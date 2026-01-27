@@ -40,5 +40,61 @@
       "gongji": 100,
       "shouyuan": 1000
     }
+  },
+  "元婴": {
+    "cl": [
+      {
+        "name": "化神丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 2000,
+      "gongji": 200,
+      "shouyuan": 2000
+    }
+  },
+  "化神": {
+    "cl": [
+      {
+        "name": "返虚丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 3500,
+      "gongji": 350,
+      "shouyuan": 3500
+    }
+  },
+  "返虚": {
+    "cl": [
+      {
+        "name": "合体丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 5000,
+      "gongji": 500,
+      "shouyuan": 5000
+    }
+  },
+  "合体": {
+    "cl": [
+      {
+        "name": "大乘丹",
+        "type": 2,
+        "num": 1
+      }
+    ],
+    "add": {
+      "qixue": 7500,
+      "gongji": 750,
+      "shouyuan": 7500
+    }
   }
 }

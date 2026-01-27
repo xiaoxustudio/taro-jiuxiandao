@@ -79,4 +79,5 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     current: GongFaType | null;
   }; // 功法列表
   fangshi?: FangshiSnapshot;
+  danfangData?: Record<string, any>;
 }
