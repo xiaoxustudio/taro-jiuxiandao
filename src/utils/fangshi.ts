@@ -272,6 +272,14 @@ const createRandomDanFangList = (
 ): FangshiItem[] => {
   const list: FangshiItem[] = [];
   const used = new Set<string>();
+  const usageCounts = new Map<string, number>();
+  const materialPoolMap = new Map<string, FangshiItem>();
+  materialPool.forEach((item) => {
+    if (item?.name && !materialPoolMap.has(item.name)) {
+      materialPoolMap.set(item.name, item);
+    }
+  });
+  const normalizedPool = [...materialPoolMap.values()];
   const maxGradeIndex = Math.min(dfGrades.length - 1, realmIndex);
   const allowedGrades = dfGrades.slice(0, maxGradeIndex + 1);
   const seed = Date.now().toString(36);
@@ -307,10 +315,10 @@ const createRandomDanFangList = (
     const gradeMul = dyGradeMultipliers[grade];
     const rarityMul = dyRarityMultipliers[rarity];
     const baseLs = Math.round(priceBase * gradeMul * rarityMul);
-    const filteredPool = materialPool.filter(
+    const filteredPool = normalizedPool.filter(
       (item) => getGradeIndex(item.itype, clGrades) <= gradeIndex && item.name
     );
-    const pool = filteredPool.length ? filteredPool : materialPool;
+    const pool = filteredPool.length ? filteredPool : normalizedPool;
     const pickCount = Math.min(
       pool.length,
       Math.max(2, 2 + Math.floor(gradeIndex / 2) + random(0, 1))
@@ -318,14 +326,38 @@ const createRandomDanFangList = (
     const picked: FangshiItem[] = [];
     const mutablePool = [...pool];
     for (let j = 0; j < pickCount && mutablePool.length; j += 1) {
-      const idx = random(0, mutablePool.length - 1);
-      picked.push(mutablePool.splice(idx, 1)[0]);
+      let minUsage = Infinity;
+      mutablePool.forEach((item) => {
+        const usedCount = usageCounts.get(item.name) ?? 0;
+        if (usedCount < minUsage) {
+          minUsage = usedCount;
+        }
+      });
+      const candidates = mutablePool.filter(
+        (item) => (usageCounts.get(item.name) ?? 0) <= minUsage + 1
+      );
+      const targetPool = candidates.length ? candidates : mutablePool;
+      const idx = random(0, targetPool.length - 1);
+      const pickedItem = targetPool[idx];
+      const removeIndex = mutablePool.findIndex(
+        (item) => item.name === pickedItem.name
+      );
+      if (removeIndex >= 0) {
+        mutablePool.splice(removeIndex, 1);
+      }
+      picked.push(pickedItem);
+      usageCounts.set(
+        pickedItem.name,
+        (usageCounts.get(pickedItem.name) ?? 0) + 1
+      );
     }
     const cl = picked.map((item): [string, number] => {
       const clGradeIndex = getGradeIndex(item.itype, clGrades);
       const minNum = 1 + Math.max(0, gradeIndex - clGradeIndex);
       const maxNum = 3 + gradeIndex + Math.max(0, gradeIndex - clGradeIndex);
-      return [item.name, random(minNum, maxNum)];
+      const baseNum = random(minNum, maxNum);
+      const numScale = 0.85 + Math.random() * 0.5;
+      return [item.name, Math.max(1, Math.round(baseNum * numScale))];
     });
     const time = [
       Math.max(0, Math.floor(gradeIndex / 3)),
@@ -440,11 +472,7 @@ export const createFangshiSnapshot = (
   const clList = [...createCaiLiaoList(), ...randomClList];
   const dfList = [
     ...createDanFangList(realmIndex),
-    ...createRandomDanFangList(
-      FANGSHI_CONFIG.randDfCount,
-      realmIndex,
-      randomClList
-    )
+    ...createRandomDanFangList(FANGSHI_CONFIG.randDfCount, realmIndex, clList)
   ];
   return {
     updatedAt,
