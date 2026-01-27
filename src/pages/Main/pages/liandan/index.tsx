@@ -22,31 +22,41 @@ export default function Liandan() {
   const { get, set } = useActorController();
   const [data, setData] = useState<any>(null);
   const [num, setNum] = useState(1);
+  const customDanfang = useMemo(
+    () => (get('danfangData') ?? {}) as Record<string, any>,
+    [get]
+  );
 
   const list = useMemo(
     () =>
-      get('danfang').map(
-        (v) =>
-          ({
-            key: danfangData[v.id],
+      get('danfang')
+        .map((v) => {
+          const base =
+            (danfangData as Record<string, any>)[v.id] || customDanfang[v.id];
+          if (!base) return null;
+          return {
+            key: v.id,
             title: (
               <Box>
-                {danfangData[v.id].name}（经验: {v.exp}）
+                {base.name}（经验: {v.exp}）
               </Box>
             ),
-            value: danfangData[v.id].desc,
+            value: base.desc,
             click() {
-              setData({ ...danfangData[v.id], id: v.id });
+              setData({ ...base, id: v.id });
             }
-          }) as ListItemData
-      ),
-    [get]
+          } as ListItemData;
+        })
+        .filter(Boolean) as ListItemData[],
+    [get, customDanfang]
   );
 
   const isComplate = useMemo(() => {
     if (!get('liandan.time')) return false;
     const startTime = get('liandan.time') as number;
-    const danTimeArray = danfangData[get('liandan.danyao.id')].time as number[];
+    const id = get('liandan.danyao.id') as string;
+    const base = (danfangData as Record<string, any>)[id] || customDanfang[id];
+    const danTimeArray = (base?.time ?? []) as number[];
 
     const totalNeededMs = new TimeArray(danTimeArray).milliseconds;
     const endTime = startTime + totalNeededMs;
@@ -60,7 +70,7 @@ export default function Liandan() {
     const last = new TimeArray(remainingMs);
 
     return `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）`;
-  }, [get]);
+  }, [get, customDanfang]);
 
   const getNum = (item: [string, number]) => {
     return chuwu.Get({ name: item[0], type: CWType.QT })?.num || 0;
@@ -94,8 +104,14 @@ export default function Liandan() {
           预计收获:
           {get('liandan.danyao') ? (
             <Text color='green' bold inline>
-              {danfangData[get('liandan.danyao.id')].name} X
-              {get('liandan.danyao.num')}
+              {
+                (
+                  (danfangData as Record<string, any>)[
+                    get('liandan.danyao.id')
+                  ] || customDanfang[get('liandan.danyao.id')]
+                ).name
+              }{' '}
+              X{get('liandan.danyao.num')}
             </Text>
           ) : (
             '无'
@@ -111,7 +127,9 @@ export default function Liandan() {
               const dy = get('liandan.danyao');
               if (dy) {
                 const { id, num: dNum } = dy;
-                const { name } = danfangData[id];
+                const base =
+                  (danfangData as Record<string, any>)[id] || customDanfang[id];
+                const { name } = base;
                 chuwu.Add({
                   name,
                   type: CWType.DY,
@@ -129,7 +147,7 @@ export default function Liandan() {
           起炉收丹
         </JXButton>
       </JXSpace>
-      <List list={list} />
+      <List list={list} noFlex />
       <JXModal
         visible={!!data}
         okText='炼制'

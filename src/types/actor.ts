@@ -1,4 +1,4 @@
-import type { FangshiSnapshot } from '@/assets/fangshi';
+import type { FangshiSnapshot } from '@/utils/fangshi';
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
 import { GongFaType } from './gongfa';
 

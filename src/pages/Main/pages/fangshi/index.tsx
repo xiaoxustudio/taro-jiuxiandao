@@ -5,7 +5,7 @@ import {
   FangshiSnapshot,
   FANGSHI_REFRESH_INTERVAL,
   resolveFangshiSnapshot
-} from '@/assets/fangshi';
+} from '@/utils/fangshi';
 import danfangData from '@/assets/danfang.json';
 import {
   Box,
@@ -167,7 +167,7 @@ export default function Fangshi() {
         });
       }
     }));
-  }, [currentCategory, currentList]);
+  }, [currentCategory, currentList, get, set]);
   const lsMemo = useMemo(
     () => chuwu.Get({ name: '灵石', type: CWType.QT }),
     []
