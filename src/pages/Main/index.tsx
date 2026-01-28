@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import title from '@/assets/logo.png';
 import {
   JXButton,
+  JXInput,
   JXModal,
   JXSpace,
   JXToast,
@@ -28,6 +29,7 @@ import {
 import TpData from '@/assets/tp.json';
 import danfangData from '@/assets/danfang.json';
 import { CWType } from '@/types';
+import { dfGrades } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
 
@@ -35,6 +37,8 @@ function Main() {
   const { get, set, actor } = useActorController();
   const [tujianVisible, setTujianVisible] = useState(false);
   const [tujianTab, setTujianTab] = useState<'dy' | 'df'>('dy');
+  const [tujianGrade, setTujianGrade] = useState('全部');
+  const [tujianKeyword, setTujianKeyword] = useState('');
   useEffect(() => {
     const pages =
       typeof Taro.getCurrentPages === 'function' ? Taro.getCurrentPages() : [];
@@ -305,6 +309,14 @@ function Main() {
     () => (tujianTab === 'dy' ? danyaoList : danfangList),
     [danfangList, danyaoList, tujianTab]
   );
+  const filteredTujianList = useMemo(() => {
+    const keyword = tujianKeyword.trim();
+    return tujianList.filter((item) => {
+      if (tujianGrade !== '全部' && item.itype !== tujianGrade) return false;
+      if (keyword && !item.name?.includes(keyword)) return false;
+      return true;
+    });
+  }, [tujianGrade, tujianKeyword, tujianList]);
 
   // 开始修炼
   const handleXiuLian = useCallback(() => {
@@ -556,18 +568,43 @@ function Main() {
                   图鉴
                 </Text>
                 <JXSpace gap={6}>
-                  <JXButton size='mini' onClick={() => setTujianTab('dy')}>
+                  <JXButton
+                    size='mini'
+                    disabled={tujianTab === 'dy'}
+                    onClick={() => setTujianTab('dy')}
+                  >
                     丹药
                   </JXButton>
-                  <JXButton size='mini' onClick={() => setTujianTab('df')}>
+                  <JXButton
+                    size='mini'
+                    disabled={tujianTab === 'df'}
+                    onClick={() => setTujianTab('df')}
+                  >
                     丹方
                   </JXButton>
                 </JXSpace>
               </JXSpace>
-              <View style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                {tujianList.length ? (
-                  <JXGrid columns={4} gap={8}>
-                    {tujianList.map((item, index) => (
+              <View style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {['全部', ...dfGrades].map((grade) => (
+                  <JXButton
+                    key={grade}
+                    size='mini'
+                    disabled={tujianGrade === grade}
+                    onClick={() => setTujianGrade(grade)}
+                  >
+                    {grade}
+                  </JXButton>
+                ))}
+              </View>
+              <JXInput
+                placeholder='按名称搜索'
+                value={tujianKeyword}
+                onChange={(val) => setTujianKeyword(val)}
+              />
+              <View style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                {filteredTujianList.length ? (
+                  <JXGrid columns={4} gap={8} height={200}>
+                    {filteredTujianList.map((item, index) => (
                       <JXGrid.Item
                         key={`${item.name}-${item.itype}-${index}`}
                         align='center'

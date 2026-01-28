@@ -1,8 +1,29 @@
 import { Grid, GridItemProps, GridProps } from 'antd-mobile';
 import { CSSProperties, PropsWithChildren } from 'react';
 
-function JXGrid({ children, ...props }: PropsWithChildren<GridProps>) {
-  return <Grid {...props}>{children}</Grid>;
+export interface JXGridProps extends GridProps {
+  height?: number | string;
+}
+
+function JXGrid({
+  children,
+  height,
+  style,
+  ...props
+}: PropsWithChildren<JXGridProps>) {
+  const normalizedHeight = typeof height === 'number' ? `${height}px` : height;
+  return (
+    <Grid
+      {...props}
+      style={{
+        ...style,
+        height: normalizedHeight,
+        overflowY: normalizedHeight ? 'auto' : style?.overflowY
+      }}
+    >
+      {children}
+    </Grid>
+  );
 }
 
 export interface JXGridItemProps extends GridItemProps {
