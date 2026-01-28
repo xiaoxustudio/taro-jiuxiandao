@@ -232,6 +232,18 @@ function Main() {
   useEffect(() => {
     if (!tujianVisible) return;
     const anyTaro = Taro as any;
+    const parseStored = (raw: any) => {
+      if (!raw) return undefined;
+      if (typeof raw === 'string') {
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          String(e);
+          return raw;
+        }
+      }
+      return raw;
+    };
     const load = async (key?: string) => {
       if (!key) return undefined;
       let raw: any;
@@ -245,19 +257,12 @@ function Main() {
           String(e);
           return undefined;
         }
+      } else if (typeof localStorage !== 'undefined') {
+        raw = localStorage.getItem(key);
       } else {
         return undefined;
       }
-      if (!raw) return undefined;
-      if (typeof raw === 'string') {
-        try {
-          return JSON.parse(raw);
-        } catch (e) {
-          String(e);
-          return raw;
-        }
-      }
-      return raw;
+      return parseStored(raw);
     };
     const run = async () => {
       const pool = get('danfangPoolByGrade') as

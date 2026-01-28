@@ -51,6 +51,10 @@ const storageSet = async (key: string, data: any) => {
   }
   if (typeof anyTaro.setStorage === 'function') {
     await anyTaro.setStorage({ key, data });
+    return;
+  }
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(key, JSON.stringify(data));
   }
 };
 
@@ -62,6 +66,10 @@ const storageRemove = async (key: string) => {
   }
   if (typeof anyTaro.removeStorage === 'function') {
     await anyTaro.removeStorage({ key });
+    return;
+  }
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(key);
   }
 };
 
