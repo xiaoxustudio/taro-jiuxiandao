@@ -228,9 +228,9 @@ export const caiLiaoBaseList = [
 ];
 
 export const clNameParts = [
-  ['灵', '玄', '玉', '雪', '苍', '赤', '紫', '青', '黑', '金'],
-  ['心', '魄', '魂', '元', '神', '华', '纹', '影', '痕', '息'],
-  ['草', '花', '藤', '木', '液', '砂', '石', '晶', '萃', '页']
+  ['灵', '玄', '玉', '雪', '苍', '赤', '紫', '青', '黑', '金', '霜', '炎'],
+  ['心', '魄', '魂', '元', '神', '华', '纹', '影', '痕', '息', '骨', '髓'],
+  ['草', '花', '藤', '木', '液', '砂', '石', '晶', '萃', '页', '露', '芽']
 ] as const;
 export const clGrades = [
   '一品',
@@ -253,6 +253,140 @@ export const clGradePrice: Record<(typeof clGrades)[number], [number, number]> =
     七品: [32000, 80000],
     八品: [64000, 160000]
   };
+
+// ------------------------------
+// 材料注册与初始化配置
+// ------------------------------
+export const MATERIAL_INIT_COUNT = 1000;
+export type MaterialRegistryItem = {
+  name: string;
+  itype: (typeof clGrades)[number];
+};
+export type MaterialPoolByGrade = Record<
+  (typeof clGrades)[number],
+  MaterialRegistryItem[]
+>;
+export const MATERIAL_BASE_LIST: MaterialRegistryItem[] = [
+  { name: '洗骨花', itype: '一品' },
+  { name: '千叶草', itype: '一品' },
+  { name: '玫瑰花', itype: '一品' },
+  { name: '妖丹', itype: '一品' },
+  { name: '万灵草', itype: '三品' },
+  { name: '草灵', itype: '一品' },
+  { name: '百灵血竹', itype: '二品' },
+  { name: '彳果', itype: '二品' },
+  { name: '枯木灵藤', itype: '三品' },
+  { name: '木之精华', itype: '三品' },
+  { name: '柔水', itype: '二品' },
+  { name: '灵氩液', itype: '四品' },
+  { name: '氺华', itype: '四品' },
+  { name: '魔晶', itype: '一品' },
+  { name: '玄纹髓', itype: '五品' },
+  { name: '霜魄晶', itype: '六品' },
+  { name: '幽炎砂', itype: '七品' },
+  { name: '残·龙魂', itype: '八品' }
+];
+export const MATERIAL_GRADE_COUNTS: Record<(typeof clGrades)[number], number> =
+  {
+    一品: 10,
+    二品: 8,
+    三品: 6,
+    四品: 5,
+    五品: 4,
+    六品: 3,
+    七品: 2,
+    八品: 2
+  };
+const UINT32_MAX = 4294967296;
+const seedToNumber = (seed: string) => {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i += 1) {
+    h = (Math.imul(h, 16777619) + seed.charCodeAt(i)) % UINT32_MAX;
+  }
+  return h;
+};
+export const createRng = (seed?: string) => {
+  if (!seed) return Math.random;
+  let state = seedToNumber(seed);
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) % UINT32_MAX;
+    return state / UINT32_MAX;
+  };
+};
+export const createMaterialRegistry = (options?: {
+  seed?: string;
+  counts?: Partial<Record<(typeof clGrades)[number], number>>;
+}) => {
+  const rng = createRng(options?.seed);
+  const counts = { ...MATERIAL_GRADE_COUNTS, ...(options?.counts ?? {}) };
+  const used = new Set<string>(MATERIAL_BASE_LIST.map((item) => item.name));
+  const list: MaterialRegistryItem[] = [...MATERIAL_BASE_LIST];
+  clGrades.forEach((grade) => {
+    const target = counts[grade] ?? 0;
+    const current = list.filter((item) => item.itype === grade).length;
+    const need = Math.max(0, target - current);
+    for (let i = 0; i < need; i += 1) {
+      let name = clNameParts
+        .map((part) => part[Math.floor(rng() * part.length)])
+        .join('');
+      let guard = 0;
+      while (used.has(name) && guard < 5) {
+        name = clNameParts
+          .map((part) => part[Math.floor(rng() * part.length)])
+          .join('');
+        guard += 1;
+      }
+      if (used.has(name)) {
+        name = `${name}${Math.floor(rng() * 90) + 10}`;
+      }
+      used.add(name);
+      list.push({ name, itype: grade });
+    }
+  });
+  return list;
+};
+export const createMaterialPoolByGrade = (options?: {
+  seed?: string;
+  countPerGrade?: number;
+}) => {
+  const rng = createRng(options?.seed);
+  const countPerGrade = options?.countPerGrade ?? 500;
+  const pool = clGrades.reduce((acc, grade) => {
+    acc[grade] = [];
+    return acc;
+  }, {} as MaterialPoolByGrade);
+  const used = new Set<string>();
+  MATERIAL_BASE_LIST.forEach((item) => {
+    used.add(item.name);
+    pool[item.itype].push(item);
+  });
+  clGrades.forEach((grade) => {
+    const current = pool[grade].length;
+    const need = Math.max(0, countPerGrade - current);
+    for (let i = 0; i < need; i += 1) {
+      let name = clNameParts
+        .map((part) => part[Math.floor(rng() * part.length)])
+        .join('');
+      let guard = 0;
+      while (used.has(name) && guard < 5) {
+        name = clNameParts
+          .map((part) => part[Math.floor(rng() * part.length)])
+          .join('');
+        guard += 1;
+      }
+      if (used.has(name)) {
+        name = `${name}${Math.floor(rng() * 90) + 10}`;
+      }
+      used.add(name);
+      pool[grade].push({ name, itype: grade });
+    }
+  });
+  return pool;
+};
+export const flattenMaterialPool = (pool?: MaterialPoolByGrade) => {
+  if (!pool) return [];
+  return clGrades.flatMap((grade) => pool[grade] ?? []);
+};
 
 // ------------------------------
 // 丹方配置
@@ -360,6 +494,19 @@ export const REALM_ORDER = [
   '合体',
   '大乘'
 ];
+export const REALM_GRADE_WEIGHTS: Record<
+  (typeof REALM_ORDER)[number],
+  number[]
+> = {
+  练气: [12, 6, 3, 1, 0, 0, 0, 0],
+  筑基: [8, 10, 6, 2, 1, 0, 0, 0],
+  结丹: [4, 8, 10, 5, 2, 1, 0, 0],
+  元婴: [2, 5, 8, 10, 5, 2, 1, 0],
+  化神: [0, 3, 6, 9, 9, 4, 2, 1],
+  返虚: [0, 1, 4, 7, 9, 7, 4, 2],
+  合体: [0, 0, 2, 5, 7, 9, 8, 4],
+  大乘: [0, 0, 1, 3, 6, 9, 10, 8]
+};
 export const PJ_BY_REALM = [
   FabaoPinjie.练气,
   FabaoPinjie.筑基,

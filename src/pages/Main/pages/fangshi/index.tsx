@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import Taro from '@tarojs/taro';
 import {
   fangshiCategories,
   FangshiCategoryKey,
@@ -7,6 +8,7 @@ import {
   resolveFangshiSnapshot
 } from '@/utils/fangshi';
 import danfangData from '@/assets/danfang.json';
+import { createMaterialRegistry, MaterialRegistryItem } from '@/assets/const';
 import {
   Box,
   Container,
@@ -183,7 +185,63 @@ export default function Fangshi() {
     const refresh = () => {
       const realm = get('jingjie') as string;
       const current = get('fangshi') as FangshiSnapshot | null;
-      const next = resolveFangshiSnapshot(current, realm);
+      const existingRegistry = get(
+        'materialRegistry'
+      ) as MaterialRegistryItem[];
+      let materialPoolByGrade = get('materialPoolByGrade') as any;
+      let danfangPoolByGrade = get('danfangPoolByGrade') as any;
+      if (!materialPoolByGrade) {
+        const keys = get('materialPoolStorageKeysByGrade') as
+          | Record<string, string>
+          | undefined;
+        if (keys && Object.keys(keys).length) {
+          const next: Record<string, { name: string; itype: string }[]> = {};
+          Object.entries(keys).forEach(([grade, key]) => {
+            const loaded = Taro.getStorageSync(key);
+            if (!Array.isArray(loaded)) return;
+            next[grade] = (loaded as string[]).map((name) => ({
+              name,
+              itype: grade
+            }));
+          });
+          if (Object.keys(next).length) {
+            materialPoolByGrade = next;
+            set('materialPoolByGrade', next);
+          }
+        }
+      }
+      if (!danfangPoolByGrade) {
+        const keys = get('danfangPoolStorageKeysByGrade') as
+          | Record<string, string>
+          | undefined;
+        if (keys && Object.keys(keys).length) {
+          const next: Record<string, any[]> = {};
+          Object.entries(keys).forEach(([grade, key]) => {
+            const loaded = Taro.getStorageSync(key);
+            if (!Array.isArray(loaded)) return;
+            next[grade] = loaded as any[];
+          });
+          if (Object.keys(next).length) {
+            danfangPoolByGrade = next;
+            set('danfangPoolByGrade', next);
+          }
+        }
+      }
+      const registry =
+        existingRegistry && existingRegistry.length
+          ? existingRegistry
+          : createMaterialRegistry({ seed: get('uuid') as string });
+      if (!existingRegistry || !existingRegistry.length) {
+        set('materialRegistry', registry);
+      }
+      const next = resolveFangshiSnapshot(
+        current,
+        realm,
+        Date.now(),
+        registry,
+        materialPoolByGrade,
+        danfangPoolByGrade
+      );
       if (current !== next) {
         set('fangshi', next);
       }

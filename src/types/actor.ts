@@ -1,4 +1,5 @@
 import type { FangshiSnapshot } from '@/utils/fangshi';
+import type { MaterialPoolByGrade } from '@/assets/const';
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
 import { GongFaType } from './gongfa';
 
@@ -80,4 +81,12 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   }; // 功法列表
   fangshi?: FangshiSnapshot;
   danfangData?: Record<string, any>;
+  materialRegistry?: { name: string; itype: string }[];
+  materialPoolByGrade?: MaterialPoolByGrade;
+  danfangPoolByGrade?: Record<string, any[]>;
+  materialPoolStorageKey?: string;
+  materialPoolStorageKeysByGrade?: Record<string, string>;
+  danfangPoolStorageKey?: string;
+  danfangPoolStorageKeysByGrade?: Record<string, string>;
+  danfangDataStorageKey?: string;
 }

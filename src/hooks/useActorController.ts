@@ -1,5 +1,6 @@
 import { cloneDeep, omit } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
+import Taro from '@tarojs/taro';
+import { useCallback, useEffect, useMemo } from 'react';
 import { ActorIdents } from '@/consts';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
@@ -19,6 +20,126 @@ function useActorController() {
   } else if (ActorIdents.includes(current)) {
     throw new Error('无法读取存档(identifier)');
   }
+
+  useEffect(() => {
+    const anyTaro = Taro as any;
+    const load = async (key?: string) => {
+      if (!key) return undefined;
+      let raw: any;
+      if (typeof anyTaro.getStorageSync === 'function') {
+        raw = anyTaro.getStorageSync(key);
+      } else if (typeof anyTaro.getStorage === 'function') {
+        try {
+          const res = await anyTaro.getStorage({ key });
+          raw = res?.data;
+        } catch (e) {
+          String(e);
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+
+      if (!raw) return undefined;
+      if (typeof raw === 'string') {
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          String(e);
+          return raw;
+        }
+      }
+      return raw;
+    };
+
+    const run = async () => {
+      const patch: Partial<ActorDataConfig> = {};
+
+      if (!actor.materialPoolByGrade && actor.materialPoolStorageKey) {
+        const loaded = await load(actor.materialPoolStorageKey);
+        if (loaded) patch.materialPoolByGrade = loaded;
+      }
+      if (
+        !actor.materialPoolByGrade &&
+        actor.materialPoolStorageKeysByGrade &&
+        Object.keys(actor.materialPoolStorageKeysByGrade).length
+      ) {
+        const next: Record<string, { name: string; itype: string }[]> = {};
+        await Promise.all(
+          Object.entries(actor.materialPoolStorageKeysByGrade).map(
+            async ([grade, key]) => {
+              const loaded = await load(key);
+              if (!Array.isArray(loaded)) return;
+              if (loaded.length && typeof loaded[0] === 'string') {
+                next[grade] = (loaded as string[]).map((name) => ({
+                  name,
+                  itype: grade
+                }));
+              } else {
+                next[grade] = loaded as any;
+              }
+            }
+          )
+        );
+        if (Object.keys(next).length) {
+          patch.materialPoolByGrade = next as any;
+        }
+      }
+      if (!actor.danfangPoolByGrade && actor.danfangPoolStorageKey) {
+        const loaded = await load(actor.danfangPoolStorageKey);
+        if (loaded) patch.danfangPoolByGrade = loaded;
+      }
+      if (
+        !actor.danfangPoolByGrade &&
+        actor.danfangPoolStorageKeysByGrade &&
+        Object.keys(actor.danfangPoolStorageKeysByGrade).length
+      ) {
+        const next: Record<string, any[]> = {};
+        await Promise.all(
+          Object.entries(actor.danfangPoolStorageKeysByGrade).map(
+            async ([grade, key]) => {
+              const loaded = await load(key);
+              if (!Array.isArray(loaded)) return;
+              next[grade] = loaded as any[];
+            }
+          )
+        );
+        if (Object.keys(next).length) {
+          patch.danfangPoolByGrade = next;
+        }
+      }
+      if (!actor.danfangData && actor.danfangDataStorageKey) {
+        const loaded = await load(actor.danfangDataStorageKey);
+        if (loaded) patch.danfangData = loaded;
+      }
+
+      if (!Object.keys(patch).length) return;
+
+      useActorStore.setState((state) => {
+        const { current: curr } = useStore.getState();
+        const currentActor = state.actors[curr];
+        if (!currentActor) return state;
+        return {
+          ...state,
+          actors: {
+            ...state.actors,
+            [curr]: { ...currentActor, ...patch }
+          }
+        };
+      });
+    };
+
+    run();
+  }, [
+    actor.danfangData,
+    actor.danfangDataStorageKey,
+    actor.danfangPoolByGrade,
+    actor.danfangPoolStorageKey,
+    actor.danfangPoolStorageKeysByGrade,
+    actor.materialPoolByGrade,
+    actor.materialPoolStorageKey,
+    actor.materialPoolStorageKeysByGrade
+  ]);
 
   /**
    * @description: 获取属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
@@ -82,6 +203,23 @@ function useActorController() {
       // 设置最终值
       const lastKey = pathParts[pathParts.length - 1];
       copyActorTarget[lastKey] = val;
+
+      if (key === 'danfangData') {
+        const storageKey = `actor:${newActor.uuid}:danfangData`;
+        try {
+          const anyTaro = Taro as any;
+          if (typeof anyTaro.setStorageSync === 'function') {
+            anyTaro.setStorageSync(storageKey, val);
+          } else if (typeof anyTaro.setStorage === 'function') {
+            anyTaro
+              .setStorage({ key: storageKey, data: val })
+              .catch((e: any) => String(e));
+          }
+          newActor.danfangDataStorageKey = storageKey;
+        } catch (e) {
+          String(e);
+        }
+      }
 
       // 更新整个角色数据
       return {

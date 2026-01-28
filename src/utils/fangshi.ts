@@ -8,10 +8,11 @@ import {
   mainAttrMultiplier,
   extraAttrMultiplier,
   FANGSHI_CONFIG,
-  caiLiaoBaseList,
-  clNameParts,
   clGrades,
   clGradePrice,
+  createMaterialRegistry,
+  MaterialRegistryItem,
+  MaterialPoolByGrade,
   danfangIds,
   dfGrades,
   dyNameParts,
@@ -21,6 +22,7 @@ import {
   dyRarityMultipliers,
   DY_EFFECT_SCALE,
   REALM_ORDER,
+  REALM_GRADE_WEIGHTS,
   PJ_BY_REALM,
   FANGSHI_REFRESH_INTERVAL
 } from '@/assets/const';
@@ -55,6 +57,14 @@ type FaBaoBaseItem = Omit<FangshiItem, 'type' | 'lv' | 'isPile'>;
 
 const pick = <T>(list: T[]) => list[random(0, list.length - 1)];
 const buildName = (parts: string[][]) => parts.map(pick).join('');
+function shuffle<T>(list: T[]) {
+  const arr = [...list];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 const createFaBaoBaseList = (): FaBaoBaseItem[] => {
   const list: FaBaoBaseItem[] = [];
@@ -145,39 +155,50 @@ const createFaBaoList = (): FangshiItem[] =>
   }));
 
 type CaiLiaoBaseItem = Omit<FangshiItem, 'type' | 'isPile'>;
-const createCaiLiaoList = (): FangshiItem[] =>
-  (caiLiaoBaseList as CaiLiaoBaseItem[]).map((item) => ({
+const createCaiLiaoList = (
+  materialRegistry?: MaterialRegistryItem[]
+): FangshiItem[] => {
+  const registry =
+    materialRegistry && materialRegistry.length
+      ? materialRegistry
+      : createMaterialRegistry();
+  const list: CaiLiaoBaseItem[] = registry.map((item) => {
+    const [minP, maxP] = clGradePrice[item.itype];
+    return {
+      name: item.name,
+      desc: '材料，用于炼制丹药',
+      itype: item.itype,
+      ls: random(minP, maxP)
+    };
+  });
+  return list.map((item) => ({
     ...item,
     type: CWType.QT,
     isPile: true
   }));
+};
 
-const createRandomCaiLiaoList = (count: number): FangshiItem[] => {
-  const list: FangshiItem[] = [];
-  const used = new Set<string>();
-  for (let i = 0; i < count; i += 1) {
-    let name = buildName(clNameParts as unknown as string[][]);
-    let guard = 0;
-    while (used.has(name) && guard < 5) {
-      name = buildName(clNameParts as unknown as string[][]);
-      guard += 1;
-    }
-    if (used.has(name)) {
-      name = `${name}${random(1, 99)}`;
-    }
-    used.add(name);
-    const grade = clGrades[random(0, clGrades.length - 1)];
-    const [minP, maxP] = clGradePrice[grade];
-    list.push({
-      name,
+const createRandomCaiLiaoList = (
+  count: number,
+  materialRegistry?: MaterialRegistryItem[]
+): FangshiItem[] => {
+  const registry =
+    materialRegistry && materialRegistry.length
+      ? materialRegistry
+      : createMaterialRegistry();
+  const pool = shuffle(registry);
+  const picked = pool.slice(0, Math.min(count, pool.length));
+  return picked.map((item) => {
+    const [minP, maxP] = clGradePrice[item.itype];
+    return {
+      name: item.name,
       desc: '材料，用于炼制丹药',
-      itype: grade,
+      itype: item.itype,
       ls: random(minP, maxP),
       type: CWType.QT,
       isPile: true
-    });
-  }
-  return list;
+    };
+  });
 };
 
 export const createDanYaoList = (): FangshiItem[] =>
@@ -201,6 +222,22 @@ const pickRarity = (p: number) => {
   if (p < 0.97) return dyRarityLevels[3];
   return dyRarityLevels[4];
 };
+
+const dfNameSuffixPool = [
+  '玄',
+  '灵',
+  '真',
+  '太',
+  '元',
+  '清',
+  '虚',
+  '明',
+  '化',
+  '归',
+  '无',
+  '极',
+  '道'
+] as const;
 
 const createRandomDanYaoList = (
   count: number,
@@ -283,15 +320,25 @@ const createRandomDanFangList = (
   const maxGradeIndex = Math.min(dfGrades.length - 1, realmIndex);
   const allowedGrades = dfGrades.slice(0, maxGradeIndex + 1);
   const seed = Date.now().toString(36);
+  const dfNameParts = (dyNameParts as unknown as string[][]).slice(0, 2);
   for (let i = 0; i < count; i += 1) {
-    let name = buildName(dyNameParts as unknown as string[][]);
+    let name = buildName(dfNameParts);
     let guard = 0;
-    while (used.has(name) && guard < 5) {
-      name = buildName(dyNameParts as unknown as string[][]);
+    while (used.has(name) && guard < 20) {
+      name = buildName(dfNameParts);
       guard += 1;
     }
     if (used.has(name)) {
-      name = `${name}${random(1, 99)}`;
+      let candidate = name;
+      let suffixGuard = 0;
+      while (used.has(candidate) && suffixGuard < 8) {
+        const suffix =
+          dfNameSuffixPool[random(0, dfNameSuffixPool.length - 1)] ||
+          dfNameSuffixPool[0];
+        candidate = `${name}${suffix}`;
+        suffixGuard += 1;
+      }
+      name = candidate;
     }
     used.add(name);
     const grade = allowedGrades[random(0, allowedGrades.length - 1)];
@@ -422,13 +469,84 @@ export const getRealmIndex = (realm: string) => {
   return idx === -1 ? 0 : idx;
 };
 
-const shuffle = <T>(list: T[]) => {
-  const arr = [...list];
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+const pickWeightedIndex = (weights: number[]) => {
+  const sumW = weights.reduce((a, b) => a + b, 0) || 1;
+  const rPick = random(1, sumW);
+  let acc = 0;
+  for (let i = 0; i < weights.length; i += 1) {
+    acc += weights[i];
+    if (rPick <= acc) return i;
   }
-  return arr;
+  return 0;
+};
+
+const pickMaterialsFromPoolByGrade = (
+  realm: string,
+  count: number,
+  pool: MaterialPoolByGrade
+): FangshiItem[] => {
+  const weights =
+    REALM_GRADE_WEIGHTS[realm as keyof typeof REALM_GRADE_WEIGHTS] ||
+    REALM_GRADE_WEIGHTS['练气'];
+  const used = new Set<string>();
+  const list: FangshiItem[] = [];
+  let guard = 0;
+  while (list.length < count && guard < count * 30) {
+    const gradeIndex = pickWeightedIndex(weights);
+    const grade = clGrades[gradeIndex] || clGrades[0];
+    const candidates = pool[grade] ?? [];
+    if (candidates.length) {
+      const picked = candidates[random(0, candidates.length - 1)];
+      if (picked?.name && !used.has(picked.name)) {
+        used.add(picked.name);
+        const [minP, maxP] = clGradePrice[grade];
+        list.push({
+          name: picked.name,
+          desc: '材料，用于炼制丹药',
+          itype: grade,
+          ls: random(minP, maxP),
+          type: CWType.QT,
+          isPile: true
+        });
+      } else {
+        guard += 1;
+      }
+    } else {
+      guard += 1;
+    }
+  }
+  return list;
+};
+
+const pickDanFangFromPoolByGrade = (
+  realm: string,
+  count: number,
+  pool: Record<string, FangshiItem[]>
+): FangshiItem[] => {
+  const weights =
+    REALM_GRADE_WEIGHTS[realm as keyof typeof REALM_GRADE_WEIGHTS] ||
+    REALM_GRADE_WEIGHTS['练气'];
+  const used = new Set<string>();
+  const list: FangshiItem[] = [];
+  let guard = 0;
+  while (list.length < count && guard < count * 30) {
+    const gradeIndex = pickWeightedIndex(weights);
+    const grade = dfGrades[gradeIndex] || dfGrades[0];
+    const candidates = pool[grade] ?? [];
+    if (candidates.length) {
+      const picked = candidates[random(0, candidates.length - 1)];
+      const key = picked?.id || picked?.name;
+      if (key && !used.has(key)) {
+        used.add(key);
+        list.push(picked);
+      } else {
+        guard += 1;
+      }
+    } else {
+      guard += 1;
+    }
+  }
+  return list;
 };
 
 const pickByRealm = <T extends { ls: number }>(
@@ -460,28 +578,49 @@ const pickFaBaoByRealm = (
 
 export const createFangshiSnapshot = (
   realm: string,
-  updatedAt = Date.now()
+  updatedAt?: number,
+  materialRegistry?: MaterialRegistryItem[],
+  materialPoolByGrade?: MaterialPoolByGrade,
+  danfangPoolByGrade?: Record<string, FangshiItem[]>
 ): FangshiSnapshot => {
+  const ts = updatedAt ?? Date.now();
   const realmIndex = getRealmIndex(realm);
   const fbList = createFaBaoList();
   const dyList = [
     ...createDanYaoList(),
     ...createRandomDanYaoList(FANGSHI_CONFIG.randDyCount, realmIndex)
   ];
-  const randomClList = createRandomCaiLiaoList(FANGSHI_CONFIG.randClCount);
-  const clList = [...createCaiLiaoList(), ...randomClList];
+  const randomClList = createRandomCaiLiaoList(
+    FANGSHI_CONFIG.randClCount,
+    materialRegistry
+  );
+  const clList = [...createCaiLiaoList(materialRegistry), ...randomClList];
   const dfList = [
     ...createDanFangList(realmIndex),
     ...createRandomDanFangList(FANGSHI_CONFIG.randDfCount, realmIndex, clList)
   ];
+  const clItems = materialPoolByGrade
+    ? pickMaterialsFromPoolByGrade(
+        realm,
+        FANGSHI_CONFIG.clBaseCount + realmIndex,
+        materialPoolByGrade
+      )
+    : pickByRealm(clList, realmIndex, FANGSHI_CONFIG.clBaseCount);
+  const dfItems = danfangPoolByGrade
+    ? pickDanFangFromPoolByGrade(
+        realm,
+        FANGSHI_CONFIG.dfBaseCount + realmIndex,
+        danfangPoolByGrade
+      )
+    : pickByRealm(dfList, realmIndex, FANGSHI_CONFIG.dfBaseCount);
   return {
-    updatedAt,
+    updatedAt: ts,
     realm,
     items: {
       fb: pickFaBaoByRealm(fbList, realmIndex, FANGSHI_CONFIG.fbBaseCount),
       dy: pickByRealm(dyList, realmIndex, FANGSHI_CONFIG.dyBaseCount),
-      cl: pickByRealm(clList, realmIndex, FANGSHI_CONFIG.clBaseCount),
-      df: pickByRealm(dfList, realmIndex, FANGSHI_CONFIG.dfBaseCount)
+      cl: clItems,
+      df: dfItems
     }
   };
 };
@@ -489,14 +628,24 @@ export const createFangshiSnapshot = (
 export const resolveFangshiSnapshot = (
   snapshot: FangshiSnapshot | null | undefined,
   realm: string,
-  now = Date.now()
+  now?: number,
+  materialRegistry?: MaterialRegistryItem[],
+  materialPoolByGrade?: MaterialPoolByGrade,
+  danfangPoolByGrade?: Record<string, FangshiItem[]>
 ) => {
+  const ts = now ?? Date.now();
   if (
     snapshot &&
     snapshot.realm === realm &&
-    now - snapshot.updatedAt < FANGSHI_REFRESH_INTERVAL
+    ts - snapshot.updatedAt < FANGSHI_REFRESH_INTERVAL
   ) {
     return snapshot;
   }
-  return createFangshiSnapshot(realm, now);
+  return createFangshiSnapshot(
+    realm,
+    ts,
+    materialRegistry,
+    materialPoolByGrade,
+    danfangPoolByGrade
+  );
 };

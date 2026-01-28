@@ -1,5 +1,6 @@
 import { random } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Taro from '@tarojs/taro';
 import difangData from '@/assets/df.json';
 import {
   Container,
@@ -23,6 +24,11 @@ import useScroll from '@/hooks/useScroll';
 import chuwu from '@/utils/chuwu';
 import { navigateTo, numberToChinese } from '@/utils';
 import { JingJie1ToNumber } from '@/utils/actor';
+import {
+  REALM_GRADE_WEIGHTS,
+  clGrades,
+  createMaterialRegistry
+} from '@/assets/const';
 import styles from './index.module.less';
 
 export default function Shilian() {
@@ -114,18 +120,66 @@ export default function Shilian() {
       }
     }
     const jj2 = jj2Arr[sPick];
-    const dropPools: Record<string, string[]> = {
-      练气: ['妖丹', '千叶草', '草灵', '魔晶'],
-      筑基: ['百灵血竹', '枯木灵藤', '木之精华', '彳果', '柔水', '妖丹'],
-      结丹: ['灵氩液', '木之精华', '草灵', '妖丹', '柔水'],
-      元婴: ['残·龙魂', '灵氩液', '木之精华', '妖丹'],
-      化神: ['灵氩液', '木之精华', '妖丹'],
-      返虚: ['灵氩液', '妖丹'],
-      合体: ['灵氩液', '妖丹'],
-      大乘: ['灵氩液', '妖丹']
-    };
-    const clPool = dropPools[df.jingjie] || dropPools['练气'];
-    const clName = clPool[random(0, clPool.length - 1)];
+    let materialPoolByGrade = get('materialPoolByGrade') as
+      | Record<string, { name: string; itype: string }[]>
+      | undefined;
+    if (!materialPoolByGrade) {
+      const keys = get('materialPoolStorageKeysByGrade') as
+        | Record<string, string>
+        | undefined;
+      if (keys && Object.keys(keys).length) {
+        const next: Record<string, { name: string; itype: string }[]> = {};
+        Object.entries(keys).forEach(([grade, key]) => {
+          const raw = Taro.getStorageSync(key);
+          let loaded: any = raw;
+          if (typeof raw === 'string') {
+            try {
+              loaded = JSON.parse(raw);
+            } catch (e) {
+              String(e);
+              loaded = undefined;
+            }
+          }
+          if (!Array.isArray(loaded)) return;
+          next[grade] = (loaded as any[]).map((name) => ({
+            name,
+            itype: grade
+          }));
+        });
+        if (Object.keys(next).length) {
+          materialPoolByGrade = next;
+          set('materialPoolByGrade', next);
+        }
+      }
+    }
+    const registry = (
+      (get('materialRegistry') || []) as { name: string; itype: string }[]
+    ).length
+      ? ((get('materialRegistry') || []) as { name: string; itype: string }[])
+      : createMaterialRegistry({ seed: get('uuid') });
+    const weights =
+      REALM_GRADE_WEIGHTS[df.jingjie as keyof typeof REALM_GRADE_WEIGHTS] ||
+      REALM_GRADE_WEIGHTS['练气'];
+    const sumW = weights.reduce((a, b) => a + b, 0) || 1;
+    const rPick = random(1, sumW);
+    let acc = 0;
+    let gradeIndex = 0;
+    for (let i = 0; i < weights.length; i += 1) {
+      acc += weights[i];
+      if (rPick <= acc) {
+        gradeIndex = i;
+        break;
+      }
+    }
+    const targetGrade = clGrades[gradeIndex] || clGrades[0];
+    const fromMap = materialPoolByGrade?.[targetGrade] ?? [];
+    let pool = fromMap;
+    if (!pool.length) {
+      const filtered = registry.filter((m) => m.itype === targetGrade);
+      pool = filtered.length ? filtered : registry;
+    }
+    const clName =
+      pool[random(0, Math.max(0, pool.length - 1))]?.name || '妖丹';
     const stageCoefMap: Record<string, number> = {
       初期: 1.0,
       中期: 1.12,
@@ -159,7 +213,7 @@ export default function Shilian() {
       xw,
       df: df.name
     };
-  }, [df.jingjie, df.name, get]);
+  }, [df.jingjie, df.name, get, set]);
   const [YaoShouInstance, setYaoShouInstance] = useState<YaoShouZDType | null>(
     null
   ); // 妖兽实例
@@ -190,6 +244,14 @@ export default function Shilian() {
   }>({ totalRounds: 0, wins: 0, losses: 0, history: [] });
   const isGuajiRef = useRef(isGuaji);
   const currentGuajiFightRoundsRef = useRef(0);
+  useEffect(() => {
+    const existing = get('materialRegistry') as
+      | { name: string; itype: string }[]
+      | undefined;
+    if (!existing || !existing.length) {
+      set('materialRegistry', createMaterialRegistry({ seed: get('uuid') }));
+    }
+  }, [get, set]);
   useEffect(() => {
     isGuajiRef.current = isGuaji;
   }, [isGuaji]);
