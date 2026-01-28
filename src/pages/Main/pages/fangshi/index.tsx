@@ -20,7 +20,7 @@ import {
   Text
 } from '@/components';
 import { ActorDataConfigForZhanDou, CWType } from '@/types';
-import { AttrTransformChinese } from '@/utils';
+import { AttrTransformChinese, getGradeColor } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
 import useActorController from '@/hooks/useActorController';
@@ -58,7 +58,9 @@ export default function Fangshi() {
           <Text>{v.name}</Text>
           <JXSpace between>
             <Text>灵石：{v.ls}</Text>
-            <Text align='right'>{v.itype}</Text>
+            <Text align='right' color={getGradeColor(v.itype) || undefined}>
+              {v.itype}
+            </Text>
           </JXSpace>
         </Box>
       ),
@@ -74,10 +76,19 @@ export default function Fangshi() {
               <Text size={20} bold>
                 {v.name}
               </Text>
-              {v.pj && <Text>品阶：{v.pj}</Text>}
+              {v.pj && (
+                <Text color={getGradeColor(v.pj) || undefined}>
+                  品阶：{v.pj}
+                </Text>
+              )}
               <Text>
                 {[1, 5].includes(v.type) ? (
-                  <>品阶：{v.itype}</>
+                  <>
+                    品阶：
+                    <Text inline color={getGradeColor(v.itype) || undefined}>
+                      {v.itype}
+                    </Text>
+                  </>
                 ) : (
                   <>类型：{v.itype}</>
                 )}

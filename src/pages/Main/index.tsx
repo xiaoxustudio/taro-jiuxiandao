@@ -15,7 +15,7 @@ import {
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
-import { navigateTo, TimeArray, ZhouTian } from '@/utils';
+import { getGradeColor, navigateTo, TimeArray, ZhouTian } from '@/utils';
 import {
   getJingJieMaxDep,
   getLingQiForJingJie,
@@ -611,7 +611,9 @@ function Main() {
                       >
                         <JXSpace direction='vertical' gap={2}>
                           <Text>{item.name}</Text>
-                          <Text color='#888'>{item.itype}</Text>
+                          <Text color={getGradeColor(item.itype) || '#888'}>
+                            {item.itype}
+                          </Text>
                         </JXSpace>
                       </JXGrid.Item>
                     ))}
