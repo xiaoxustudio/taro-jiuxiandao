@@ -371,7 +371,35 @@ function Index() {
               guard += 1;
             }
             if (materialUsed.has(name)) {
-              name = `${name}${Math.floor(materialRng() * 90) + 10}`;
+              const baseName = name;
+              let candidate = baseName;
+              let suffixGuard = 0;
+              while (materialUsed.has(candidate) && suffixGuard < 16) {
+                const suffix =
+                  dfNameSuffixPool[
+                    Math.floor(materialRng() * dfNameSuffixPool.length)
+                  ] || dfNameSuffixPool[0];
+                candidate = `${baseName}${suffix}`;
+                suffixGuard += 1;
+              }
+              if (materialUsed.has(candidate)) {
+                let candidate2 = candidate;
+                let suffixGuard2 = 0;
+                while (materialUsed.has(candidate2) && suffixGuard2 < 24) {
+                  const s1 =
+                    dfNameSuffixPool[
+                      Math.floor(materialRng() * dfNameSuffixPool.length)
+                    ] || dfNameSuffixPool[0];
+                  const s2 =
+                    dfNameSuffixPool[
+                      Math.floor(materialRng() * dfNameSuffixPool.length)
+                    ] || dfNameSuffixPool[0];
+                  candidate2 = `${baseName}${s1}${s2}`;
+                  suffixGuard2 += 1;
+                }
+                candidate = candidate2;
+              }
+              name = candidate;
             }
             materialUsed.add(name);
             materialPoolByGrade[grade].push({ name, itype: grade });
@@ -472,28 +500,47 @@ function Index() {
             usedDanfangName.add(baseName);
 
             const isShen = danfangRng() < 0.5;
-            const scale = DY_EFFECT_SCALE[grade];
+            const scale =
+              (DY_EFFECT_SCALE as unknown as Record<string, any>)[grade] ??
+              (DY_EFFECT_SCALE as unknown as Record<string, any>)[dfGrades[0]];
             const valRange = isShen ? scale.shenshi : scale.xiuwei;
             const baseVal =
               valRange[0] === valRange[1]
                 ? valRange[0]
                 : Math.floor(danfangRng() * (valRange[1] - valRange[0] + 1)) +
                   valRange[0];
+            const safeBaseVal = Math.max(
+              1,
+              Number.isFinite(baseVal) ? baseVal : valRange[0]
+            );
             const attr: Record<string, number> = isShen
-              ? { shenshi: baseVal }
-              : { xiuwei: baseVal };
+              ? { shenshi: safeBaseVal }
+              : { xiuwei: safeBaseVal };
             const priceRange = scale.price;
             const t =
               valRange[1] === valRange[0]
                 ? 0
-                : (baseVal - valRange[0]) / (valRange[1] - valRange[0]);
+                : (safeBaseVal - valRange[0]) / (valRange[1] - valRange[0]);
             const priceBase = Math.round(
               priceRange[0] + t * (priceRange[1] - priceRange[0])
             );
             const rarity = pickRarity(danfangRng());
-            const gradeMul = dyGradeMultipliers[grade];
-            const rarityMul = dyRarityMultipliers[rarity];
-            const baseLs = Math.round(priceBase * gradeMul * rarityMul);
+            const gradeMul =
+              (dyGradeMultipliers as unknown as Record<string, number>)[
+                grade
+              ] ?? 1;
+            const rarityMul =
+              (dyRarityMultipliers as unknown as Record<string, number>)[
+                rarity
+              ] ?? 1;
+            const safePriceBase = Math.max(
+              1,
+              Number.isFinite(priceBase) ? priceBase : priceRange[0]
+            );
+            const baseLs = Math.max(
+              1,
+              Math.round(safePriceBase * gradeMul * rarityMul)
+            );
 
             const pickCount = Math.min(
               pool.length,
@@ -565,7 +612,7 @@ function Index() {
               cl,
               time,
               baseLs,
-              ls: Math.round(baseLs * FANGSHI_CONFIG.dfPriceScale)
+              ls: Math.max(1, Math.round(baseLs * FANGSHI_CONFIG.dfPriceScale))
             };
 
             danfangPoolByGrade[grade].push(danfangItem);

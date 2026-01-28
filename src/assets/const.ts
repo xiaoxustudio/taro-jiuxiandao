@@ -313,6 +313,53 @@ export const createRng = (seed?: string) => {
     return state / UINT32_MAX;
   };
 };
+
+const uniqueNameSuffixPool = [
+  '玄',
+  '灵',
+  '真',
+  '太',
+  '元',
+  '清',
+  '虚',
+  '明',
+  '化',
+  '归',
+  '无',
+  '极',
+  '道'
+] as const;
+
+const appendUniqueSuffix = (
+  baseName: string,
+  used: Set<string>,
+  rng: () => number
+) => {
+  let candidate = baseName;
+  let guard = 0;
+  while (used.has(candidate) && guard < 16) {
+    const suffix =
+      uniqueNameSuffixPool[Math.floor(rng() * uniqueNameSuffixPool.length)] ??
+      uniqueNameSuffixPool[0];
+    candidate = `${baseName}${suffix}`;
+    guard += 1;
+  }
+  if (!used.has(candidate)) return candidate;
+  let candidate2 = candidate;
+  let guard2 = 0;
+  while (used.has(candidate2) && guard2 < 24) {
+    const s1 =
+      uniqueNameSuffixPool[Math.floor(rng() * uniqueNameSuffixPool.length)] ??
+      uniqueNameSuffixPool[0];
+    const s2 =
+      uniqueNameSuffixPool[Math.floor(rng() * uniqueNameSuffixPool.length)] ??
+      uniqueNameSuffixPool[0];
+    candidate2 = `${baseName}${s1}${s2}`;
+    guard2 += 1;
+  }
+  return candidate2;
+};
+
 export const createMaterialRegistry = (options?: {
   seed?: string;
   counts?: Partial<Record<(typeof clGrades)[number], number>>;
@@ -337,7 +384,7 @@ export const createMaterialRegistry = (options?: {
         guard += 1;
       }
       if (used.has(name)) {
-        name = `${name}${Math.floor(rng() * 90) + 10}`;
+        name = appendUniqueSuffix(name, used, rng);
       }
       used.add(name);
       list.push({ name, itype: grade });
@@ -375,7 +422,7 @@ export const createMaterialPoolByGrade = (options?: {
         guard += 1;
       }
       if (used.has(name)) {
-        name = `${name}${Math.floor(rng() * 90) + 10}`;
+        name = appendUniqueSuffix(name, used, rng);
       }
       used.add(name);
       pool[grade].push({ name, itype: grade });

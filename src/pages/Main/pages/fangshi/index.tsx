@@ -8,7 +8,6 @@ import {
   resolveFangshiSnapshot
 } from '@/utils/fangshi';
 import danfangData from '@/assets/danfang.json';
-import { createMaterialRegistry, MaterialRegistryItem } from '@/assets/const';
 import {
   Box,
   Container,
@@ -185,9 +184,6 @@ export default function Fangshi() {
     const refresh = () => {
       const realm = get('jingjie') as string;
       const current = get('fangshi') as FangshiSnapshot | null;
-      const existingRegistry = get(
-        'materialRegistry'
-      ) as MaterialRegistryItem[];
       let materialPoolByGrade = get('materialPoolByGrade') as any;
       let danfangPoolByGrade = get('danfangPoolByGrade') as any;
       if (!materialPoolByGrade) {
@@ -197,9 +193,18 @@ export default function Fangshi() {
         if (keys && Object.keys(keys).length) {
           const next: Record<string, { name: string; itype: string }[]> = {};
           Object.entries(keys).forEach(([grade, key]) => {
-            const loaded = Taro.getStorageSync(key);
+            const raw = Taro.getStorageSync(key);
+            let loaded: any = raw;
+            if (typeof raw === 'string') {
+              try {
+                loaded = JSON.parse(raw);
+              } catch (e) {
+                String(e);
+                loaded = undefined;
+              }
+            }
             if (!Array.isArray(loaded)) return;
-            next[grade] = (loaded as string[]).map((name) => ({
+            next[grade] = (loaded as any[]).map((name) => ({
               name,
               itype: grade
             }));
@@ -217,7 +222,16 @@ export default function Fangshi() {
         if (keys && Object.keys(keys).length) {
           const next: Record<string, any[]> = {};
           Object.entries(keys).forEach(([grade, key]) => {
-            const loaded = Taro.getStorageSync(key);
+            const raw = Taro.getStorageSync(key);
+            let loaded: any = raw;
+            if (typeof raw === 'string') {
+              try {
+                loaded = JSON.parse(raw);
+              } catch (e) {
+                String(e);
+                loaded = undefined;
+              }
+            }
             if (!Array.isArray(loaded)) return;
             next[grade] = loaded as any[];
           });
@@ -227,18 +241,10 @@ export default function Fangshi() {
           }
         }
       }
-      const registry =
-        existingRegistry && existingRegistry.length
-          ? existingRegistry
-          : createMaterialRegistry({ seed: get('uuid') as string });
-      if (!existingRegistry || !existingRegistry.length) {
-        set('materialRegistry', registry);
-      }
       const next = resolveFangshiSnapshot(
         current,
         realm,
         Date.now(),
-        registry,
         materialPoolByGrade,
         danfangPoolByGrade
       );
