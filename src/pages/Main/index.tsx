@@ -231,56 +231,79 @@ function Main() {
 
   useEffect(() => {
     if (!tujianVisible) return;
-    const pool = get('danfangPoolByGrade') as Record<string, any[]> | undefined;
-    if (pool) return;
-    const keys = get('danfangPoolStorageKeysByGrade') as
-      | Record<string, string>
-      | undefined;
-    if (!keys || !Object.keys(keys).length) return;
-    const next: Record<string, any[]> = {};
-    Object.entries(keys).forEach(([grade, key]) => {
-      const raw = Taro.getStorageSync(key);
-      let loaded: any = raw;
-      if (typeof raw === 'string') {
+    const anyTaro = Taro as any;
+    const load = async (key?: string) => {
+      if (!key) return undefined;
+      let raw: any;
+      if (typeof anyTaro.getStorageSync === 'function') {
+        raw = anyTaro.getStorageSync(key);
+      } else if (typeof anyTaro.getStorage === 'function') {
         try {
-          loaded = JSON.parse(raw);
+          const res = await anyTaro.getStorage({ key });
+          raw = res?.data;
         } catch (e) {
           String(e);
-          loaded = undefined;
+          return undefined;
         }
+      } else {
+        return undefined;
       }
-      if (!Array.isArray(loaded)) return;
-      next[grade] = loaded as any[];
-    });
-    if (Object.keys(next).length) {
-      set('danfangPoolByGrade', next);
-    }
-    const gongfaPool = get('gongfaPoolByGrade') as
-      | Record<string, any[]>
-      | undefined;
-    if (gongfaPool) return;
-    const gongfaKeys = get('gongfaPoolStorageKeysByGrade') as
-      | Record<string, string>
-      | undefined;
-    if (!gongfaKeys || !Object.keys(gongfaKeys).length) return;
-    const gongfaNext: Record<string, any[]> = {};
-    Object.entries(gongfaKeys).forEach(([grade, key]) => {
-      const raw = Taro.getStorageSync(key);
-      let loaded: any = raw;
+      if (!raw) return undefined;
       if (typeof raw === 'string') {
         try {
-          loaded = JSON.parse(raw);
+          return JSON.parse(raw);
         } catch (e) {
           String(e);
-          loaded = undefined;
+          return raw;
         }
       }
-      if (!Array.isArray(loaded)) return;
-      gongfaNext[grade] = loaded as any[];
-    });
-    if (Object.keys(gongfaNext).length) {
-      set('gongfaPoolByGrade', gongfaNext);
-    }
+      return raw;
+    };
+    const run = async () => {
+      const pool = get('danfangPoolByGrade') as
+        | Record<string, any[]>
+        | undefined;
+      if (!pool) {
+        const keys = get('danfangPoolStorageKeysByGrade') as
+          | Record<string, string>
+          | undefined;
+        if (keys && Object.keys(keys).length) {
+          const next: Record<string, any[]> = {};
+          await Promise.all(
+            Object.entries(keys).map(async ([grade, key]) => {
+              const loaded = await load(key);
+              if (!Array.isArray(loaded)) return;
+              next[grade] = loaded as any[];
+            })
+          );
+          if (Object.keys(next).length) {
+            set('danfangPoolByGrade', next);
+          }
+        }
+      }
+      const gongfaPool = get('gongfaPoolByGrade') as
+        | Record<string, any[]>
+        | undefined;
+      if (!gongfaPool) {
+        const gongfaKeys = get('gongfaPoolStorageKeysByGrade') as
+          | Record<string, string>
+          | undefined;
+        if (gongfaKeys && Object.keys(gongfaKeys).length) {
+          const gongfaNext: Record<string, any[]> = {};
+          await Promise.all(
+            Object.entries(gongfaKeys).map(async ([grade, key]) => {
+              const loaded = await load(key);
+              if (!Array.isArray(loaded)) return;
+              gongfaNext[grade] = loaded as any[];
+            })
+          );
+          if (Object.keys(gongfaNext).length) {
+            set('gongfaPoolByGrade', gongfaNext);
+          }
+        }
+      }
+    };
+    run();
   }, [get, set, tujianVisible]);
 
   const danfangList = useMemo(() => {
