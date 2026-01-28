@@ -28,6 +28,7 @@ import {
   dyRarityMultipliers,
   DY_EFFECT_SCALE,
   FANGSHI_CONFIG,
+  ACTOR_POOL_CONFIG,
   MaterialPoolByGrade,
   MATERIAL_BASE_LIST
 } from '@/assets/const';
@@ -311,7 +312,7 @@ function Index() {
 
     try {
       const seed = actor.uuid;
-      const countPerGrade = 500;
+      const { countPerGrade } = ACTOR_POOL_CONFIG;
       const materialTotal = clGrades.length * countPerGrade;
       const danfangTotal = dfGrades.length * countPerGrade;
       const storedKeys: string[] = [];
@@ -663,7 +664,7 @@ function Index() {
           ...actor.cw,
           qt: [
             ...actor.cw.qt,
-            { name: '灵石', type: CWType.QT, isPile: true, num: 30000 }
+            { name: '灵石', type: CWType.QT, isPile: true, num: 3000 }
           ]
         }
       };

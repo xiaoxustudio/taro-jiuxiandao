@@ -258,6 +258,9 @@ export const clGradePrice: Record<(typeof clGrades)[number], [number, number]> =
 // 材料注册与初始化配置
 // ------------------------------
 export const MATERIAL_INIT_COUNT = 1000;
+export const ACTOR_POOL_CONFIG = {
+  countPerGrade: 500
+};
 export type MaterialRegistryItem = {
   name: string;
   itype: (typeof clGrades)[number];
@@ -397,7 +400,8 @@ export const createMaterialPoolByGrade = (options?: {
   countPerGrade?: number;
 }) => {
   const rng = createRng(options?.seed);
-  const countPerGrade = options?.countPerGrade ?? 500;
+  const countPerGrade =
+    options?.countPerGrade ?? ACTOR_POOL_CONFIG.countPerGrade;
   const pool = clGrades.reduce((acc, grade) => {
     acc[grade] = [];
     return acc;

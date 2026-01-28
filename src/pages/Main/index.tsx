@@ -2,7 +2,7 @@ import { round } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import title from '@/assets/logo.png';
 import {
   JXButton,
@@ -33,6 +33,8 @@ import styles from './index.module.less';
 
 function Main() {
   const { get, set, actor } = useActorController();
+  const [tujianVisible, setTujianVisible] = useState(false);
+  const [tujianTab, setTujianTab] = useState<'dy' | 'df'>('dy');
   useEffect(() => {
     const pages =
       typeof Taro.getCurrentPages === 'function' ? Taro.getCurrentPages() : [];
@@ -215,11 +217,94 @@ function Main() {
       click() {}
     },
     {
-      name: '赌场',
-      disabeld: true,
-      click() {}
+      name: '图鉴',
+      click() {
+        setTujianVisible(true);
+      }
     }
   ];
+
+  useEffect(() => {
+    if (!tujianVisible) return;
+    const pool = get('danfangPoolByGrade') as Record<string, any[]> | undefined;
+    if (pool) return;
+    const keys = get('danfangPoolStorageKeysByGrade') as
+      | Record<string, string>
+      | undefined;
+    if (!keys || !Object.keys(keys).length) return;
+    const next: Record<string, any[]> = {};
+    Object.entries(keys).forEach(([grade, key]) => {
+      const raw = Taro.getStorageSync(key);
+      let loaded: any = raw;
+      if (typeof raw === 'string') {
+        try {
+          loaded = JSON.parse(raw);
+        } catch (e) {
+          String(e);
+          loaded = undefined;
+        }
+      }
+      if (!Array.isArray(loaded)) return;
+      next[grade] = loaded as any[];
+    });
+    if (Object.keys(next).length) {
+      set('danfangPoolByGrade', next);
+    }
+  }, [get, set, tujianVisible]);
+
+  const danfangList = useMemo(() => {
+    const pool = get('danfangPoolByGrade') as Record<string, any[]> | undefined;
+    if (!pool) return [];
+    const map = new Map<string, { name: string; itype?: string }>();
+    Object.values(pool).forEach((items) => {
+      items.forEach((item: any) => {
+        const key = item?.id || item?.name;
+        if (!key) return;
+        if (!map.has(key)) {
+          map.set(key, { name: item.name, itype: item.itype });
+        }
+      });
+    });
+    return [...map.values()];
+  }, [get]);
+
+  const danyaoList = useMemo(() => {
+    const pool = get('danfangPoolByGrade') as Record<string, any[]> | undefined;
+    if (pool && Object.keys(pool).length) {
+      const map = new Map<string, { name: string; itype?: string }>();
+      Object.values(pool).forEach((items) => {
+        items.forEach((item: any) => {
+          const key = item?.id || item?.name;
+          if (!key) return;
+          const rawName = item?.name;
+          const name =
+            typeof rawName === 'string'
+              ? rawName.replace(/丹方$/, '丹')
+              : rawName;
+          if (!map.has(key)) {
+            map.set(key, { name, itype: item?.itype });
+          }
+        });
+      });
+      return [...map.values()];
+    }
+    const custom = (get('danfangData') ?? {}) as Record<string, any>;
+    const map = new Map<string, { name: string; itype?: string }>();
+    Object.entries(danfangData as Record<string, any>).forEach(([id, item]) => {
+      if (!item?.name) return;
+      map.set(id, { name: item.name, itype: item.itype });
+    });
+    Object.entries(custom).forEach(([id, item]) => {
+      if (!item?.name) return;
+      map.set(id, { name: item.name, itype: item.itype });
+    });
+    return [...map.values()];
+  }, [get]);
+
+  const tujianList = useMemo(
+    () => (tujianTab === 'dy' ? danyaoList : danfangList),
+    [danfangList, danyaoList, tujianTab]
+  );
 
   // 开始修炼
   const handleXiuLian = useCallback(() => {
@@ -458,6 +543,51 @@ function Main() {
             </JXButton>
           </JXGrid.Item>
         </JXGrid>
+        <JXModal
+          visible={tujianVisible}
+          okText='关闭'
+          onOk={() => setTujianVisible(false)}
+          onCancel={() => setTujianVisible(false)}
+          closeOnMaskClick
+          content={
+            <JXSpace direction='vertical' gap={10}>
+              <JXSpace between>
+                <Text size={18} bold>
+                  图鉴
+                </Text>
+                <JXSpace gap={6}>
+                  <JXButton size='mini' onClick={() => setTujianTab('dy')}>
+                    丹药
+                  </JXButton>
+                  <JXButton size='mini' onClick={() => setTujianTab('df')}>
+                    丹方
+                  </JXButton>
+                </JXSpace>
+              </JXSpace>
+              <View style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                {tujianList.length ? (
+                  <JXGrid columns={4} gap={8}>
+                    {tujianList.map((item, index) => (
+                      <JXGrid.Item
+                        key={`${item.name}-${item.itype}-${index}`}
+                        align='center'
+                      >
+                        <JXSpace direction='vertical' gap={2}>
+                          <Text>{item.name}</Text>
+                          <Text color='#888'>{item.itype}</Text>
+                        </JXSpace>
+                      </JXGrid.Item>
+                    ))}
+                  </JXGrid>
+                ) : (
+                  <Text color='#888'>
+                    {tujianTab === 'dy' ? '暂无丹药数据' : '暂无丹方数据'}
+                  </Text>
+                )}
+              </View>
+            </JXSpace>
+          }
+        />
       </JXSpace>
     </View>
   );
