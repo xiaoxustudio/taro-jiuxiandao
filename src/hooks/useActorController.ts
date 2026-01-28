@@ -5,6 +5,7 @@ import { ActorIdents } from '@/consts';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { ActorDataConfig, NestedKeyOf } from '@/types';
+import { GongFaType } from '@/types/gongfa';
 
 /**
  * @description: 当前角色控制器
@@ -108,6 +109,25 @@ function useActorController() {
           patch.danfangPoolByGrade = next;
         }
       }
+      if (
+        !actor.gongfaPoolByGrade &&
+        actor.gongfaPoolStorageKeysByGrade &&
+        Object.keys(actor.gongfaPoolStorageKeysByGrade).length
+      ) {
+        const next: Record<string, GongFaType[]> = {};
+        await Promise.all(
+          Object.entries(actor.gongfaPoolStorageKeysByGrade).map(
+            async ([grade, key]) => {
+              const loaded = await load(key);
+              if (!Array.isArray(loaded)) return;
+              next[grade] = loaded as GongFaType[];
+            }
+          )
+        );
+        if (Object.keys(next).length) {
+          patch.gongfaPoolByGrade = next;
+        }
+      }
       if (!actor.danfangData && actor.danfangDataStorageKey) {
         const loaded = await load(actor.danfangDataStorageKey);
         if (loaded) patch.danfangData = loaded;
@@ -136,6 +156,8 @@ function useActorController() {
     actor.danfangPoolByGrade,
     actor.danfangPoolStorageKey,
     actor.danfangPoolStorageKeysByGrade,
+    actor.gongfaPoolByGrade,
+    actor.gongfaPoolStorageKeysByGrade,
     actor.materialPoolByGrade,
     actor.materialPoolStorageKey,
     actor.materialPoolStorageKeysByGrade

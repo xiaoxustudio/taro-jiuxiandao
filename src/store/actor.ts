@@ -49,6 +49,13 @@ const useActorStore = create<ActorStore>()(
                 ) as string[])
               );
             }
+            if (actor.gongfaPoolStorageKeysByGrade) {
+              keys.push(
+                ...(Object.values(
+                  actor.gongfaPoolStorageKeysByGrade
+                ) as string[])
+              );
+            }
             keys.forEach((k) => {
               try {
                 Taro.removeStorageSync(k);
@@ -71,7 +78,8 @@ const useActorStore = create<ActorStore>()(
             omit(actor as any, [
               'materialPoolByGrade',
               'danfangPoolByGrade',
-              'danfangData'
+              'danfangData',
+              'gongfaPoolByGrade'
             ])
           ])
         ) as Record<string, ActorDataConfig>

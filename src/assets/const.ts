@@ -259,7 +259,8 @@ export const clGradePrice: Record<(typeof clGrades)[number], [number, number]> =
 // ------------------------------
 export const MATERIAL_INIT_COUNT = 1000;
 export const ACTOR_POOL_CONFIG = {
-  countPerGrade: 500
+  countPerGrade: 200,
+  gongfaCountPerGrade: 300
 };
 export type MaterialRegistryItem = {
   name: string;

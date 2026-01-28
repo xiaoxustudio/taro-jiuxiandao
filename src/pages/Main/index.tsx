@@ -29,6 +29,7 @@ import {
 import TpData from '@/assets/tp.json';
 import danfangData from '@/assets/danfang.json';
 import { CWType } from '@/types';
+import { GongFaType } from '@/types/gongfa';
 import { dfGrades } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
@@ -36,7 +37,7 @@ import styles from './index.module.less';
 function Main() {
   const { get, set, actor } = useActorController();
   const [tujianVisible, setTujianVisible] = useState(false);
-  const [tujianTab, setTujianTab] = useState<'dy' | 'df'>('dy');
+  const [tujianTab, setTujianTab] = useState<'dy' | 'df' | 'gf'>('dy');
   const [tujianGrade, setTujianGrade] = useState('全部');
   const [tujianKeyword, setTujianKeyword] = useState('');
   useEffect(() => {
@@ -254,6 +255,32 @@ function Main() {
     if (Object.keys(next).length) {
       set('danfangPoolByGrade', next);
     }
+    const gongfaPool = get('gongfaPoolByGrade') as
+      | Record<string, any[]>
+      | undefined;
+    if (gongfaPool) return;
+    const gongfaKeys = get('gongfaPoolStorageKeysByGrade') as
+      | Record<string, string>
+      | undefined;
+    if (!gongfaKeys || !Object.keys(gongfaKeys).length) return;
+    const gongfaNext: Record<string, any[]> = {};
+    Object.entries(gongfaKeys).forEach(([grade, key]) => {
+      const raw = Taro.getStorageSync(key);
+      let loaded: any = raw;
+      if (typeof raw === 'string') {
+        try {
+          loaded = JSON.parse(raw);
+        } catch (e) {
+          String(e);
+          loaded = undefined;
+        }
+      }
+      if (!Array.isArray(loaded)) return;
+      gongfaNext[grade] = loaded as any[];
+    });
+    if (Object.keys(gongfaNext).length) {
+      set('gongfaPoolByGrade', gongfaNext);
+    }
   }, [get, set, tujianVisible]);
 
   const danfangList = useMemo(() => {
@@ -305,10 +332,46 @@ function Main() {
     return [...map.values()];
   }, [get]);
 
-  const tujianList = useMemo(
-    () => (tujianTab === 'dy' ? danyaoList : danfangList),
-    [danfangList, danyaoList, tujianTab]
-  );
+  const gongfaList = useMemo(() => {
+    const pool = get('gongfaPoolByGrade') as Record<string, any[]> | undefined;
+    if (pool && Object.keys(pool).length) {
+      const map = new Map<string, { name: string; itype?: string }>();
+      Object.entries(pool).forEach(([grade, items]) => {
+        items.forEach((item: any) => {
+          const key = item?.id || item?.name;
+          if (!key || map.has(key)) return;
+          map.set(key, {
+            name: item.name,
+            itype: item?.pj || item?.itype || grade
+          });
+        });
+      });
+      return [...map.values()];
+    }
+    const list = (get('gongfa.ls') || []) as GongFaType[];
+    const current = get('gongfa.current') as GongFaType | null;
+    const map = new Map<string, { name: string; itype?: string }>();
+    const addGongfa = (gf?: GongFaType | null) => {
+      if (!gf?.name) return;
+      const key = gf.id || gf.name;
+      if (map.has(key)) return;
+      map.set(key, { name: gf.name, itype: gf.pj });
+    };
+    list.forEach(addGongfa);
+    addGongfa(current);
+    return [...map.values()];
+  }, [get]);
+
+  const tujianList = useMemo(() => {
+    if (tujianTab === 'dy') return danyaoList;
+    if (tujianTab === 'df') return danfangList;
+    return gongfaList;
+  }, [danfangList, danyaoList, gongfaList, tujianTab]);
+  const emptyTujianText = useMemo(() => {
+    if (tujianTab === 'dy') return '暂无丹药数据';
+    if (tujianTab === 'df') return '暂无丹方数据';
+    return '暂无功法数据';
+  }, [tujianTab]);
   const filteredTujianList = useMemo(() => {
     const keyword = tujianKeyword.trim();
     return tujianList.filter((item) => {
@@ -557,10 +620,10 @@ function Main() {
         </JXGrid>
         <JXModal
           visible={tujianVisible}
-          okText='关闭'
-          onOk={() => setTujianVisible(false)}
+          cancleText='关闭'
           onCancel={() => setTujianVisible(false)}
           closeOnMaskClick
+          disableOk
           content={
             <JXSpace direction='vertical' gap={10}>
               <JXSpace between>
@@ -581,6 +644,13 @@ function Main() {
                     onClick={() => setTujianTab('df')}
                   >
                     丹方
+                  </JXButton>
+                  <JXButton
+                    size='mini'
+                    disabled={tujianTab === 'gf'}
+                    onClick={() => setTujianTab('gf')}
+                  >
+                    功法
                   </JXButton>
                 </JXSpace>
               </JXSpace>
@@ -619,9 +689,7 @@ function Main() {
                     ))}
                   </JXGrid>
                 ) : (
-                  <Text color='#888'>
-                    {tujianTab === 'dy' ? '暂无丹药数据' : '暂无丹方数据'}
-                  </Text>
+                  <Text color='#888'>{emptyTujianText}</Text>
                 )}
               </View>
             </JXSpace>

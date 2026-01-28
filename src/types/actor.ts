@@ -84,9 +84,11 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   materialRegistry?: { name: string; itype: string }[];
   materialPoolByGrade?: MaterialPoolByGrade;
   danfangPoolByGrade?: Record<string, any[]>;
+  gongfaPoolByGrade?: Record<string, GongFaType[]>;
   materialPoolStorageKey?: string;
   materialPoolStorageKeysByGrade?: Record<string, string>;
   danfangPoolStorageKey?: string;
   danfangPoolStorageKeysByGrade?: Record<string, string>;
+  gongfaPoolStorageKeysByGrade?: Record<string, string>;
   danfangDataStorageKey?: string;
 }

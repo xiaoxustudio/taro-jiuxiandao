@@ -15,7 +15,7 @@ import useStore from '@/store/store';
 import { ActorDataConfig, CWType } from '@/types';
 import { UUID } from '@/utils';
 import { HasActor } from '@/utils/actor';
-import { GongFaPinJie } from '@/types/gongfa';
+import { GongFaPinJie, GongFaType } from '@/types/gongfa';
 import {
   clGrades,
   clNameParts,
@@ -30,7 +30,8 @@ import {
   FANGSHI_CONFIG,
   ACTOR_POOL_CONFIG,
   MaterialPoolByGrade,
-  MATERIAL_BASE_LIST
+  MATERIAL_BASE_LIST,
+  REALM_ORDER
 } from '@/assets/const';
 import styles from './index.module.less';
 
@@ -97,6 +98,23 @@ const dfNameSuffixPool = [
   '极',
   '道'
 ] as const;
+
+const gongfaGrades = [
+  GongFaPinJie.一品,
+  GongFaPinJie.二品,
+  GongFaPinJie.三品,
+  GongFaPinJie.四品,
+  GongFaPinJie.五品,
+  GongFaPinJie.六品,
+  GongFaPinJie.七品,
+  GongFaPinJie.八品
+] as const;
+const gongfaNameParts = [
+  ['玄', '灵', '太', '清', '青', '赤', '苍', '紫', '金', '幽'],
+  ['元', '真', '阳', '阴', '雷', '火', '风', '冰', '星', '月'],
+  ['诀', '功', '经', '法', '录', '典', '术']
+] as const;
+const gongfaAttrKeys = ['gongji', 'fangyu', 'qixue', 'sudu'] as const;
 
 const options = [
   {
@@ -189,7 +207,7 @@ function Index() {
   const { set: setActorStore } = useActorStore();
   const [genState, setGenState] = useState<{
     visible: boolean;
-    phase: '材料' | '丹方';
+    phase: '材料' | '丹方' | '功法';
     done: number;
     total: number;
     name: string;
@@ -273,22 +291,7 @@ function Index() {
     },
     danfang: [],
     gongfa: {
-      ls: [
-        {
-          id: UUID(),
-          name: '锻体诀',
-          pj: GongFaPinJie.一品, // 品阶
-          lv: 0, // 层级
-          exp: 0, // 进度
-          max_exp: 1000, // 最大进度
-          lg: '0', // 灵根
-          limit: '0', // 限制
-          xl: '0', // 修炼增益
-          attr: {
-            gongji: 10
-          } // 其他属性
-        }
-      ],
+      ls: [],
       current: null
     }
   });
@@ -312,14 +315,17 @@ function Index() {
 
     try {
       const seed = actor.uuid;
-      const { countPerGrade } = ACTOR_POOL_CONFIG;
+      const { countPerGrade, gongfaCountPerGrade } = ACTOR_POOL_CONFIG;
       const materialTotal = clGrades.length * countPerGrade;
       const danfangTotal = dfGrades.length * countPerGrade;
+      const gongfaTotal = gongfaGrades.length * gongfaCountPerGrade;
       const storedKeys: string[] = [];
       const materialPoolStorageKeysByGrade: Record<string, string> = {};
       const danfangPoolStorageKeysByGrade: Record<string, string> = {};
+      const gongfaPoolStorageKeysByGrade: Record<string, string> = {};
       const materialRng = createRng(`${seed}:material`);
       const danfangRng = createRng(`${seed}:danfang`);
+      const gongfaRng = createRng(`${seed}:gongfa`);
       const dfNameParts = dyNameParts.slice(0, 2);
 
       setGenState({
@@ -651,7 +657,158 @@ function Index() {
 
       await fillDanfangGrade(0);
 
+      setGenState({
+        visible: true,
+        phase: '功法',
+        done: 0,
+        total: gongfaTotal,
+        name: ''
+      });
+
+      const gongfaPoolByGrade = gongfaGrades.reduce(
+        (acc, grade) => {
+          acc[grade] = [];
+          return acc;
+        },
+        {} as Record<(typeof gongfaGrades)[number], GongFaType[]>
+      );
+      const usedGongfaNames = new Set<string>();
+      let gongfaDone = 0;
+
+      const nextGongfaName = () => {
+        let name = buildName(gongfaNameParts, gongfaRng);
+        let guard = 0;
+        while (usedGongfaNames.has(name) && guard < 8) {
+          name = buildName(gongfaNameParts, gongfaRng);
+          guard += 1;
+        }
+        if (usedGongfaNames.has(name)) {
+          let candidate = name;
+          let suffixGuard = 0;
+          while (usedGongfaNames.has(candidate) && suffixGuard < 12) {
+            const suffix =
+              dfNameSuffixPool[
+                Math.floor(gongfaRng() * dfNameSuffixPool.length)
+              ] || dfNameSuffixPool[0];
+            candidate = `${name}${suffix}`;
+            suffixGuard += 1;
+          }
+          name = candidate;
+        }
+        usedGongfaNames.add(name);
+        return name;
+      };
+
+      const fillGongfaGrade = async (gradeIndex: number): Promise<void> => {
+        if (gradeIndex >= gongfaGrades.length) return;
+        const grade = gongfaGrades[gradeIndex];
+        const limit =
+          REALM_ORDER[Math.min(gradeIndex, REALM_ORDER.length - 1)] ||
+          REALM_ORDER[0];
+        const maxExp = 800 + gradeIndex * 200;
+        const xl = `${Math.max(1, Math.round(3 + gradeIndex * 2))}%`;
+
+        const fillGongfaChunk = async (remaining: number): Promise<void> => {
+          if (remaining <= 0) return;
+          const chunkSize = Math.min(6, remaining);
+          let lastName = '';
+          for (let i = 0; i < chunkSize; i += 1) {
+            const name = nextGongfaName();
+            const mainKey =
+              gongfaAttrKeys[Math.floor(gongfaRng() * gongfaAttrKeys.length)] ||
+              gongfaAttrKeys[0];
+            const baseMin = 6 + gradeIndex * 4;
+            const baseMax = 12 + gradeIndex * 6;
+            const mainVal =
+              baseMax <= baseMin
+                ? baseMin
+                : Math.round(baseMin + gongfaRng() * (baseMax - baseMin));
+            const attr: Record<string, number> = {
+              [mainKey]: Math.max(1, mainVal)
+            };
+            if (gongfaRng() < 0.4) {
+              const secondKey =
+                gongfaAttrKeys[
+                  Math.floor(gongfaRng() * gongfaAttrKeys.length)
+                ] || gongfaAttrKeys[0];
+              if (!attr[secondKey]) {
+                const secondVal = Math.max(
+                  1,
+                  Math.round(mainVal * (0.35 + gongfaRng() * 0.3))
+                );
+                attr[secondKey] = secondVal;
+              }
+            }
+            gongfaPoolByGrade[grade].push({
+              id: UUID(),
+              name,
+              pj: grade,
+              lv: 0,
+              exp: 0,
+              max_exp: maxExp,
+              lg: `${actor.linggen}灵根`,
+              limit,
+              xl,
+              attr
+            });
+            gongfaDone += 1;
+            lastName = name;
+          }
+          setGenState({
+            visible: true,
+            phase: '功法',
+            done: gongfaDone,
+            total: gongfaTotal,
+            name: lastName
+          });
+          await yieldToMain();
+          await fillGongfaChunk(remaining - chunkSize);
+        };
+
+        await fillGongfaChunk(gongfaCountPerGrade);
+        await fillGongfaGrade(gradeIndex + 1);
+      };
+
+      await fillGongfaGrade(0);
+
+      const gongfaKeyEntries = Object.keys(gongfaPoolByGrade).map((grade) => ({
+        grade,
+        storageKey: `actor:${seed}:gongfaPoolByGrade:${grade}`
+      }));
+      try {
+        await Promise.all(
+          gongfaKeyEntries.map(({ grade, storageKey }) =>
+            storageSet(storageKey, gongfaPoolByGrade[grade])
+          )
+        );
+      } catch (e: any) {
+        await rollbackStoredKeys([
+          ...storedKeys,
+          ...gongfaKeyEntries.map((item) => item.storageKey)
+        ]);
+        throw new Error(
+          e?.message || '存档空间不足，无法保存功法数据，请清理存档后重试'
+        );
+      }
+      gongfaKeyEntries.forEach(({ grade, storageKey }) => {
+        storedKeys.push(storageKey);
+        gongfaPoolStorageKeysByGrade[grade] = storageKey;
+      });
+
       const materialRegistry = createMaterialRegistry({ seed });
+      const starterGrade = gongfaGrades[0];
+      const starterPool = gongfaPoolByGrade[starterGrade] || [];
+      const starterIndex = starterPool.length
+        ? Math.floor(gongfaRng() * starterPool.length)
+        : -1;
+      const starter = starterIndex >= 0 ? starterPool[starterIndex] : undefined;
+      const starterGongfa = starter
+        ? {
+            ...starter,
+            id: UUID(),
+            attr: { ...(starter.attr ?? {}) }
+          }
+        : undefined;
 
       const nextActor: ActorDataConfig = {
         ...actor,
@@ -660,6 +817,12 @@ function Index() {
         danfangPoolByGrade,
         materialPoolStorageKeysByGrade,
         danfangPoolStorageKeysByGrade,
+        gongfaPoolByGrade,
+        gongfaPoolStorageKeysByGrade,
+        gongfa: {
+          ls: starterGongfa ? [starterGongfa] : actor.gongfa.ls,
+          current: null
+        },
         cw: {
           ...actor.cw,
           qt: [
