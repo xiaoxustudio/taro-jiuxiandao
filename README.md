@@ -1,110 +1,102 @@
 <div align="center">
-<img src="src/assets/logo.png" />
+  <img src="src/assets/logo.png" />
 </div>
 <p />
 <p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge&color=#4fc08d" />
+  <img src="https://img.shields.io/badge/License-MPL_2.0-blue.svg?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Taro-4.x-0a7cff.svg?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/React-18-61dafb.svg?style=for-the-badge" />
 </p>
 
 > [!WARNING]
-> 此项目仍在开发阶段，如果遇到问题请发送 Issue
->
-> 也欢迎各路大佬提交pr参与开发
+> 此项目仍在开发阶段，欢迎提交 Issue 与 PR
 
-# 九仙道重构版
+# 九仙道
 
-上古鸿蒙未分，天地混沌。待到道化万物，炎黄现世，世人便已有追求天道之意。而后，袭明自然，道法天地，修仙之辈皆以己心明悟修道之法。待到日后上古九神君修为大成，修仙界更是步入一大盛世。然则无论人妖，纵使已初悟天道，亦难逃邪念惑心。于是人，鬼，妖，魔四族互相倾轧，以致各方元气大伤，从此修仙界便入沉寂。但如今，各方之斗又现端倪。且灵兽谷之诞生，又为此番争斗增添了几分难料之意。此番风起云涌之际，怎可料是否会有新的大能续写传奇……
+基于 Taro + React 的文字修仙题材重构版，覆盖多端构建能力，当前以 H5 开发体验为主。
 
 <p align="center">
   <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/ccb7e915-d796-4e63-a1d9-3ee78f8b6723" />
   <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/b4b3cf93-ae8c-4e8b-aaa2-125ccc763f72" />
 </p>
 
-# 历史
+## 技术栈
 
-九仙道始于 2016年（可能更早，我加入的时候差不多就是这个点），22年停止更新
+- Taro 4.x + React 18
+- TypeScript
+- antd-mobile
+- Zustand
+- Less
 
-# 使用
-
-本项目使用taro进行编写，使用前需了解taro相关知识
+## 开发与构建
 
 1. 安装依赖
 
 ```sh
-pnpm i # 安装依赖
+pnpm i
 ```
 
-2. 启动服务
+2. 启动 H5 开发
 
 ```sh
 pnpm dev
 ```
 
-# 构建
+3. 构建 H5
 
 ```sh
 pnpm build
 ```
 
-[安卓端项目工程](https://github.com/xiaoxustudio/taro-jiuxiandao-android)
+## 多端脚本
 
-# 进度
+- H5：`pnpm dev:h5` / `pnpm build:h5`
+- 小程序：`pnpm dev:weapp` / `pnpm build:weapp`
+- 百度：`pnpm dev:swan` / `pnpm build:swan`
+- 支付宝：`pnpm dev:alipay` / `pnpm build:alipay`
+- 抖音：`pnpm dev:tt` / `pnpm build:tt`
+- QQ：`pnpm dev:qq` / `pnpm build:qq`
+- 京东：`pnpm dev:jd` / `pnpm build:jd`
+- RN：`pnpm dev:rn` / `pnpm build:rn`
+- Harmony Hybrid：`pnpm dev:harmony-hybrid` / `pnpm build:harmony-hybrid`
 
-- [x] 主界面
-- [x] 创建角色界面
-- [x] 主界面
-- [x] 主界面属性显示
-- [x] 试炼
-- [x] 试炼功能（还需进一步检验数据，基础打斗已实现）
-- [x] 炼丹
-- [x] 炼丹功能
-- [ ] 炼器
-- [ ] 炼器功能
-- [x] 法宝
-- [x] 法宝功能
-- [x] 功法
-- [x] 功法功能
-- [ ] 动态功能
-- [x] 坊市
-- [x] 坊市功能
-- [x] 储物
-- [x] 储物功能
-- [ ] 灵兽
-- [ ] 灵兽功能
-- [ ] 门派
-- [ ] 门派功能
-- [ ] 药园
-- [ ] 药园功能
-- [x] 洞府
-- [ ] 洞府功能
-- [ ] 成就
-- [ ] 成就功能
-- [ ] 赌场
-- [ ] 赌场功能
-- [x] 角色功能
-- [ ] 社区功能
-- [ ] CDK功能
-- [x] 签到
-- [ ] ...待定
+## 已包含页面
 
-# 贡献
+- 入口与角色：创建角色、角色列表
+- 角色系统：角色信息、签到
+- 资源系统：储物
+- 战斗与玩法：试炼、炼丹、功法、法宝、坊市、洞府
 
-参照 [CONTRIBUTING](./CONTRIBUTING.md) 进行
+## 目录结构
 
-# 关于
+- src/pages：页面与路由
+- src/components：基础组件库
+- src/hooks：通用 hooks
+- src/store：全局状态
+- src/utils：业务与工具函数
+- src/types：类型定义
+- src/assets：静态资源与配置
+
+## 相关项目
+
+- 安卓端项目工程：https://github.com/xiaoxustudio/taro-jiuxiandao-android
+
+## 历史
+
+九仙道始于 2016 年（可能更早），22 年停止更新，本项目为重构版。
+
+## 贡献
+
+参照 [CONTRIBUTING](./CONTRIBUTING.md) 进行。
+
+## 关于
 
 此项目由徐然（原团队成员小徐）进行重构。
 
-作者：[徐然](https://github.com/xiaoxustudio)
+- 作者：https://github.com/xiaoxustudio
+- 联系方式：xugame@qq.com
+- QQ 群：562435313 / 467303733
 
-联系方式：[xugame@qq.com](emailto://xugame@qq.com)
-
-欢迎提出您宝贵的 **issue**，我们将会处理。
-
-QQ群聊：  
-群1：**562435313**  
-群2：**467303733**  
-
-# LICENSE
+## License
 
 [MPL 2.0](LICENSE)
