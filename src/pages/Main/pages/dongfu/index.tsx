@@ -1,14 +1,51 @@
-import { round } from 'lodash-es';
+import { random, round } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
 import { Button, Toast } from 'antd-mobile';
-import { Text, View } from '@tarojs/components';
-import { Container, ItemCounter, JXModal, JXSpace } from '@/components';
+import { View } from '@tarojs/components';
+import { Container, ItemCounter, JXModal, JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
-import { numberToChinese } from '@/utils';
+import { REALM_ORDER } from '@/assets/const';
+import {
+  generateRandomName,
+  getCurrentDate,
+  getGradeColor,
+  numberToChinese
+} from '@/utils';
 import chuwu from '@/utils/chuwu';
-import { CWType } from '@/types';
+import { ActorDataConfigForZhanDou, CWType } from '@/types';
 import useModal from '@/hooks/useModal';
 import './index.less';
+
+type DaoLvQuality =
+  | '一品'
+  | '二品'
+  | '三品'
+  | '四品'
+  | '五品'
+  | '六品'
+  | '七品'
+  | '八品';
+
+type DaoLvCandidate = {
+  name: string;
+  quality: DaoLvQuality;
+  affinity: number;
+  jingjie?: string;
+  jingjie1?: string;
+  jingjie2?: string;
+  attr: Partial<ActorDataConfigForZhanDou>;
+};
+
+const DAOLV_QUALITIES = [
+  '一品',
+  '二品',
+  '三品',
+  '四品',
+  '五品',
+  '六品',
+  '七品',
+  '八品'
+] as const satisfies readonly DaoLvQuality[];
 
 export default function Dongfu() {
   const { get, set } = useActorController();
@@ -16,6 +53,7 @@ export default function Dongfu() {
   const [blNum, setBlNum] = useState(0); // 补灵数量
   const { state: stateBuling } = useModal(); // 补灵
   const { state: stateShengjie } = useModal(); // 升阶
+  const { state: stateDaolv } = useModal(); // 道侣
   const lv = useMemo(() => get('dongfu').lv, [get]);
   const pjMemo = useMemo(() => `${numberToChinese(lv)}阶`, [lv]);
 
@@ -26,6 +64,385 @@ export default function Dongfu() {
   );
 
   const needUpLingshi = useMemo(() => lv * 2000, [lv]);
+
+  const daolv = useMemo(() => get('dongfu').daolv, [get]);
+
+  const daolvMarket = useMemo(() => {
+    const today = getCurrentDate();
+    const raw = get('dongfu').daolvMarket || null;
+    if (!raw || raw.date !== today) {
+      return {
+        date: today,
+        refreshCount: 0,
+        candidates: [] as DaoLvCandidate[]
+      };
+    }
+    return raw as {
+      date: string;
+      refreshCount: number;
+      candidates: DaoLvCandidate[];
+    };
+  }, [get]);
+
+  const isTodayShuangXiu = useMemo(() => {
+    const today = getCurrentDate();
+    const last = get('dongfu').shuangxiu?.date;
+    return last === today;
+  }, [get]);
+
+  const getSafeNumber = useCallback((v: unknown) => {
+    if (typeof v !== 'number') return 0;
+    if (!Number.isFinite(v)) return 0;
+    return v;
+  }, []);
+
+  const getRealmTierIndex = useCallback((realm?: string) => {
+    if (!realm) return 0;
+    const idx = REALM_ORDER.indexOf(realm);
+    return idx >= 0 ? idx : 0;
+  }, []);
+
+  const calcBreakupLingshi = useCallback(
+    (oldDaoLv: Partial<DaoLvCandidate> | null | undefined) => {
+      const qIndex = oldDaoLv?.quality
+        ? Math.max(0, DAOLV_QUALITIES.indexOf(oldDaoLv.quality))
+        : 0;
+      const tierIndex = getRealmTierIndex(oldDaoLv?.jingjie);
+      const attr = oldDaoLv?.attr || {};
+      const qixue = getSafeNumber(attr.qixue);
+      const gongji = getSafeNumber(attr.gongji);
+      const fangyu = getSafeNumber(attr.fangyu);
+      const sudu = getSafeNumber(attr.sudu);
+      const baoji = getSafeNumber(attr.baoji);
+
+      const baseScore =
+        qixue * 0.08 + gongji * 15 + fangyu * 12 + sudu * 25 + baoji * 120;
+      const tierMul = 1 + tierIndex * 0.2;
+      const qualityMul = 1 + qIndex * 0.1;
+
+      const scaled = baseScore * tierMul * qualityMul * 2 + 1000;
+      return Math.round(scaled);
+    },
+    [getRealmTierIndex, getSafeNumber]
+  );
+
+  const calcDaoLvAttr = useCallback(
+    (quality: DaoLvQuality): Partial<ActorDataConfigForZhanDou> => {
+      const total = {
+        qixue:
+          getSafeNumber(get('qixue')) + getSafeNumber(get('addAttr.qixue')),
+        gongji:
+          getSafeNumber(get('gongji')) + getSafeNumber(get('addAttr.gongji')),
+        fangyu:
+          getSafeNumber(get('fangyu')) + getSafeNumber(get('addAttr.fangyu')),
+        sudu: getSafeNumber(get('sudu')) + getSafeNumber(get('addAttr.sudu')),
+        baoji: getSafeNumber(get('baoji')) + getSafeNumber(get('addAttr.baoji'))
+      };
+
+      switch (quality) {
+        case '一品':
+          return { gongji: Math.max(1, Math.round(total.gongji * 0.06)) };
+        case '二品':
+          return { qixue: Math.max(10, Math.round(total.qixue * 0.05)) };
+        case '三品':
+          return { fangyu: Math.max(1, Math.round(total.fangyu * 0.25)) };
+        case '四品':
+          return { sudu: Math.max(1, Math.round(total.sudu * 0.15)) };
+        case '五品':
+          return { baoji: 2 };
+        case '六品':
+          return {
+            gongji: Math.max(1, Math.round(total.gongji * 0.12)),
+            fangyu: Math.max(1, Math.round(total.fangyu * 0.35))
+          };
+        case '七品':
+          return {
+            qixue: Math.max(10, Math.round(total.qixue * 0.12)),
+            sudu: Math.max(1, Math.round(total.sudu * 0.3)),
+            baoji: 3
+          };
+        case '八品':
+          return {
+            gongji: Math.max(1, Math.round(total.gongji * 0.25)),
+            fangyu: Math.max(1, Math.round(total.fangyu * 0.7)),
+            qixue: Math.max(10, Math.round(total.qixue * 0.18)),
+            sudu: Math.max(1, Math.round(total.sudu * 0.35)),
+            baoji: 5
+          };
+        default:
+          return {};
+      }
+    },
+    [get, getSafeNumber]
+  );
+
+  const genDaoLvCandidates = useCallback((): DaoLvCandidate[] => {
+    const weights = [50, 25, 12, 6, 3, 2, 1, 1];
+    const picks: DaoLvQuality[] = [];
+    while (picks.length < 3) {
+      const sum = weights.reduce((a, b) => a + b, 0) || 1;
+      const r = random(1, sum);
+      let acc = 0;
+      let idx = 0;
+      for (let i = 0; i < weights.length; i += 1) {
+        acc += weights[i];
+        if (r <= acc) {
+          idx = i;
+          break;
+        }
+      }
+      const q = DAOLV_QUALITIES[idx] || DAOLV_QUALITIES[0];
+      if (!picks.includes(q)) {
+        picks.push(q);
+      }
+    }
+
+    return picks.map((q) => {
+      const qIndex = Math.max(0, DAOLV_QUALITIES.indexOf(q));
+      const affinityBaseMin = 5 + qIndex * 4;
+      const affinityBaseMax = 18 + qIndex * 8;
+      const affinity = Math.min(100, random(affinityBaseMin, affinityBaseMax));
+      return {
+        name: generateRandomName(),
+        quality: q,
+        affinity,
+        jingjie: get('jingjie'),
+        jingjie1: get('jingjie1'),
+        jingjie2: get('jingjie2'),
+        attr: calcDaoLvAttr(q)
+      };
+    });
+  }, [calcDaoLvAttr, get]);
+
+  const openDaoLvModal = useCallback(() => {
+    const today = getCurrentDate();
+    const raw = get('dongfu').daolvMarket || null;
+    if (!raw || raw.date !== today) {
+      set('dongfu.daolvMarket', {
+        date: today,
+        refreshCount: 0,
+        candidates: []
+      });
+    }
+    stateDaolv.setVisiableModal(true);
+  }, [get, set, stateDaolv]);
+
+  const handleRefreshDaoLv = useCallback(() => {
+    const today = getCurrentDate();
+    const raw = get('dongfu').daolvMarket || null;
+    const refreshCount = raw && raw.date === today ? raw.refreshCount || 0 : 0;
+    if (refreshCount >= 3) {
+      Toast.show('今日道侣刷新次数已用完');
+      return;
+    }
+    if (lingshi < 3000) {
+      Toast.show('灵石不足');
+      return;
+    }
+
+    chuwu.Remove({ name: '灵石', type: CWType.QT, num: 3000 });
+    const candidates = genDaoLvCandidates();
+    set('dongfu.daolvMarket', {
+      date: today,
+      refreshCount: refreshCount + 1,
+      candidates
+    });
+  }, [genDaoLvCandidates, get, lingshi, set]);
+
+  const handleSelectDaoLv = useCallback(
+    (candidate: DaoLvCandidate) => {
+      const old = get('dongfu').daolv as DaoLvCandidate | null;
+      if (
+        old &&
+        old.name === candidate.name &&
+        old.quality === candidate.quality
+      ) {
+        Toast.show(`你与${candidate.name}已是道侣`);
+        stateDaolv.setVisiableModal(false);
+        return;
+      }
+
+      const doSelect = () => {
+        const currentAddAttr = get('addAttr') as ActorDataConfigForZhanDou;
+        const nextAddAttr: ActorDataConfigForZhanDou = { ...currentAddAttr };
+        const applyDelta = (
+          attr: Partial<ActorDataConfigForZhanDou> | undefined,
+          dir: 1 | -1
+        ) => {
+          if (!attr) return;
+          Object.keys(attr).forEach((k) => {
+            const key = k as keyof ActorDataConfigForZhanDou;
+            const v = attr[key];
+            if (typeof v !== 'number') return;
+            if (typeof nextAddAttr[key] !== 'number') return;
+            nextAddAttr[key] += v * dir;
+          });
+        };
+        applyDelta(old?.attr, -1);
+        applyDelta(candidate.attr, 1);
+        set('addAttr', nextAddAttr);
+        set('dongfu.daolv', candidate);
+        stateDaolv.setVisiableModal(false);
+      };
+
+      if (!old) {
+        doSelect();
+        Toast.show(`你与${candidate.name}结为道侣`);
+        return;
+      }
+
+      const breakupCost = calcBreakupLingshi(old);
+      const hasLingshi =
+        (chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0) >= breakupCost;
+      if (!hasLingshi) {
+        Toast.show(`灵石不足，分开需要${breakupCost}灵石`);
+        return;
+      }
+
+      const { close } = JXModal.show({
+        title: '已有道侣',
+        content: (
+          <JXSpace direction='vertical' gap={6}>
+            <Text>
+              你当前已有道侣：
+              <Text inline style={{ color: getGradeColor(old.quality) }}>
+                {old.name}（{old.quality}）
+              </Text>
+            </Text>
+            <Text>
+              若要另结新道侣，需要先分开，并给予灵石安慰：
+              <Text inline color='red'>
+                {breakupCost}
+              </Text>
+            </Text>
+            <Text>
+              新道侣：
+              <Text inline style={{ color: getGradeColor(candidate.quality) }}>
+                {candidate.name}（{candidate.quality}）
+              </Text>
+            </Text>
+          </JXSpace>
+        ),
+        okText: '分开并结为道侣',
+        cancleText: '取消',
+        onOk() {
+          const enough =
+            (chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0) >=
+            breakupCost;
+          if (!enough) {
+            Toast.show(`灵石不足，分开需要${breakupCost}灵石`);
+            return;
+          }
+          chuwu.Remove({ name: '灵石', type: CWType.QT, num: breakupCost });
+          doSelect();
+          Toast.show(
+            `你与${old.name}分开（消耗灵石${breakupCost}），并与${candidate.name}结为道侣`
+          );
+          close();
+        },
+        onCancel() {
+          close();
+        }
+      });
+    },
+    [calcBreakupLingshi, get, set, stateDaolv]
+  );
+
+  const handleDropDaoLv = useCallback(() => {
+    const old = get('dongfu').daolv as DaoLvCandidate | null;
+    if (!old) {
+      Toast.show('你还没有道侣');
+      return;
+    }
+
+    const breakupCost = calcBreakupLingshi(old);
+    const { close } = JXModal.show({
+      title: '分开',
+      content: (
+        <JXSpace direction='vertical' gap={6}>
+          <Text>
+            道侣：
+            <Text inline style={{ color: getGradeColor(old.quality) }}>
+              {old.name}（{old.quality}）
+            </Text>
+          </Text>
+          <Text>
+            分开需要给予灵石安慰：
+            <Text inline color='red'>
+              {breakupCost}
+            </Text>
+          </Text>
+        </JXSpace>
+      ),
+      okText: '确认分开',
+      cancleText: '取消',
+      onOk() {
+        const enough =
+          (chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0) >=
+          breakupCost;
+        if (!enough) {
+          Toast.show(`灵石不足，分开需要${breakupCost}灵石`);
+          return;
+        }
+
+        chuwu.Remove({ name: '灵石', type: CWType.QT, num: breakupCost });
+
+        const currentAddAttr = get('addAttr') as ActorDataConfigForZhanDou;
+        const nextAddAttr: ActorDataConfigForZhanDou = { ...currentAddAttr };
+        const applyDelta = (
+          attr: Partial<ActorDataConfigForZhanDou> | undefined,
+          dir: 1 | -1
+        ) => {
+          if (!attr) return;
+          Object.keys(attr).forEach((k) => {
+            const key = k as keyof ActorDataConfigForZhanDou;
+            const v = attr[key];
+            if (typeof v !== 'number') return;
+            if (typeof nextAddAttr[key] !== 'number') return;
+            nextAddAttr[key] += v * dir;
+          });
+        };
+        applyDelta(old.attr, -1);
+        set('addAttr', nextAddAttr);
+        set('dongfu.daolv', null);
+        Toast.show(`你与${old.name}分开（消耗灵石${breakupCost}）`);
+        close();
+      },
+      onCancel() {
+        close();
+      }
+    });
+  }, [calcBreakupLingshi, get, set]);
+
+  const handleShuangXiu = useCallback(() => {
+    const currentDaoLv = get('dongfu').daolv as any;
+    if (!currentDaoLv) {
+      Toast.show('你还没有道侣');
+      return;
+    }
+    const today = getCurrentDate();
+    const last = get('dongfu').shuangxiu?.date;
+    if (last === today) {
+      Toast.show('今日已双修过了');
+      return;
+    }
+    const affinity = Math.max(
+      0,
+      Math.min(100, Number(currentDaoLv.affinity || 0))
+    );
+    const qIndex = Math.max(0, DAOLV_QUALITIES.indexOf(currentDaoLv.quality));
+    const qMul = 1 + qIndex * 0.08;
+    const base = 120 + lv * 80;
+    const gain = Math.max(1, Math.round(base * (1 + affinity / 100) * qMul));
+    set('xiuwei', get('xiuwei') + gain);
+    set('dongfu.shuangxiu', { date: today });
+    const affinityGain = random(1, Math.max(1, 2 + Math.floor(qIndex / 2)));
+    set('dongfu.daolv', {
+      ...currentDaoLv,
+      affinity: Math.min(100, affinity + affinityGain)
+    });
+    Toast.show(`双修有成，修为+${gain}，亲密度+${affinityGain}`);
+  }, [get, lv, set]);
 
   /* 补灵 */
   const getTransformRate = useMemo(() => lv * 0.005, [lv]); // 每升1级，补灵的转化率增加0.5%
@@ -87,7 +504,23 @@ export default function Dongfu() {
         <Text>灵池灵气：{get('dongfu').lingchi}</Text>
       </JXSpace>
       <JXSpace style={{ margin: '10px 0', padding: '0 10px' }}>
-        <Text>{get('daohao')} 还未拥有道侣</Text>
+        {daolv ? (
+          <Text>
+            道侣：
+            <Text inline style={{ color: getGradeColor(daolv.quality) }}>
+              {daolv.name}（{daolv.quality}
+              {daolv.jingjie
+                ? `，${daolv.jingjie}${daolv.jingjie1 || ''}${
+                    daolv.jingjie2 || ''
+                  }`
+                : ''}
+              ）
+            </Text>
+            ，亲密度：{daolv.affinity}
+          </Text>
+        ) : (
+          <Text>{get('daohao')} 还未拥有道侣</Text>
+        )}
       </JXSpace>
       <JXSpace direction='vertical' gap={5}>
         <Button
@@ -102,13 +535,21 @@ export default function Dongfu() {
         >
           升阶
         </Button>
-        <Button style={{ width: '100%' }} disabled>
+        <Button
+          style={{ width: '100%' }}
+          onClick={handleShuangXiu}
+          disabled={!daolv || isTodayShuangXiu}
+        >
           双修
         </Button>
-        <Button style={{ width: '100%' }} disabled>
-          仙缘
+        <Button
+          style={{ width: '100%' }}
+          onClick={handleDropDaoLv}
+          disabled={!daolv}
+        >
+          弃之
         </Button>
-        <Button style={{ width: '100%' }} disabled>
+        <Button style={{ width: '100%' }} onClick={openDaoLvModal}>
           道侣
         </Button>
       </JXSpace>
@@ -165,6 +606,63 @@ export default function Dongfu() {
           </Text>
           )
         </View>
+      </JXModal>
+      {/* 道侣 */}
+      <JXModal
+        controller={stateDaolv}
+        title='道侣'
+        disableOk
+        onCancel={() => stateDaolv.setVisiableModal(false)}
+      >
+        <JXSpace direction='vertical' gap={8}>
+          <Text>
+            今日刷新：{daolvMarket.refreshCount}/3（每次消耗3000灵石）
+          </Text>
+          <Text>灵石：{lingshi}</Text>
+          <Button
+            style={{ width: '100%' }}
+            onClick={handleRefreshDaoLv}
+            disabled={daolvMarket.refreshCount >= 3}
+          >
+            刷新道侣
+          </Button>
+          <JXSpace direction='vertical' gap={6}>
+            {daolvMarket.candidates?.length ? (
+              daolvMarket.candidates.map((c) => (
+                <View key={`${c.name}-${c.quality}`}>
+                  <JXSpace direction='vertical' gap={4}>
+                    <Text>
+                      <Text inline style={{ color: getGradeColor(c.quality) }}>
+                        {c.name}（{c.quality}
+                        {c.jingjie
+                          ? `，${c.jingjie}${c.jingjie1 || ''}${
+                              c.jingjie2 || ''
+                            }`
+                          : ''}
+                        ）
+                      </Text>
+                      ，亲密度：{c.affinity}
+                    </Text>
+                    <Text>
+                      属性：攻{c.attr.gongji || 0} 防{c.attr.fangyu || 0} 血
+                      {c.attr.qixue || 0} 速{c.attr.sudu || 0} 暴
+                      {c.attr.baoji || 0}
+                    </Text>
+                    <Button
+                      style={{ width: '100%' }}
+                      onClick={() => handleSelectDaoLv(c)}
+                    >
+                      结为道侣
+                    </Button>
+                    <hr />
+                  </JXSpace>
+                </View>
+              ))
+            ) : (
+              <Text>暂无候选道侣，请先刷新</Text>
+            )}
+          </JXSpace>
+        </JXSpace>
       </JXModal>
     </Container>
   );

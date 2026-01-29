@@ -62,7 +62,29 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     lv: number;
     lingchi: number; // 灵池
     daolv: null | {
+      name: string;
+      quality: string;
       affinity: number;
+      jingjie?: string;
+      jingjie1?: string;
+      jingjie2?: string;
+      attr: Partial<ActorDataConfigForZhanDou>;
+    };
+    daolvMarket?: null | {
+      date: string;
+      refreshCount: number;
+      candidates: Array<{
+        name: string;
+        quality: string;
+        affinity: number;
+        jingjie?: string;
+        jingjie1?: string;
+        jingjie2?: string;
+        attr: Partial<ActorDataConfigForZhanDou>;
+      }>;
+    };
+    shuangxiu?: null | {
+      date: string;
     };
   }; // 洞府
   liandan: {

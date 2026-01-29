@@ -262,7 +262,9 @@ function Index() {
     dongfu: {
       lingchi: 1000,
       lv: 1,
-      daolv: null
+      daolv: null,
+      daolvMarket: null,
+      shuangxiu: null
     },
     // dongfu: null,
     zd: {
