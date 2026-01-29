@@ -16,6 +16,11 @@ export interface OperaterType {
   num?: number;
 }
 
+/**
+ * @description: 储物类型映射到角色储物字段名
+ * @param {CWType} type
+ * @return {*}
+ */
 function TR(type: CWType) {
   switch (type) {
     case CWType.FB:

@@ -152,6 +152,10 @@ const createFaBaoList = (): FangshiItem[] =>
     isPile: false
   }));
 
+/**
+ * @description: 基于丹方配置生成固定丹药列表
+ * @return {*}
+ */
 export const createDanYaoList = (): FangshiItem[] =>
   danfangIds.map((id) => {
     const base = danfangData[id] as any;
@@ -227,6 +231,10 @@ const createRandomDanYaoList = (
   return list;
 };
 
+/**
+ * @description: 坊市分类配置（用于 UI tab 与购买逻辑）
+ * @return {*}
+ */
 export const fangshiCategories = [
   { key: 'fb', label: '法宝', action: 'item' },
   { key: 'dy', label: '丹药', action: 'item' },
@@ -238,6 +246,11 @@ export const fangshiCategories = [
   }
 ] as const;
 
+/**
+ * @description: 获取境界在 REALM_ORDER 中的索引（找不到返回 0）
+ * @param {string} realm
+ * @return {*}
+ */
 export const getRealmIndex = (realm: string) => {
   const idx = REALM_ORDER.indexOf(realm);
   return idx === -1 ? 0 : idx;
@@ -350,6 +363,14 @@ const pickFaBaoByRealm = (
   return shuffle(sorted).slice(0, count);
 };
 
+/**
+ * @description: 生成坊市快照（按境界与材料/丹方池生成商品）
+ * @param {string} realm
+ * @param {number} updatedAt
+ * @param {*} materialPoolByGrade
+ * @param {*} danfangPoolByGrade
+ * @return {*}
+ */
 export const createFangshiSnapshot = (
   realm: string,
   updatedAt?: number,
@@ -389,6 +410,15 @@ export const createFangshiSnapshot = (
   };
 };
 
+/**
+ * @description: 解析/刷新坊市快照（未过期则复用，否则重新生成）
+ * @param {*} snapshot
+ * @param {string} realm
+ * @param {number} now
+ * @param {*} materialPoolByGrade
+ * @param {*} danfangPoolByGrade
+ * @return {*}
+ */
 export const resolveFangshiSnapshot = (
   snapshot: FangshiSnapshot | null | undefined,
   realm: string,

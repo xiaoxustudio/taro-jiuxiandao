@@ -1,6 +1,17 @@
-export const ActorIdents = ['set', 'remove']; // 角色特殊键
+export const ActorIdents: readonly string[] = ['set', 'remove']; // 角色特殊键
 
-export const linggenArray = ['金', '木', '水', '火', '土', '风', '雷'];
+export const linggenArray = ['金', '木', '水', '火', '土', '风', '雷'] as const;
+
+export const DAOLV_QUALITIES = [
+  '一品',
+  '二品',
+  '三品',
+  '四品',
+  '五品',
+  '六品',
+  '七品',
+  '八品'
+] as const;
 
 export const monsterSurnames = [
   '古',
@@ -28,7 +39,7 @@ export const monsterSurnames = [
   '月',
   '日',
   '星'
-];
+] as const;
 export const monsterNames = [
   '龙',
   '虎',
@@ -50,7 +61,7 @@ export const monsterNames = [
   '鲲',
   '鳐',
   '鲸'
-];
+] as const;
 // 常见的古风姓氏
 export const surnames = [
   '赵',
@@ -113,7 +124,7 @@ export const surnames = [
   '任',
   '袁',
   '柳'
-];
+] as const;
 
 // 常见的古风名字的单字
 export const nameParts = [
@@ -167,4 +178,4 @@ export const nameParts = [
   '灵',
   '萤',
   '如'
-];
+] as const;

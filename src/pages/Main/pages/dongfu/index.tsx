@@ -5,47 +5,24 @@ import { View } from '@tarojs/components';
 import { Container, ItemCounter, JXModal, JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { REALM_ORDER } from '@/assets/const';
+import { DAOLV_QUALITIES } from '@/consts';
 import {
   generateRandomName,
+  getRealmTierIndex,
   getCurrentDate,
   getGradeColor,
-  numberToChinese
+  numberToChinese,
+  safeNumber
 } from '@/utils';
 import chuwu from '@/utils/chuwu';
-import { ActorDataConfigForZhanDou, CWType } from '@/types';
+import {
+  ActorDataConfigForZhanDou,
+  CWType,
+  DaoLvCandidate,
+  DaoLvQuality
+} from '@/types';
 import useModal from '@/hooks/useModal';
 import './index.less';
-
-type DaoLvQuality =
-  | '一品'
-  | '二品'
-  | '三品'
-  | '四品'
-  | '五品'
-  | '六品'
-  | '七品'
-  | '八品';
-
-type DaoLvCandidate = {
-  name: string;
-  quality: DaoLvQuality;
-  affinity: number;
-  jingjie?: string;
-  jingjie1?: string;
-  jingjie2?: string;
-  attr: Partial<ActorDataConfigForZhanDou>;
-};
-
-const DAOLV_QUALITIES = [
-  '一品',
-  '二品',
-  '三品',
-  '四品',
-  '五品',
-  '六品',
-  '七品',
-  '八品'
-] as const satisfies readonly DaoLvQuality[];
 
 export default function Dongfu() {
   const { get, set } = useActorController();
@@ -90,30 +67,18 @@ export default function Dongfu() {
     return last === today;
   }, [get]);
 
-  const getSafeNumber = useCallback((v: unknown) => {
-    if (typeof v !== 'number') return 0;
-    if (!Number.isFinite(v)) return 0;
-    return v;
-  }, []);
-
-  const getRealmTierIndex = useCallback((realm?: string) => {
-    if (!realm) return 0;
-    const idx = REALM_ORDER.indexOf(realm);
-    return idx >= 0 ? idx : 0;
-  }, []);
-
   const calcBreakupLingshi = useCallback(
     (oldDaoLv: Partial<DaoLvCandidate> | null | undefined) => {
       const qIndex = oldDaoLv?.quality
         ? Math.max(0, DAOLV_QUALITIES.indexOf(oldDaoLv.quality))
         : 0;
-      const tierIndex = getRealmTierIndex(oldDaoLv?.jingjie);
+      const tierIndex = getRealmTierIndex(oldDaoLv?.jingjie, REALM_ORDER);
       const attr = oldDaoLv?.attr || {};
-      const qixue = getSafeNumber(attr.qixue);
-      const gongji = getSafeNumber(attr.gongji);
-      const fangyu = getSafeNumber(attr.fangyu);
-      const sudu = getSafeNumber(attr.sudu);
-      const baoji = getSafeNumber(attr.baoji);
+      const qixue = safeNumber(attr.qixue);
+      const gongji = safeNumber(attr.gongji);
+      const fangyu = safeNumber(attr.fangyu);
+      const sudu = safeNumber(attr.sudu);
+      const baoji = safeNumber(attr.baoji);
 
       const baseScore =
         qixue * 0.08 + gongji * 15 + fangyu * 12 + sudu * 25 + baoji * 120;
@@ -123,20 +88,17 @@ export default function Dongfu() {
       const scaled = baseScore * tierMul * qualityMul * 2 + 1000;
       return Math.round(scaled);
     },
-    [getRealmTierIndex, getSafeNumber]
+    []
   );
 
   const calcDaoLvAttr = useCallback(
     (quality: DaoLvQuality): Partial<ActorDataConfigForZhanDou> => {
       const total = {
-        qixue:
-          getSafeNumber(get('qixue')) + getSafeNumber(get('addAttr.qixue')),
-        gongji:
-          getSafeNumber(get('gongji')) + getSafeNumber(get('addAttr.gongji')),
-        fangyu:
-          getSafeNumber(get('fangyu')) + getSafeNumber(get('addAttr.fangyu')),
-        sudu: getSafeNumber(get('sudu')) + getSafeNumber(get('addAttr.sudu')),
-        baoji: getSafeNumber(get('baoji')) + getSafeNumber(get('addAttr.baoji'))
+        qixue: safeNumber(get('qixue')) + safeNumber(get('addAttr.qixue')),
+        gongji: safeNumber(get('gongji')) + safeNumber(get('addAttr.gongji')),
+        fangyu: safeNumber(get('fangyu')) + safeNumber(get('addAttr.fangyu')),
+        sudu: safeNumber(get('sudu')) + safeNumber(get('addAttr.sudu')),
+        baoji: safeNumber(get('baoji')) + safeNumber(get('addAttr.baoji'))
       };
 
       switch (quality) {
@@ -173,7 +135,7 @@ export default function Dongfu() {
           return {};
       }
     },
-    [get, getSafeNumber]
+    [get]
   );
 
   const genDaoLvCandidates = useCallback((): DaoLvCandidate[] => {

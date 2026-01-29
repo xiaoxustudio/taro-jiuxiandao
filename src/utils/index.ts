@@ -1,5 +1,6 @@
 import Taro from '@tarojs/taro';
 import { omit } from 'lodash-es';
+import { REALM_ORDER } from '@/assets/const';
 import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
 import { ActorDataConfigForZhanDou } from '@/types';
 
@@ -7,6 +8,10 @@ export { default as TimeArray } from './TimeArray';
 
 let UniqueIndex = 0;
 
+/**
+ * @description: 生成递增的唯一序号（进程内）
+ * @return {*}
+ */
 export const CreateUniqueIndex = () => {
   return ++UniqueIndex;
 };
@@ -19,7 +24,38 @@ type NavigateOptions = Omit<
   'url'
 >;
 
+/**
+ * @description: 获取当前时间戳（毫秒）
+ * @return {*}
+ */
 export const currentTime = () => Date.now();
+
+/**
+ * @description: 安全获取 number（非 number 或非有限数返回 fallback）
+ * @param {unknown} v
+ * @param {number} fallback
+ * @return {*}
+ */
+export function safeNumber(v: unknown, fallback = 0) {
+  if (typeof v !== 'number') return fallback;
+  if (!Number.isFinite(v)) return fallback;
+  return v;
+}
+
+/**
+ * @description: 获取境界在排序数组中的层级索引（找不到返回 0）
+ * @param {string} realm
+ * @param {readonly string[]} realmOrder
+ * @return {*}
+ */
+export function getRealmTierIndex(
+  realm?: string,
+  realmOrder: readonly string[] = REALM_ORDER
+) {
+  if (!realm) return 0;
+  const idx = realmOrder.indexOf(realm);
+  return idx >= 0 ? idx : 0;
+}
 
 /**
  * @description: 跳转路由（自动加顶层pages）
@@ -49,6 +85,11 @@ export function navigateTo(url: string, options: NavigateOptions = {}) {
   });
 }
 
+/**
+ * @description: 返回上一页（透传 Taro.navigateBack 参数）
+ * @param {*} option
+ * @return {*}
+ */
 export function navigateBack(option?: Parameters<typeof Taro.navigateBack>[0]) {
   Taro.navigateBack(option);
 }
@@ -198,6 +239,11 @@ export function ZhouTian(
   return Math.min(msDiff / divisor, limit);
 }
 
+/**
+ * @description: 中文数字转阿拉伯数字（支持 十/百/千/万/亿）
+ * @param {string} chineseNum
+ * @return {*}
+ */
 export function chineseToNumber(chineseNum: string): number {
   const chineseNumbers: { [key: string]: number } = {
     零: 0,
@@ -241,6 +287,11 @@ export function chineseToNumber(chineseNum: string): number {
   return result + temp;
 }
 
+/**
+ * @description: 阿拉伯数字转中文数字
+ * @param {number} number
+ * @return {*}
+ */
 export function numberToChinese(number: number): string {
   const units = ['', '十', '百', '千', '万', '十', '百', '千', '亿'];
   const nums = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
@@ -302,8 +353,33 @@ export const realmColorMap: Record<string, string> = {
   大乘: gradeColorList[7]
 };
 
+/**
+ * @description: 获取品级/境界对应的颜色
+ * @param {string} label
+ * @return {*}
+ */
 export const getGradeColor = (label?: string) =>
   (label && gradeColorMap[label]) || (label && realmColorMap[label]) || '';
+
+/**
+ * @description: 将包含境界的名称拆分为三段，并返回境界颜色
+ * @param {string} name
+ * @return {*}
+ */
+export function splitNameByRealm(name: string) {
+  const realm = REALM_ORDER.find((item) => name.includes(item));
+  if (!realm) return null;
+  const color = getGradeColor(realm);
+  if (!color) return null;
+  const index = name.indexOf(realm);
+  if (index < 0) return null;
+  return {
+    before: name.slice(0, index),
+    realm,
+    after: name.slice(index + realm.length),
+    color
+  };
+}
 
 /**
  * 获取当前日期的字符串格式（YYYY-MM-DD）
@@ -351,3 +427,5 @@ export const AttrTransformChinese = (
       throw new Error(`not found attr ${attr}`);
   }
 };
+
+export * from './zhandou';

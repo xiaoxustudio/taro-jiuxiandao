@@ -7,16 +7,30 @@ import TimeArray from './TimeArray';
 
 /* 功法相关 */
 
+/**
+ * @description: 获取当前角色的功法列表
+ * @return {*}
+ */
 function getList(): GongFaType[] {
   const acData = getActor();
   return acData.gongfa.ls;
 }
 
+/**
+ * @description: 根据 id 获取功法
+ * @param {string} id
+ * @return {*}
+ */
 function get(id: string): GongFaType | undefined {
   const acData = getActor();
   return acData.gongfa.ls.find((v) => v.id === id);
 }
 
+/**
+ * @description: 移除指定功法（按 name 或 id）
+ * @param {*} param0
+ * @return {*}
+ */
 function remove({ name, id }: { name?: string; id?: string }) {
   const { set } = useActorStore.getState();
   const { current } = useStore.getState();
@@ -29,6 +43,12 @@ function remove({ name, id }: { name?: string; id?: string }) {
   set(current, acData);
 }
 
+/**
+ * @description: 添加功法（可选替换同 id 功法）
+ * @param {GongFaType} gf
+ * @param {boolean} replace
+ * @return {*}
+ */
 function add(gf: GongFaType, replace = false) {
   const { set } = useActorStore.getState();
   const { current } = useStore.getState();
@@ -44,6 +64,11 @@ function add(gf: GongFaType, replace = false) {
 
 type GongFaTypeEx = GongFaType & { update: () => void };
 
+/**
+ * @description: 获取带 update 方法的功法对象（用于就地保存更新）
+ * @param {string} id
+ * @return {*}
+ */
 function update(id: string) {
   const gf = get(id);
   if (gf)

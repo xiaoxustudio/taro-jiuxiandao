@@ -10,6 +10,11 @@ export enum ErrorTypeCode {
 export const ErrorTypeMap = AutoMapObject(ErrorTypeCode);
 
 // 类型转换为中文
+/**
+ * @description: 错误类型枚举转中文文字
+ * @param {ErrorTypeCode} type
+ * @return {*}
+ */
 export function ErrorTypeTransform(type: ErrorTypeCode): string {
   const result = ErrorTypeCode[type];
   if (!result) {
@@ -49,6 +54,11 @@ class ErrorController {
     this.eventType = `ErrorController-${this.tag}`;
   }
 
+  /**
+   * @description: 派发错误事件，并抛出异常中断流程
+   * @param {string} content
+   * @return {*}
+   */
   emitError(content: string) {
     const e = new ErrorEvent(this.eventType, { content, type: this.tag });
     window.document.dispatchEvent(e);
@@ -56,6 +66,12 @@ class ErrorController {
     throw `[${ErrorTypeTransform(this.tag)}]：${content}`;
   }
 
+  /**
+   * @description: 订阅该错误类型事件
+   * @param {*} callback
+   * @param {*} options
+   * @return {*}
+   */
   addEventListener(
     callback: EventListenerOrEventListenerObject,
     options?: AddEventListenerOptions | boolean
@@ -63,6 +79,12 @@ class ErrorController {
     window.document.addEventListener(this.eventType, callback, options);
   }
 
+  /**
+   * @description: 取消订阅该错误类型事件
+   * @param {*} callback
+   * @param {*} options
+   * @return {*}
+   */
   removeEventListener(
     callback: EventListenerOrEventListenerObject,
     options?: AddEventListenerOptions | boolean

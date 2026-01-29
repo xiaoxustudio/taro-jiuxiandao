@@ -22,10 +22,14 @@ import {
 } from '@/types';
 import useScroll from '@/hooks/useScroll';
 import chuwu from '@/utils/chuwu';
-import { getGradeColor, navigateTo, numberToChinese } from '@/utils';
+import {
+  calcZhanDouHit,
+  navigateTo,
+  numberToChinese,
+  splitNameByRealm
+} from '@/utils';
 import { JingJie1ToNumber } from '@/utils/actor';
 import {
-  REALM_ORDER,
   REALM_GRADE_WEIGHTS,
   clGrades,
   createMaterialRegistry
@@ -33,19 +37,15 @@ import {
 import styles from './index.module.less';
 
 const renderNameWithRealmColor = (name: string) => {
-  const realm = REALM_ORDER.find((item) => name.includes(item));
-  if (!realm) return name;
-  const color = getGradeColor(realm);
-  if (!color) return name;
-  const index = name.indexOf(realm);
-  if (index < 0) return name;
+  const parts = splitNameByRealm(name);
+  if (!parts) return name;
   return (
     <>
-      {name.slice(0, index)}
-      <Text color={color} inline>
-        {realm}
+      {parts.before}
+      <Text color={parts.color} inline>
+        {parts.realm}
       </Text>
-      {name.slice(index + realm.length)}
+      {parts.after}
     </>
   );
 };
@@ -276,16 +276,7 @@ export default function Shilian() {
    */
   const zhandouLogic = useCallback(
     (zd1: YaoShouZDType | ActorZDType, zd2: YaoShouZDType | ActorZDType) => {
-      let b = false;
-      const bj = random(1, 100);
-      const isCrit = bj <= zd1.baoji;
-      const critMul = isCrit ? 1.5 : 1;
-      const baseAtk = Math.max(0, Math.round(zd1.gongji * critMul));
-      const def = Math.max(0, zd2.fangyu);
-      const damage = Math.max(1, Math.round(baseAtk * (100 / (100 + def))));
-      b = isCrit;
-      const newHp = Math.max(0, Math.round(zd2.qixue - damage));
-      const defender = { ...zd2, qixue: newHp };
+      const { isCrit, damage, defender } = calcZhanDouHit(zd1, zd2);
       const isEnemyAttacker = 'df' in zd1;
       const isEnemyDefender = 'df' in zd2;
       const attackerColor = isEnemyAttacker ? 'orange' : 'blue';
@@ -301,7 +292,7 @@ export default function Shilian() {
                   【{isEnemyAttacker ? '敌' : '我'}】
                   {renderNameWithRealmColor(zd1.name)}
                 </Text>
-                {b ? (
+                {isCrit ? (
                   <>
                     乘隙爆发，重拳落下，造成
                     <Text color='red' inline bold>
