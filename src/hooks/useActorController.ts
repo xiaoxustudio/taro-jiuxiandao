@@ -1,9 +1,9 @@
 import { cloneDeep, omit } from 'lodash-es';
-import Taro from '@tarojs/taro';
 import { useCallback, useEffect, useMemo } from 'react';
 import { ActorIdents } from '@/consts';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
+import useStorageStore from '@/store/storage';
 import { ActorDataConfig, NestedKeyOf } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 
@@ -23,39 +23,7 @@ function useActorController() {
   }
 
   useEffect(() => {
-    const anyTaro = Taro as any;
-    const parseStored = (raw: any) => {
-      if (!raw) return undefined;
-      if (typeof raw === 'string') {
-        try {
-          return JSON.parse(raw);
-        } catch (e) {
-          String(e);
-          return raw;
-        }
-      }
-      return raw;
-    };
-    const load = async (key?: string) => {
-      if (!key) return undefined;
-      let raw: any;
-      if (typeof anyTaro.getStorageSync === 'function') {
-        raw = anyTaro.getStorageSync(key);
-      } else if (typeof anyTaro.getStorage === 'function') {
-        try {
-          const res = await anyTaro.getStorage({ key });
-          raw = res?.data;
-        } catch (e) {
-          String(e);
-          return undefined;
-        }
-      } else if (typeof localStorage !== 'undefined') {
-        raw = localStorage.getItem(key);
-      } else {
-        return undefined;
-      }
-      return parseStored(raw);
-    };
+    const { get: load } = useStorageStore.getState();
 
     const run = async () => {
       const patch: Partial<ActorDataConfig> = {};
@@ -233,16 +201,8 @@ function useActorController() {
       if (key === 'danfangData') {
         const storageKey = `actor:${newActor.uuid}:danfangData`;
         try {
-          const anyTaro = Taro as any;
-          if (typeof anyTaro.setStorageSync === 'function') {
-            anyTaro.setStorageSync(storageKey, val);
-          } else if (typeof anyTaro.setStorage === 'function') {
-            anyTaro
-              .setStorage({ key: storageKey, data: val })
-              .catch((e: any) => String(e));
-          } else if (typeof localStorage !== 'undefined') {
-            localStorage.setItem(storageKey, JSON.stringify(val));
-          }
+          const { set: setStorage } = useStorageStore.getState();
+          setStorage(storageKey, val).catch((e: any) => String(e));
           newActor.danfangDataStorageKey = storageKey;
         } catch (e) {
           String(e);

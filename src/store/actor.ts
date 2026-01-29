@@ -1,9 +1,9 @@
 import { omit } from 'lodash-es';
-import Taro from '@tarojs/taro';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ActorDataConfig } from '@/types';
 import { ActorIdents } from '@/consts';
+import useStorageStore from '@/store/storage';
 
 interface ActorStore {
   set: (store: string, newVal: ActorDataConfig) => void;
@@ -57,11 +57,8 @@ const useActorStore = create<ActorStore>()(
               );
             }
             keys.forEach((k) => {
-              try {
-                Taro.removeStorageSync(k);
-              } catch (e) {
-                String(e);
-              }
+              const { remove } = useStorageStore.getState();
+              remove(k).catch((e: any) => String(e));
             });
           });
           const om = omit(state.actors, oArray.concat(ActorIdents));

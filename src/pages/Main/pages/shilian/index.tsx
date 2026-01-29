@@ -1,6 +1,5 @@
 import { random } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Taro from '@tarojs/taro';
 import difangData from '@/assets/df.json';
 import {
   Container,
@@ -12,6 +11,7 @@ import {
   Text
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
+import useStorageStore from '@/store/storage';
 import {
   ActorZDType,
   CWType,
@@ -143,27 +143,23 @@ export default function Shilian() {
       | Record<string, { name: string; itype: string }[]>
       | undefined;
     if (!materialPoolByGrade) {
+      const { getSync: storageGetSync } = useStorageStore.getState();
       const keys = get('materialPoolStorageKeysByGrade') as
         | Record<string, string>
         | undefined;
       if (keys && Object.keys(keys).length) {
         const next: Record<string, { name: string; itype: string }[]> = {};
         Object.entries(keys).forEach(([grade, key]) => {
-          const raw = Taro.getStorageSync(key);
-          let loaded: any = raw;
-          if (typeof raw === 'string') {
-            try {
-              loaded = JSON.parse(raw);
-            } catch (e) {
-              String(e);
-              loaded = undefined;
-            }
-          }
+          const loaded = storageGetSync(key);
           if (!Array.isArray(loaded)) return;
-          next[grade] = (loaded as any[]).map((name) => ({
-            name,
-            itype: grade
-          }));
+          if (loaded.length && typeof loaded[0] === 'string') {
+            next[grade] = (loaded as any[]).map((name) => ({
+              name,
+              itype: grade
+            }));
+          } else {
+            next[grade] = loaded as any;
+          }
         });
         if (Object.keys(next).length) {
           materialPoolByGrade = next;

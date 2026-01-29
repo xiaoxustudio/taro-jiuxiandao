@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import Taro from '@tarojs/taro';
 import {
   fangshiCategories,
   FangshiCategoryKey,
@@ -24,6 +23,7 @@ import { AttrTransformChinese, getGradeColor } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
 import useActorController from '@/hooks/useActorController';
+import useStorageStore from '@/store/storage';
 import './index.less';
 
 export default function Fangshi() {
@@ -198,27 +198,23 @@ export default function Fangshi() {
       let materialPoolByGrade = get('materialPoolByGrade') as any;
       let danfangPoolByGrade = get('danfangPoolByGrade') as any;
       if (!materialPoolByGrade) {
+        const { getSync: storageGetSync } = useStorageStore.getState();
         const keys = get('materialPoolStorageKeysByGrade') as
           | Record<string, string>
           | undefined;
         if (keys && Object.keys(keys).length) {
           const next: Record<string, { name: string; itype: string }[]> = {};
           Object.entries(keys).forEach(([grade, key]) => {
-            const raw = Taro.getStorageSync(key);
-            let loaded: any = raw;
-            if (typeof raw === 'string') {
-              try {
-                loaded = JSON.parse(raw);
-              } catch (e) {
-                String(e);
-                loaded = undefined;
-              }
-            }
+            const loaded = storageGetSync(key);
             if (!Array.isArray(loaded)) return;
-            next[grade] = (loaded as any[]).map((name) => ({
-              name,
-              itype: grade
-            }));
+            if (loaded.length && typeof loaded[0] === 'string') {
+              next[grade] = (loaded as any[]).map((name) => ({
+                name,
+                itype: grade
+              }));
+            } else {
+              next[grade] = loaded as any;
+            }
           });
           if (Object.keys(next).length) {
             materialPoolByGrade = next;
@@ -227,22 +223,14 @@ export default function Fangshi() {
         }
       }
       if (!danfangPoolByGrade) {
+        const { getSync: storageGetSync } = useStorageStore.getState();
         const keys = get('danfangPoolStorageKeysByGrade') as
           | Record<string, string>
           | undefined;
         if (keys && Object.keys(keys).length) {
           const next: Record<string, any[]> = {};
           Object.entries(keys).forEach(([grade, key]) => {
-            const raw = Taro.getStorageSync(key);
-            let loaded: any = raw;
-            if (typeof raw === 'string') {
-              try {
-                loaded = JSON.parse(raw);
-              } catch (e) {
-                String(e);
-                loaded = undefined;
-              }
-            }
+            const loaded = storageGetSync(key);
             if (!Array.isArray(loaded)) return;
             next[grade] = loaded as any[];
           });

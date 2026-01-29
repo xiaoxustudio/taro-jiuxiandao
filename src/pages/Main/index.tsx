@@ -15,6 +15,7 @@ import {
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
+import useStorageStore from '@/store/storage';
 import { getGradeColor, navigateTo, TimeArray, ZhouTian } from '@/utils';
 import {
   getJingJieMaxDep,
@@ -231,39 +232,7 @@ function Main() {
 
   useEffect(() => {
     if (!tujianVisible) return;
-    const anyTaro = Taro as any;
-    const parseStored = (raw: any) => {
-      if (!raw) return undefined;
-      if (typeof raw === 'string') {
-        try {
-          return JSON.parse(raw);
-        } catch (e) {
-          String(e);
-          return raw;
-        }
-      }
-      return raw;
-    };
-    const load = async (key?: string) => {
-      if (!key) return undefined;
-      let raw: any;
-      if (typeof anyTaro.getStorageSync === 'function') {
-        raw = anyTaro.getStorageSync(key);
-      } else if (typeof anyTaro.getStorage === 'function') {
-        try {
-          const res = await anyTaro.getStorage({ key });
-          raw = res?.data;
-        } catch (e) {
-          String(e);
-          return undefined;
-        }
-      } else if (typeof localStorage !== 'undefined') {
-        raw = localStorage.getItem(key);
-      } else {
-        return undefined;
-      }
-      return parseStored(raw);
-    };
+    const { get: load } = useStorageStore.getState();
     const run = async () => {
       const pool = get('danfangPoolByGrade') as
         | Record<string, any[]>

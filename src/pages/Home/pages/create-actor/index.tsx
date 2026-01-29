@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
+import useStorageStore from '@/store/storage';
 import { ActorDataConfig, CWType } from '@/types';
 import { UUID } from '@/utils';
 import { HasActor } from '@/utils/actor';
@@ -44,33 +45,13 @@ const yieldToMain = () =>
   });
 
 const storageSet = async (key: string, data: any) => {
-  const anyTaro = Taro as any;
-  if (typeof anyTaro.setStorageSync === 'function') {
-    anyTaro.setStorageSync(key, data);
-    return;
-  }
-  if (typeof anyTaro.setStorage === 'function') {
-    await anyTaro.setStorage({ key, data });
-    return;
-  }
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
+  const { set } = useStorageStore.getState();
+  await set(key, data);
 };
 
 const storageRemove = async (key: string) => {
-  const anyTaro = Taro as any;
-  if (typeof anyTaro.removeStorageSync === 'function') {
-    anyTaro.removeStorageSync(key);
-    return;
-  }
-  if (typeof anyTaro.removeStorage === 'function') {
-    await anyTaro.removeStorage({ key });
-    return;
-  }
-  if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem(key);
-  }
+  const { remove } = useStorageStore.getState();
+  await remove(key);
 };
 
 const rollbackStoredKeys = async (keys: string[]) => {
