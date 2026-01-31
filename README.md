@@ -17,7 +17,7 @@
 
 <p align="center">
   <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/ccb7e915-d796-4e63-a1d9-3ee78f8b6723" />
-  <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/b4b3cf93-ae8c-4e8b-aaa2-125ccc763f72" />
+  <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/f6db7f7f-9f9c-40a8-8c33-1268bc2efb1c" />
 </p>
 
 ## 技术栈
