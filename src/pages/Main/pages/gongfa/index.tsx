@@ -51,11 +51,11 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 }
 
 export default function Gongfa() {
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
   const [selectState, select] = useValue('', true);
   const current = useMemo<GongFaType | null>(
     () => get('gongfa.current'),
-    [get, set, selectState] // eslint-disable-line
+    [actor, get, set, selectState] // eslint-disable-line
   );
 
   const shouldGetExp = useMemo(() => {
