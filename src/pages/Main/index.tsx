@@ -398,6 +398,13 @@ function Main() {
 
     const jjRate = 1 + (getLingQiToNumber() - 1) * 0.15;
 
+    const gongfaCurrent = get('gongfa.current') as GongFaType | null;
+    const gongfaXL =
+      typeof gongfaCurrent?.xl === 'number'
+        ? gongfaCurrent.xl
+        : Number((gongfaCurrent?.xl || '').toString().replace('%', '')) || 0;
+    const gongfaRate = Math.max(0, gongfaXL) / 100;
+
     const dfLingchi = get('dongfu') ? get('dongfu').lingchi : 0;
 
     const zhoutian = ZhouTian(xiulian.time);
@@ -406,7 +413,7 @@ function Main() {
 
     const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate); // 每小周天能获取修为
 
-    const baseXiu = round(zhotianByzhoutian * zhoutian, 2);
+    const baseXiu = round(zhotianByzhoutian * zhoutian * (1 + gongfaRate), 2);
     const calcXiu = round(baseXiu + dfLingchi, 2);
 
     const content = (
@@ -414,6 +421,8 @@ function Main() {
         等级增益系数：{lvRate}
         <br />
         境界增益系数：{jjRate}
+        <br />
+        功法修炼增益：{(gongfaRate * 100).toFixed(2)}%
         <br />
         洞府增益：{dfLingchi}
         <br />
