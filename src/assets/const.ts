@@ -262,20 +262,27 @@ export const ACTOR_POOL_CONFIG = {
   countPerGrade: 200,
   gongfaCountPerGrade: 300
 };
+
+// 材料注册项
 export type MaterialRegistryItem = {
   name: string;
   itype: (typeof clGrades)[number];
 };
+
+// 种子注册项
 export type SeedRegistryItem = {
   name: string;
   material: string;
   itype: (typeof clGrades)[number];
   time: [number, number, number];
 };
+
+// 材料池，按等级分类
 export type MaterialPoolByGrade = Record<
   (typeof clGrades)[number],
   MaterialRegistryItem[]
 >;
+
 export const SEED_GROW_TIME_BY_GRADE: Record<
   (typeof clGrades)[number],
   [number, number, number]

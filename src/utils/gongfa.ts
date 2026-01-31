@@ -116,9 +116,10 @@ function putCurrentGongfa(): Promise<boolean> {
   const currentGongFa = acData.gongfa.current;
   let state = false;
   if (currentGongFa) {
-    const timeArr = currentGongFa?.time
-      ? new TimeArray(currentGongFa.time)
-      : new TimeArray(Date.now());
+    const elapsedMs = currentGongFa?.time
+      ? Math.max(0, Date.now() - currentGongFa.time)
+      : 0;
+    const timeArr = new TimeArray(elapsedMs);
     const addExp = timeArr.toZhouTian() * 1000;
     currentGongFa.exp += addExp;
     add(currentGongFa);

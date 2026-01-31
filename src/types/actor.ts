@@ -20,6 +20,7 @@ export interface ActorDataConfigForZhanDou {
 
 export type DaoLvQuality = (typeof DAOLV_QUALITIES)[number];
 
+// 道侣
 export type DaoLvCandidate = {
   name: string;
   quality: DaoLvQuality;
@@ -30,31 +31,38 @@ export type DaoLvCandidate = {
   attr: Partial<ActorDataConfigForZhanDou>;
 };
 
+// 道侣列表
 export type DaoLvMarket = {
   date: string;
   refreshCount: number;
   candidates: DaoLvCandidate[];
 };
 
+// 洞府数据
 export type DongfuData = {
   lv: number;
   lingchi: number;
   daolv: DaoLvCandidate | null;
-  daolvMarket?: DaoLvMarket | null;
-  shuangxiu?: { date: string } | null;
+  daolvMarket?: DaoLvMarket | null; // 道侣市场
+  shuangxiu?: { date: string } | null; // 双修
 };
+
 export type YaoyuanSeed = SeedRegistryItem & {
   num: number;
 };
+
+// 药园灵田
 export type YaoyuanPlot = {
   id: number;
   lv: number;
   unlocked: boolean;
   seed: (SeedRegistryItem & { plantTime: number }) | null;
 };
+
+// 药园数据
 export type YaoyuanData = {
   lv: number;
-  plots: YaoyuanPlot[];
+  plots: YaoyuanPlot[]; // 已种植的灵田
   seeds: YaoyuanSeed[];
 };
 export type ActorDataConfigForFaBao = {

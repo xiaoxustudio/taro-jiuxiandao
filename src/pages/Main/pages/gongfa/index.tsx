@@ -52,17 +52,16 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 
 export default function Gongfa() {
   const { get, set, actor } = useActorController();
-  const [selectState, select] = useValue('', true);
+  const [, select] = useValue('', true);
   const current = useMemo<GongFaType | null>(
     () => get('gongfa.current'),
-    [actor, get, set, selectState] // eslint-disable-line
+    [actor, get] // eslint-disable-line
   );
 
   const shouldGetExp = useMemo(() => {
-    const timeArr = current?.time
-      ? new TimeArray(current.time)
-      : new TimeArray(Date.now());
-    return timeArr.toZhouTian() * 1000;
+    if (!current?.time) return 0;
+    const elapsedMs = Math.max(0, Date.now() - current.time);
+    return new TimeArray(elapsedMs).toZhouTian() * 1000;
   }, [current]);
 
   const xiuxi = () => {
@@ -81,19 +80,22 @@ export default function Gongfa() {
       JXToast('未穿戴功法').show();
       return;
     }
-    current.exp += shouldGetExp;
-    if (current.exp >= current.max_exp) {
-      current.exp = current.max_exp;
-      current.lv += 1;
-      current.max_exp += 1000;
-      const keys = Object.keys(current.attr);
+    const updatedGongfa = JSON.parse(JSON.stringify(current)) as GongFaType;
+    updatedGongfa.exp += shouldGetExp;
+    if (updatedGongfa.exp >= updatedGongfa.max_exp) {
+      updatedGongfa.exp = updatedGongfa.max_exp;
+      updatedGongfa.lv += 1;
+      updatedGongfa.max_exp += 1000;
+      const keys = Object.keys(updatedGongfa.attr || {});
       keys.forEach((key) => {
-        if (current.attr[key]) current.attr[key] += 0.1 * current.lv;
+        if (updatedGongfa.attr[key]) {
+          updatedGongfa.attr[key] += 0.1 * updatedGongfa.lv;
+        }
       });
-      current.time = Date.now();
     }
-    set('gongfa.current', current);
-    JXToast(`冲击功法${current.name}：+${shouldGetExp}`).show();
+    updatedGongfa.time = Date.now();
+    set('gongfa.current', updatedGongfa);
+    JXToast(`冲击功法${updatedGongfa.name}：+${shouldGetExp}`).show();
   }, [current, shouldGetExp, set, get]); // eslint-disable-line
 
   return (

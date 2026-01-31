@@ -29,10 +29,8 @@ class TimeArray {
   toZhouTian(limit = 12): number {
     return (
       Math.round(
-        Math.min(
-          Math.max(0, this.getSubDateTimestamp() / TimeArray.Map.day),
-          limit
-        ) * 100
+        Math.min(Math.max(0, this.milliseconds / TimeArray.Map.day), limit) *
+          100
       ) / 100
     );
   }
