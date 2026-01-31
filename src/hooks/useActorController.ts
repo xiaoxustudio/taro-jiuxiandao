@@ -104,6 +104,10 @@ function useActorController() {
         const loaded = await load(actor.danfangDataStorageKey);
         if (loaded) patch.danfangData = loaded;
       }
+      if (!actor.seedRegistry && actor.seedRegistryStorageKey) {
+        const loaded = await load(actor.seedRegistryStorageKey);
+        if (loaded) patch.seedRegistry = loaded;
+      }
 
       if (!Object.keys(patch).length) return;
 
@@ -132,7 +136,9 @@ function useActorController() {
     actor.gongfaPoolStorageKeysByGrade,
     actor.materialPoolByGrade,
     actor.materialPoolStorageKey,
-    actor.materialPoolStorageKeysByGrade
+    actor.materialPoolStorageKeysByGrade,
+    actor.seedRegistry,
+    actor.seedRegistryStorageKey
   ]);
 
   /**
@@ -204,6 +210,16 @@ function useActorController() {
           const { set: setStorage } = useStorageStore.getState();
           setStorage(storageKey, val).catch((e: any) => String(e));
           newActor.danfangDataStorageKey = storageKey;
+        } catch (e) {
+          String(e);
+        }
+      }
+      if (key === 'seedRegistry') {
+        const storageKey = `actor:${newActor.uuid}:seedRegistry`;
+        try {
+          const { set: setStorage } = useStorageStore.getState();
+          setStorage(storageKey, val).catch((e: any) => String(e));
+          newActor.seedRegistryStorageKey = storageKey;
         } catch (e) {
           String(e);
         }

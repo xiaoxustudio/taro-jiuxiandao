@@ -1,5 +1,5 @@
 import type { FangshiSnapshot } from '@/utils/fangshi';
-import type { MaterialPoolByGrade } from '@/assets/const';
+import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
 import { DAOLV_QUALITIES } from '@/consts';
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
 import { GongFaType } from './gongfa';
@@ -42,6 +42,20 @@ export type DongfuData = {
   daolv: DaoLvCandidate | null;
   daolvMarket?: DaoLvMarket | null;
   shuangxiu?: { date: string } | null;
+};
+export type YaoyuanSeed = SeedRegistryItem & {
+  num: number;
+};
+export type YaoyuanPlot = {
+  id: number;
+  lv: number;
+  unlocked: boolean;
+  seed: (SeedRegistryItem & { plantTime: number }) | null;
+};
+export type YaoyuanData = {
+  lv: number;
+  plots: YaoyuanPlot[];
+  seeds: YaoyuanSeed[];
 };
 export type ActorDataConfigForFaBao = {
   [K in keyof typeof FabaoType]: null | undefined | FBItemType;
@@ -103,6 +117,8 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   fangshi?: FangshiSnapshot; // 坊市快照
   danfangData?: Record<string, any>; // 丹方原始数据缓存
   materialRegistry?: { name: string; itype: string }[]; // 材料注册表
+  seedRegistry?: SeedRegistryItem[]; // 种子注册表
+  yaoyuan?: YaoyuanData; // 药园数据
   materialPoolByGrade?: MaterialPoolByGrade; // 材料池（按品阶）
   danfangPoolByGrade?: Record<string, any[]>; // 丹方池（按品阶）
   gongfaPoolByGrade?: Record<string, GongFaType[]>; // 功法池（按品阶）
@@ -112,4 +128,5 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   danfangPoolStorageKeysByGrade?: Record<string, string>; // 丹方池分品阶存储 key
   gongfaPoolStorageKeysByGrade?: Record<string, string>; // 功法池分品阶存储 key
   danfangDataStorageKey?: string; // 丹方数据存储 key
+  seedRegistryStorageKey?: string; // 种子注册表存储 key
 }

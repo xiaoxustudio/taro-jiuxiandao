@@ -208,8 +208,9 @@ function Main() {
     },
     {
       name: '药园',
-      disabeld: true,
-      click() {}
+      click() {
+        navigateTo('Main/pages/yaoyuan/index');
+      }
     },
     {
       name: '洞府',

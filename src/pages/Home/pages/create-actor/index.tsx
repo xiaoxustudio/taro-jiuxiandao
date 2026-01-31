@@ -20,7 +20,7 @@ import { GongFaPinJie, GongFaType } from '@/types/gongfa';
 import {
   clGrades,
   clNameParts,
-  createMaterialRegistry,
+  createSeedRegistry,
   createRng,
   dfGrades,
   dyGradeMultipliers,
@@ -30,6 +30,7 @@ import {
   DY_EFFECT_SCALE,
   FANGSHI_CONFIG,
   ACTOR_POOL_CONFIG,
+  flattenMaterialPool,
   MaterialPoolByGrade,
   MATERIAL_BASE_LIST,
   REALM_ORDER
@@ -71,6 +72,20 @@ const getGradeIndex = (grade: string, grades: readonly string[]) => {
   const idx = grades.indexOf(grade);
   return idx === -1 ? 0 : idx;
 };
+
+const getYaoyuanTotalSlots = (lv: number) =>
+  Math.min(100, 2 + Math.max(0, lv - 1));
+
+const createDefaultYaoyuanPlots = (totalSlots: number, unlockedCount = 2) =>
+  Array.from({ length: totalSlots }, (_, index) => ({
+    id: index + 1,
+    lv: 1,
+    unlocked: index < unlockedCount,
+    seed: null
+  }));
+
+const createInitialSeeds = (registry: ReturnType<typeof createSeedRegistry>) =>
+  registry.slice(0, 2).map((item) => ({ ...item, num: 1 }));
 
 const dfNameSuffixPool = [
   '玄',
@@ -284,6 +299,11 @@ function Index() {
     gongfa: {
       ls: [],
       current: null
+    },
+    yaoyuan: {
+      lv: 1,
+      plots: createDefaultYaoyuanPlots(getYaoyuanTotalSlots(1)),
+      seeds: []
     }
   });
 
@@ -786,7 +806,25 @@ function Index() {
         gongfaPoolStorageKeysByGrade[grade] = storageKey;
       });
 
-      const materialRegistry = createMaterialRegistry({ seed });
+      const materialRegistry = materialFlat.length
+        ? materialFlat
+        : flattenMaterialPool(materialPoolByGrade);
+      const seedRegistry = createSeedRegistry(materialRegistry);
+      const seedRegistryStorageKey = `actor:${seed}:seedRegistry`;
+      try {
+        await storageSet(seedRegistryStorageKey, seedRegistry);
+      } catch (e: any) {
+        await rollbackStoredKeys(storedKeys);
+        throw new Error(
+          e?.message || '存档空间不足，无法保存种子数据，请清理存档后重试'
+        );
+      }
+      storedKeys.push(seedRegistryStorageKey);
+      const yaoyuan = {
+        lv: 1,
+        plots: createDefaultYaoyuanPlots(getYaoyuanTotalSlots(1)),
+        seeds: createInitialSeeds(seedRegistry)
+      };
       const starterGrade = gongfaGrades[0];
       const starterPool = gongfaPoolByGrade[starterGrade] || [];
       const starterIndex = starterPool.length
@@ -804,6 +842,9 @@ function Index() {
       const nextActor: ActorDataConfig = {
         ...actor,
         materialRegistry,
+        seedRegistry,
+        seedRegistryStorageKey,
+        yaoyuan,
         materialPoolByGrade,
         danfangPoolByGrade,
         materialPoolStorageKeysByGrade,

@@ -266,10 +266,29 @@ export type MaterialRegistryItem = {
   name: string;
   itype: (typeof clGrades)[number];
 };
+export type SeedRegistryItem = {
+  name: string;
+  material: string;
+  itype: (typeof clGrades)[number];
+  time: [number, number, number];
+};
 export type MaterialPoolByGrade = Record<
   (typeof clGrades)[number],
   MaterialRegistryItem[]
 >;
+export const SEED_GROW_TIME_BY_GRADE: Record<
+  (typeof clGrades)[number],
+  [number, number, number]
+> = {
+  一品: [0, 0, 5],
+  二品: [0, 0, 10],
+  三品: [0, 0, 20],
+  四品: [0, 1, 0],
+  五品: [0, 2, 0],
+  六品: [0, 4, 0],
+  七品: [0, 8, 0],
+  八品: [1, 0, 0]
+};
 export const MATERIAL_BASE_LIST: MaterialRegistryItem[] = [
   { name: '洗骨花', itype: '一品' },
   { name: '千叶草', itype: '一品' },
@@ -395,6 +414,14 @@ export const createMaterialRegistry = (options?: {
     }
   });
   return list;
+};
+export const createSeedRegistry = (materials: MaterialRegistryItem[]) => {
+  return materials.map((item) => ({
+    name: `${item.name}种子`,
+    material: item.name,
+    itype: item.itype,
+    time: SEED_GROW_TIME_BY_GRADE[item.itype] ?? [0, 0, 5]
+  }));
 };
 export const createMaterialPoolByGrade = (options?: {
   seed?: string;

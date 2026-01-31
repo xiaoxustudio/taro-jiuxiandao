@@ -35,6 +35,8 @@ const useActorStore = create<ActorStore>()(
               keys.push(actor.danfangPoolStorageKey);
             if (actor.danfangDataStorageKey)
               keys.push(actor.danfangDataStorageKey);
+            if (actor.seedRegistryStorageKey)
+              keys.push(actor.seedRegistryStorageKey);
             if (actor.materialPoolStorageKeysByGrade) {
               keys.push(
                 ...(Object.values(
@@ -76,7 +78,8 @@ const useActorStore = create<ActorStore>()(
               'materialPoolByGrade',
               'danfangPoolByGrade',
               'danfangData',
-              'gongfaPoolByGrade'
+              'gongfaPoolByGrade',
+              'seedRegistry'
             ])
           ])
         ) as Record<string, ActorDataConfig>
