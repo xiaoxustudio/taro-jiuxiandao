@@ -18,12 +18,13 @@ import {
   Scroll,
   Text
 } from '@/components';
-import { ActorDataConfigForZhanDou, CWType } from '@/types';
+import { ActorDataConfigForZhanDou, CWType, YaoyuanData } from '@/types';
 import { AttrTransformChinese, getGradeColor } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
 import useActorController from '@/hooks/useActorController';
 import useStorageStore from '@/store/storage';
+import { SeedRegistryItem } from '@/assets/const';
 import './index.less';
 
 export default function Fangshi() {
@@ -164,8 +165,36 @@ export default function Fangshi() {
                   return;
                 }
               } else {
-                chuwu.Add(v);
-                JXToast(`购买物品：${v.name}`).show();
+                const isSeed = v.name.endsWith('种子') && Array.isArray(v.time);
+                if (isSeed) {
+                  const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
+                  if (currentYaoyuan) {
+                    const nextSeeds = currentYaoyuan.seeds ?? [];
+                    const existing = nextSeeds.find(
+                      (item) => item.name === v.name
+                    );
+                    const seedBase = {
+                      name: v.name,
+                      material: v.material || v.name.replace(/种子$/, ''),
+                      itype: v.itype,
+                      time: v.time
+                    };
+                    const updatedSeeds = existing
+                      ? nextSeeds.map((item) =>
+                          item.name === v.name
+                            ? { ...item, num: item.num + 1 }
+                            : item
+                        )
+                      : [...nextSeeds, { ...seedBase, num: 1 }];
+                    set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
+                  } else {
+                    chuwu.Add(v);
+                  }
+                  JXToast(`购买种子：${v.name}`).show();
+                } else {
+                  chuwu.Add(v);
+                  JXToast(`购买物品：${v.name}`).show();
+                }
               }
               chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
             } else {
@@ -197,6 +226,7 @@ export default function Fangshi() {
       const current = get('fangshi') as FangshiSnapshot | null;
       let materialPoolByGrade = get('materialPoolByGrade') as any;
       let danfangPoolByGrade = get('danfangPoolByGrade') as any;
+      let seedRegistry = get('seedRegistry') as SeedRegistryItem[] | undefined;
       if (!materialPoolByGrade) {
         const { getSync: storageGetSync } = useStorageStore.getState();
         const keys = get('materialPoolStorageKeysByGrade') as
@@ -240,12 +270,24 @@ export default function Fangshi() {
           }
         }
       }
+      if (!seedRegistry || !seedRegistry.length) {
+        const { getSync: storageGetSync } = useStorageStore.getState();
+        const key = get('seedRegistryStorageKey') as string | undefined;
+        if (key) {
+          const loaded = storageGetSync(key);
+          if (Array.isArray(loaded)) {
+            seedRegistry = loaded as SeedRegistryItem[];
+            set('seedRegistry', seedRegistry);
+          }
+        }
+      }
       const next = resolveFangshiSnapshot(
         current,
         realm,
         Date.now(),
         materialPoolByGrade,
-        danfangPoolByGrade
+        danfangPoolByGrade,
+        seedRegistry
       );
       if (current !== next) {
         set('fangshi', next);

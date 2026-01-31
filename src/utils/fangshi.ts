@@ -10,7 +10,10 @@ import {
   FANGSHI_CONFIG,
   clGrades,
   clGradePrice,
+  createSeedRegistry,
+  flattenMaterialPool,
   MaterialPoolByGrade,
+  SeedRegistryItem,
   danfangIds,
   dfGrades,
   dyNameParts,
@@ -35,6 +38,7 @@ export type FangshiItem = {
   isPile?: boolean;
   desc?: string;
   itype?: string;
+  material?: string;
   ls: number;
   baseLs?: number;
   attr?: Record<string, number>;
@@ -270,25 +274,59 @@ const pickWeightedIndex = (weights: number[]) => {
 const pickMaterialsFromPoolByGrade = (
   realm: string,
   count: number,
-  pool: MaterialPoolByGrade
+  pool: MaterialPoolByGrade,
+  seedRegistry?: SeedRegistryItem[]
 ): FangshiItem[] => {
   const weights =
     REALM_GRADE_WEIGHTS[realm as keyof typeof REALM_GRADE_WEIGHTS] ||
     REALM_GRADE_WEIGHTS['练气'];
   const used = new Set<string>();
   const list: FangshiItem[] = [];
+  const seedRegistryResolved = seedRegistry?.length
+    ? seedRegistry
+    : createSeedRegistry(flattenMaterialPool(pool));
+  const seedByGrade = clGrades.reduce(
+    (acc, grade) => {
+      acc[grade] = seedRegistryResolved.filter((item) => item.itype === grade);
+      return acc;
+    },
+    {} as Record<(typeof clGrades)[number], SeedRegistryItem[]>
+  );
   let guard = 0;
   while (list.length < count && guard < count * 30) {
     const gradeIndex = pickWeightedIndex(weights);
     const grade = clGrades[gradeIndex] || clGrades[0];
     const candidates = pool[grade] ?? [];
-    if (candidates.length) {
-      const picked = candidates[random(0, candidates.length - 1)];
-      if (picked?.name && !used.has(picked.name)) {
-        used.add(picked.name);
+    const seedCandidates = seedByGrade[grade] ?? [];
+    const shouldPickSeed = seedCandidates.length > 0 && Math.random() < 0.25;
+    let picked = false;
+    if (shouldPickSeed) {
+      const pickedSeed = seedCandidates[random(0, seedCandidates.length - 1)];
+      if (pickedSeed?.name && !used.has(pickedSeed.name)) {
+        used.add(pickedSeed.name);
         const [minP, maxP] = clGradePrice[grade];
         list.push({
-          name: picked.name,
+          name: pickedSeed.name,
+          material: pickedSeed.material,
+          desc: '种子，用于药园种植',
+          itype: grade,
+          time: pickedSeed.time,
+          ls: Math.round(random(minP, maxP) * 1.2),
+          type: CWType.QT,
+          isPile: true
+        });
+        picked = true;
+      } else {
+        guard += 1;
+      }
+    }
+    if (!picked && candidates.length) {
+      const pickedMaterial = candidates[random(0, candidates.length - 1)];
+      if (pickedMaterial?.name && !used.has(pickedMaterial.name)) {
+        used.add(pickedMaterial.name);
+        const [minP, maxP] = clGradePrice[grade];
+        list.push({
+          name: pickedMaterial.name,
           desc: '材料，用于炼制丹药',
           itype: grade,
           ls: random(minP, maxP),
@@ -298,7 +336,7 @@ const pickMaterialsFromPoolByGrade = (
       } else {
         guard += 1;
       }
-    } else {
+    } else if (!picked) {
       guard += 1;
     }
   }
@@ -375,7 +413,8 @@ export const createFangshiSnapshot = (
   realm: string,
   updatedAt?: number,
   materialPoolByGrade?: MaterialPoolByGrade,
-  danfangPoolByGrade?: Record<string, FangshiItem[]>
+  danfangPoolByGrade?: Record<string, FangshiItem[]>,
+  seedRegistry?: SeedRegistryItem[]
 ): FangshiSnapshot => {
   const ts = updatedAt ?? Date.now();
   const realmIndex = getRealmIndex(realm);
@@ -388,7 +427,8 @@ export const createFangshiSnapshot = (
     ? pickMaterialsFromPoolByGrade(
         realm,
         FANGSHI_CONFIG.clBaseCount + realmIndex,
-        materialPoolByGrade
+        materialPoolByGrade,
+        seedRegistry
       )
     : [];
   const dfItems = danfangPoolByGrade
@@ -424,7 +464,8 @@ export const resolveFangshiSnapshot = (
   realm: string,
   now?: number,
   materialPoolByGrade?: MaterialPoolByGrade,
-  danfangPoolByGrade?: Record<string, FangshiItem[]>
+  danfangPoolByGrade?: Record<string, FangshiItem[]>,
+  seedRegistry?: SeedRegistryItem[]
 ) => {
   const ts = now ?? Date.now();
   if (
@@ -438,6 +479,7 @@ export const resolveFangshiSnapshot = (
     realm,
     ts,
     materialPoolByGrade,
-    danfangPoolByGrade
+    danfangPoolByGrade,
+    seedRegistry
   );
 };

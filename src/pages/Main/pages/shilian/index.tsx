@@ -18,6 +18,7 @@ import {
   DiFangType,
   HuiHeType,
   QTItemType,
+  YaoyuanData,
   YaoShouZDType
 } from '@/types';
 import useScroll from '@/hooks/useScroll';
@@ -32,7 +33,8 @@ import { JingJie1ToNumber } from '@/utils/actor';
 import {
   REALM_GRADE_WEIGHTS,
   clGrades,
-  createMaterialRegistry
+  createMaterialRegistry,
+  SeedRegistryItem
 } from '@/assets/const';
 import styles from './index.module.less';
 
@@ -48,6 +50,16 @@ const renderNameWithRealmColor = (name: string) => {
       {parts.after}
     </>
   );
+};
+const seedDropRates: Record<(typeof clGrades)[number], number> = {
+  一品: 0.02,
+  二品: 0.018,
+  三品: 0.015,
+  四品: 0.012,
+  五品: 0.01,
+  六品: 0.008,
+  七品: 0.006,
+  八品: 0.004
 };
 
 export default function Shilian() {
@@ -376,6 +388,31 @@ export default function Shilian() {
           type: CWType.QT,
           num: random(1, 4)
         } as QTItemType;
+        const seedRegistry = (get('seedRegistry') as SeedRegistryItem[]) || [];
+        const materialRegistry =
+          ((get('materialRegistry') || []) as {
+            name: string;
+            itype: string;
+          }[]) || [];
+        const materialGrade =
+          materialRegistry.find((item) => item.name === clData.name)?.itype ||
+          seedRegistry.find((item) => item.material === clData.name)?.itype ||
+          clGrades[0];
+        const seedDropRate = seedDropRates[materialGrade] ?? 0;
+        const shouldDropSeed =
+          seedRegistry.length > 0 && Math.random() < seedDropRate;
+        let seedDrop: SeedRegistryItem | null = null;
+        const gradeSeeds = seedRegistry.filter(
+          (item) => item.itype === materialGrade
+        );
+        if (shouldDropSeed) {
+          seedDrop =
+            seedRegistry.find((item) => item.material === clData.name) ||
+            (gradeSeeds.length
+              ? gradeSeeds[random(0, gradeSeeds.length - 1)]
+              : null) ||
+            null;
+        }
         const reward = random(
           Math.max(1, Math.round(YaoShouInstance.xw * 0.7)),
           Math.max(1, Math.round(YaoShouInstance.xw * 1.2))
@@ -405,6 +442,13 @@ export default function Shilian() {
                 </>
               )
             },
+            ...(seedDrop
+              ? [
+                  {
+                    text: <>获得种子：{seedDrop.name}</>
+                  }
+                ]
+              : []),
             {
               text: <>战斗结束</>
             }
@@ -412,6 +456,23 @@ export default function Shilian() {
         }));
         clearInterval(timer.current as number);
         chuwu.Add(clData);
+        if (seedDrop) {
+          const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
+          if (currentYaoyuan) {
+            const currentSeeds = currentYaoyuan.seeds ?? [];
+            const existing = currentSeeds.find(
+              (item) => item.name === seedDrop?.name
+            );
+            const updatedSeeds = existing
+              ? currentSeeds.map((item) =>
+                  item.name === seedDrop?.name
+                    ? { ...item, num: item.num + 1 }
+                    : item
+                )
+              : [...currentSeeds, { ...seedDrop, num: 1 }];
+            set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
+          }
+        }
         set('xiuwei', get('xiuwei') + reward);
         setSessionLoot((prev) => ({
           ...prev,
