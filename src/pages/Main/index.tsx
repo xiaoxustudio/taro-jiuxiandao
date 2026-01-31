@@ -398,16 +398,16 @@ function Main() {
 
     const jjRate = 1 + (getLingQiToNumber() - 1) * 0.15;
 
-    const dfRate = get('dongfu') ? get('dongfu').lingchi : 0;
+    const dfLingchi = get('dongfu') ? get('dongfu').lingchi : 0;
 
     const zhoutian = ZhouTian(xiulian.time);
 
-    const shouldGetXiu =
-      needAddXiuWeiJJ * 0.05 * rateOfLing * lvRate * jjRate + dfRate;
+    const shouldGetXiu = needAddXiuWeiJJ * 0.05 * rateOfLing * lvRate * jjRate;
 
     const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate); // 每小周天能获取修为
 
-    const calcXiu = (zhotianByzhoutian * zhoutian).toFixed(2);
+    const baseXiu = round(zhotianByzhoutian * zhoutian, 2);
+    const calcXiu = round(baseXiu + dfLingchi, 2);
 
     const content = (
       <>
@@ -415,11 +415,11 @@ function Main() {
         <br />
         境界增益系数：{jjRate}
         <br />
-        洞府增益：{dfRate}
+        洞府增益：{dfLingchi}
         <br />
         已修炼小周天：{ZhouTian(xiulian.time).toFixed(2)}
         <br />
-        总获取修为合计：{calcXiu}
+        总获取修为合计：{calcXiu.toFixed(2)}
       </>
     );
     const c = JXModal.show({
@@ -429,8 +429,8 @@ function Main() {
       okText: '收功',
       onOk() {
         c.close();
-        set('xiuwei', round(get('xiuwei') + Number.parseFloat(calcXiu), 2));
-        set('dongfu.lingchi', 0);
+        set('xiuwei', round(get('xiuwei') + calcXiu, 2));
+        set('dongfu.lingchi', Math.max(0, dfLingchi - dfLingchi));
         set('xiulian', null);
       }
     });
