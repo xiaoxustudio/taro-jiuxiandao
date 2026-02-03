@@ -25,9 +25,20 @@ import {
 import useScroll from '@/hooks/useScroll';
 import chuwu from '@/utils/chuwu';
 import {
+  JJ2_ARR,
+  MONSTER_NAME_PARTS,
+  STAGE_INDEX_MAP,
+  TIER_MAP,
+  buildMonsterBaseAttributes,
+  calcAttrScale,
   calcZhanDouHit,
+  calcWinStreakFromHistory,
+  compositeDifficultyCoef,
   navigateTo,
   numberToChinese,
+  pickMaterialNameByGrade,
+  pickWeightedIndex,
+  resolveMaterialPoolByGrade,
   splitNameByRealm
 } from '@/utils';
 import { JingJie1ToNumber } from '@/utils/actor';
@@ -74,42 +85,31 @@ export default function Shilian() {
     () => difangData.find((v) => v.name === get('zd.df')) as DiFangType,
     [get]
   );
+  const [guajiStats, setGuajiStats] = useState<{
+    totalRounds: number;
+    wins: number;
+    losses: number;
+    history: Array<{
+      name: string;
+      df: string;
+      rounds: number;
+      result: string;
+    }>;
+  }>({ totalRounds: 0, wins: 0, losses: 0, history: [] });
   const genYaoShou = useCallback((): YaoShouZDType => {
-    const tierMap: Record<string, number> = {
-      练气: 1,
-      筑基: 2,
-      结丹: 3,
-      元婴: 4,
-      化神: 5,
-      返虚: 6,
-      合体: 7,
-      大乘: 8
-    };
-    const tier = tierMap[df.jingjie] || 1;
+    const tier = TIER_MAP[df.jingjie] || 1;
     const playerMajor = get('jingjie');
     const playerMinorNum = JingJie1ToNumber(get('jingjie1'));
     const playerStage = get('jingjie2');
-    const playerTier = tierMap[playerMajor] || 1;
-    const namesA = ['凶', '烈', '青', '赤', '玄', '金', '灵', '幽', '噬', '炎'];
-    const namesB = ['狼', '虎', '蛛', '蟒', '狮', '猿', '鳄', '蝎', '熊', '雕'];
-    const na = namesA[random(0, namesA.length - 1)];
-    const nb = namesB[random(0, namesB.length - 1)];
+    const playerTier = TIER_MAP[playerMajor] || 1;
+    const na = MONSTER_NAME_PARTS.A[random(0, MONSTER_NAME_PARTS.A.length - 1)];
+    const nb = MONSTER_NAME_PARTS.B[random(0, MONSTER_NAME_PARTS.B.length - 1)];
     const jj1Max = df.jingjie === '练气' ? 12 : 9;
     let jj1: number;
     if (tier === playerTier) {
       const offsets = [-1, 0, 1, 2, 3];
       const weights = [1, 3, 3, 2, 1];
-      const sum = weights.reduce((a, b) => a + b, 0);
-      const r = random(1, sum);
-      let acc = 0;
-      let pick = 0;
-      for (let i = 0; i < weights.length; i++) {
-        acc += weights[i];
-        if (r <= acc) {
-          pick = offsets[i];
-          break;
-        }
-      }
+      const pick = offsets[pickWeightedIndex(weights, random)] || 0;
       jj1 = Math.max(1, Math.min(jj1Max, playerMinorNum + pick));
     } else if (tier > playerTier) {
       jj1 = random(Math.max(1, Math.floor(jj1Max * 0.5)), jj1Max);
@@ -119,18 +119,10 @@ export default function Shilian() {
         Math.max(1, playerMinorNum)
       );
     }
-    const jj2Arr = ['初期', '中期', '后期', '圆满', '大圆满'];
-    const stageIndexMap: Record<string, number> = {
-      初期: 0,
-      中期: 1,
-      后期: 2,
-      圆满: 3,
-      大圆满: 4
-    };
-    const pStageIdx = stageIndexMap[playerStage] ?? 0;
+    const pStageIdx = STAGE_INDEX_MAP[playerStage] ?? 0;
     const stageCandidates: number[] = [];
     const stageWeights: number[] = [];
-    for (let i = 0; i < jj2Arr.length; i++) {
+    for (let i = 0; i < JJ2_ARR.length; i++) {
       const diff = i - pStageIdx;
       let w = 1;
       if (diff === 0) w = 4;
@@ -140,46 +132,15 @@ export default function Shilian() {
       stageCandidates.push(i);
       stageWeights.push(w);
     }
-    const totalW = stageWeights.reduce((a, b) => a + b, 0);
-    const rw = random(1, totalW);
-    let accw = 0;
-    let sPick = 0;
-    for (let i = 0; i < stageWeights.length; i++) {
-      accw += stageWeights[i];
-      if (rw <= accw) {
-        sPick = stageCandidates[i];
-        break;
-      }
-    }
-    const jj2 = jj2Arr[sPick];
-    let materialPoolByGrade = get('materialPoolByGrade') as
-      | Record<string, { name: string; itype: string }[]>
-      | undefined;
-    if (!materialPoolByGrade) {
-      const { getSync: storageGetSync } = useStorageStore.getState();
-      const keys = get('materialPoolStorageKeysByGrade') as
-        | Record<string, string>
-        | undefined;
-      if (keys && Object.keys(keys).length) {
-        const next: Record<string, { name: string; itype: string }[]> = {};
-        Object.entries(keys).forEach(([grade, key]) => {
-          const loaded = storageGetSync(key);
-          if (!Array.isArray(loaded)) return;
-          if (loaded.length && typeof loaded[0] === 'string') {
-            next[grade] = (loaded as any[]).map((name) => ({
-              name,
-              itype: grade
-            }));
-          } else {
-            next[grade] = loaded as any;
-          }
-        });
-        if (Object.keys(next).length) {
-          materialPoolByGrade = next;
-          set('materialPoolByGrade', next);
-        }
-      }
-    }
+    const sPickIndex = pickWeightedIndex(stageWeights, random);
+    const sPick = stageCandidates[sPickIndex] ?? 0;
+    const jj2 = JJ2_ARR[sPick];
+    const { getSync: storageGetSync } = useStorageStore.getState();
+    const materialPoolByGrade = resolveMaterialPoolByGrade({
+      get,
+      set,
+      storageGetSync
+    });
     const registry = (
       (get('materialRegistry') || []) as { name: string; itype: string }[]
     ).length
@@ -200,35 +161,31 @@ export default function Shilian() {
       }
     }
     const targetGrade = clGrades[gradeIndex] || clGrades[0];
-    const fromMap = materialPoolByGrade?.[targetGrade] ?? [];
-    let pool = fromMap;
-    if (!pool.length) {
-      const filtered = registry.filter((m) => m.itype === targetGrade);
-      pool = filtered.length ? filtered : registry;
-    }
-    const clName =
-      pool[random(0, Math.max(0, pool.length - 1))]?.name || '妖丹';
-    const stageCoefMap: Record<string, number> = {
-      初期: 1.0,
-      中期: 1.12,
-      后期: 1.25,
-      圆满: 1.38,
-      大圆满: 1.5
-    };
-    const j1Coef = 1 + (jj1 - 1) * 0.12;
-    const stageCoef = stageCoefMap[jj2] || 1.0;
-    const scale = tier * j1Coef * stageCoef;
-    const qixue = Math.round(random(700, 900) * scale);
-    const gongji = Math.round(random(60, 110) * scale);
-    const fangyu = Math.round(random(30, 80) * scale);
-    const sudu = Math.round(
-      (22 + random(0, 14) + tier) *
-        (1 + (jj1 - 1) * 0.04) *
-        (1 + (stageCoef - 1) * 0.5)
-    );
-    const baoji = Math.min(50, random(4, 10 + tier + Math.floor(jj1 / 3)));
-    const xw = Math.round(
-      random(100, 220) * tier * (1 + (jj1 - 1) * 0.07) * stageCoef
+    const clName = pickMaterialNameByGrade({
+      materialPoolByGrade,
+      registry,
+      targetGrade,
+      rnd: random
+    });
+    const { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, xw } =
+      buildMonsterBaseAttributes({ tier, jj1, jj2, rnd: random });
+    const winStreak = isGuaji
+      ? calcWinStreakFromHistory(guajiStats.history || [])
+      : 0;
+    const locationAndStreakCoef = compositeDifficultyCoef(tier, winStreak);
+    const addAttr = get('addAttr');
+    const qixueScale = calcAttrScale(get('qixue'), addAttr.qixue, 0.7, 0.8);
+    const gongjiScale = calcAttrScale(get('gongji'), addAttr.gongji, 0.8, 0.9);
+    const fangyuScale = calcAttrScale(get('fangyu'), addAttr.fangyu, 0.7, 0.8);
+    const suduScale = calcAttrScale(get('sudu'), addAttr.sudu, 0.6, 0.7);
+    const baojiScale = calcAttrScale(get('baoji'), addAttr.baoji, 0.6, 0.6);
+    const qixue = Math.round(rawQixue * locationAndStreakCoef * qixueScale);
+    const gongji = Math.round(rawGongji * locationAndStreakCoef * gongjiScale);
+    const fangyu = Math.round(rawFangyu * locationAndStreakCoef * fangyuScale);
+    const sudu = Math.round(rawSudu * locationAndStreakCoef * suduScale);
+    const baoji = Math.min(
+      60,
+      Math.round(rawBaoji * locationAndStreakCoef * baojiScale)
     );
     const jj1Label = `${numberToChinese(jj1)}阶`;
     return {
@@ -245,7 +202,7 @@ export default function Shilian() {
       xw,
       df: df.name
     };
-  }, [df.jingjie, df.name, get, set]);
+  }, [df.jingjie, df.name, get, guajiStats, isGuaji, set]);
   const [YaoShouInstance, setYaoShouInstance] = useState<YaoShouZDType | null>(
     null
   ); // 妖兽实例
@@ -274,17 +231,6 @@ export default function Shilian() {
     key: number;
     isCrit: boolean;
   } | null>(null);
-  const [guajiStats, setGuajiStats] = useState<{
-    totalRounds: number;
-    wins: number;
-    losses: number;
-    history: Array<{
-      name: string;
-      df: string;
-      rounds: number;
-      result: string;
-    }>;
-  }>({ totalRounds: 0, wins: 0, losses: 0, history: [] });
   const isGuajiRef = useRef(isGuaji);
   const currentGuajiFightRoundsRef = useRef(0);
   useEffect(() => {
