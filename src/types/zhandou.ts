@@ -11,6 +11,9 @@ export interface YaoShouZDType
   df: string; // 地方
   cl: string; // 掉落材料名称
   xw: number; // 击败修为
+  jingjie: string;
+  jingjie1: string;
+  jingjie2: string;
 }
 /**
  * @description: 角色战斗数据

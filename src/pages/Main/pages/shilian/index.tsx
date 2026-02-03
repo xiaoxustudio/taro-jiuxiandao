@@ -2,6 +2,7 @@ import { random } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import difangData from '@/assets/df.json';
 import {
+  Box,
   Container,
   JXButton,
   JXModal,
@@ -229,13 +230,17 @@ export default function Shilian() {
     const xw = Math.round(
       random(100, 220) * tier * (1 + (jj1 - 1) * 0.07) * stageCoef
     );
+    const jj1Label = `${numberToChinese(jj1)}阶`;
     return {
-      name: `${na}${nb}(${df.jingjie}${numberToChinese(jj1)}阶${jj2})`,
+      name: `${na}${nb}`,
       qixue,
       gongji,
       fangyu,
       sudu,
       baoji,
+      jingjie: df.jingjie,
+      jingjie1: jj1Label,
+      jingjie2: jj2,
       cl: clName,
       xw,
       df: df.name
@@ -258,6 +263,7 @@ export default function Shilian() {
   const autoBattleTimer = useRef<NodeJS.Timeout | number>(-1);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
   const fightSeqRef = useRef(0);
+  const [yaoshouMaxQixue, setYaoshouMaxQixue] = useState(0);
   const [guajiStats, setGuajiStats] = useState<{
     totalRounds: number;
     wins: number;
@@ -376,6 +382,7 @@ export default function Shilian() {
         setTimeout(() => {
           if (fightSeqRef.current === seq) {
             setYaoShouInstance(null);
+            setYaoshouMaxQixue(0);
           }
         }, 1200);
         setActorInstance(null);
@@ -501,6 +508,7 @@ export default function Shilian() {
         setTimeout(() => {
           if (fightSeqRef.current === seq2) {
             setYaoShouInstance(null);
+            setYaoshouMaxQixue(0);
           }
         }, 1200);
         setActorInstance(null);
@@ -550,6 +558,7 @@ export default function Shilian() {
     // 立即更新状态
     fightSeqRef.current += 1;
     setYaoShouInstance(newYaoShou);
+    setYaoshouMaxQixue(newYaoShou.qixue);
     setActorInstance({
       name: get('daohao'),
       qixue: get('qixue') + get('addAttr.qixue'),
@@ -678,6 +687,7 @@ export default function Shilian() {
     setTimeout(() => {
       if (fightSeqRef.current === seq) {
         setYaoShouInstance(null);
+        setYaoshouMaxQixue(0);
       }
     }, 800);
     setActorInstance(null);
@@ -832,6 +842,35 @@ export default function Shilian() {
     handleStartZD
   ]);
 
+  const actorName = ActorInstance
+    ? renderNameWithRealmColor(ActorInstance.name)
+    : '未入战';
+  const yaoshouName = YaoShouInstance
+    ? renderNameWithRealmColor(YaoShouInstance.name)
+    : '未遭遇';
+  const actorRealm = ActorInstance
+    ? `${get('jingjie') || ''}${get('jingjie1') || ''}${get('jingjie2') || ''}`
+    : '';
+  const enemyRealm = YaoShouInstance
+    ? `${YaoShouInstance.jingjie || ''}${YaoShouInstance.jingjie1 || ''}${YaoShouInstance.jingjie2 || ''}`
+    : '';
+  const actorMaxQixue = ActorInstance ? get('qixue') + get('addAttr.qixue') : 0;
+  const actorHpPercent = actorMaxQixue
+    ? Math.max(
+        0,
+        Math.min(100, (Number(ActorInstance?.qixue || 0) / actorMaxQixue) * 100)
+      )
+    : 0;
+  const enemyHpPercent = yaoshouMaxQixue
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          (Number(YaoShouInstance?.qixue || 0) / yaoshouMaxQixue) * 100
+        )
+      )
+    : 0;
+
   return (
     <Container className={styles.container} title={df.name} desc={df.desc}>
       <JXSpace gap={5} between>
@@ -865,6 +904,42 @@ export default function Shilian() {
         <JXButton onClick={handleSeeCailiao}>材料</JXButton>
         <JXButton onClick={handleSeeHistory}>战况</JXButton>
       </JXSpace>
+      <Box className={styles.battleInfoGrid}>
+        <Box className={styles.battleCard}>
+          <Text className={styles.battleTitle} color='blue'>
+            我方
+          </Text>
+          <Text>名称：{actorName}</Text>
+          <Text>气血：</Text>
+          <Box className={styles.hpBar}>
+            <Box
+              className={styles.hpFill}
+              style={{ width: `${actorHpPercent}%` }}
+            />
+          </Box>
+          <Text className={styles.hpText}>
+            {ActorInstance?.qixue ?? '-'} / {actorMaxQixue || '-'}
+          </Text>
+          <Text>境界：{renderNameWithRealmColor(actorRealm) || '-'}</Text>
+        </Box>
+        <Box className={styles.battleCard}>
+          <Text className={styles.battleTitle} color='orange'>
+            敌方
+          </Text>
+          <Text>名称：{yaoshouName}</Text>
+          <Text>气血：</Text>
+          <Box className={styles.hpBar}>
+            <Box
+              className={styles.hpFill}
+              style={{ width: `${enemyHpPercent}%` }}
+            />
+          </Box>
+          <Text className={styles.hpText}>
+            {YaoShouInstance?.qixue ?? '-'} / {yaoshouMaxQixue || '-'}
+          </Text>
+          <Text>境界：{renderNameWithRealmColor(enemyRealm) || '-'}</Text>
+        </Box>
+      </Box>
       <Scroll className={styles.content} Scroll={scrollHook}>
         {!HuiheState.logs.length && (
           <Text color='gray'>

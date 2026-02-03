@@ -9,3 +9,36 @@
   padding: 20px 12px;
   box-sizing: border-box;
 }
+.battleInfoGrid {
+  width: 100%;
+  padding: 0 12px;
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  box-sizing: border-box;
+}
+.battleCard {
+  background-color: white;
+  padding: 10px;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.battleTitle {
+  font-weight: bold;
+}
+.hpBar {
+  width: 100%;
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.hpFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff5f5f, #ff2d2d);
+  border-radius: 999px;
+}
+.hpText {
+  color: #888;
+}
