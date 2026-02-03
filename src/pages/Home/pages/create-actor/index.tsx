@@ -33,7 +33,8 @@ import {
   flattenMaterialPool,
   MaterialPoolByGrade,
   MATERIAL_BASE_LIST,
-  REALM_ORDER
+  REALM_ORDER,
+  XIUXIAN_TIME_SCALE_DEFAULT
 } from '@/assets/const';
 import styles from './index.module.less';
 
@@ -268,6 +269,7 @@ function Index() {
     },
     time1: Date.now(), // 时间1 （计算寿元）
     xiuxianStartAt: Date.now(),
+    xiuxianTimeScale: XIUXIAN_TIME_SCALE_DEFAULT,
     shenshiTime: Date.now(), // 计算神识
     qiandao: {
       count: 0,

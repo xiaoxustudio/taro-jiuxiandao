@@ -608,3 +608,4 @@ export const PJ_BY_REALM = [
 // 刷新与定时
 // ------------------------------
 export const FANGSHI_REFRESH_INTERVAL = 10 * 60 * 1000;
+export const XIUXIAN_TIME_SCALE_DEFAULT = 1;

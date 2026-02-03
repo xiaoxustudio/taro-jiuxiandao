@@ -37,7 +37,7 @@ import TpData from '@/assets/tp.json';
 import danfangData from '@/assets/danfang.json';
 import { CWType } from '@/types';
 import { GongFaType } from '@/types/gongfa';
-import { dfGrades } from '@/assets/const';
+import { dfGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
 
@@ -59,6 +59,10 @@ function Main() {
     if (!startAt) {
       const base = get('time1') || Date.now();
       set('xiuxianStartAt', base);
+    }
+    const scale = get('xiuxianTimeScale');
+    if (!scale) {
+      set('xiuxianTimeScale', XIUXIAN_TIME_SCALE_DEFAULT);
     }
   }, [get, set, actor]);
   const xiulian = useMemo(() => get('xiulian') as any, [get]);
@@ -580,7 +584,11 @@ function Main() {
             动态
           </Text>
           <Paragraph>
-            当前{formatXiuxianCalendar(get('xiuxianStartAt'))}
+            当前
+            {formatXiuxianCalendar(
+              get('xiuxianStartAt'),
+              get('xiuxianTimeScale') || XIUXIAN_TIME_SCALE_DEFAULT
+            )}
           </Paragraph>
         </JXSpace>
         {/* 操作2 */}

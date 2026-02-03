@@ -240,10 +240,10 @@ export function ZhouTian(
   return Math.min(msDiff / divisor, limit);
 }
 
-export function getXiuxianCalendar(startAt: number) {
+export function getXiuxianCalendar(startAt: number, flow = 1) {
   const base =
     typeof startAt === 'number' && startAt > 0 ? startAt : Date.now();
-  const ms = Math.max(0, Date.now() - base);
+  const ms = Math.max(0, (Date.now() - base) * Math.max(0.01, flow));
   const dayMs = TimeArray.Map.day;
   const hourMs = TimeArray.Map.hour;
   const totalDays = Math.floor(ms / dayMs);
@@ -255,8 +255,8 @@ export function getXiuxianCalendar(startAt: number) {
   return { years, months, days, shichen, totalDays, hoursToday };
 }
 
-export function formatXiuxianCalendar(startAt: number) {
-  const { years, months, days, shichen } = getXiuxianCalendar(startAt);
+export function formatXiuxianCalendar(startAt: number, flow = 1) {
+  const { years, months, days, shichen } = getXiuxianCalendar(startAt, flow);
   return `修仙历 ${years}年${months}月${days}日（第${shichen}时辰）`;
 }
 
