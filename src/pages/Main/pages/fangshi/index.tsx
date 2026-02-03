@@ -19,12 +19,17 @@ import {
   Text
 } from '@/components';
 import { ActorDataConfigForZhanDou, CWType, YaoyuanData } from '@/types';
-import { AttrTransformChinese, getGradeColor } from '@/utils';
+import {
+  AttrTransformChinese,
+  getGradeColor,
+  resolveDanfangPoolByGrade,
+  resolveMaterialPoolByGrade,
+  resolveSeedRegistry
+} from '@/utils';
 import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
 import useActorController from '@/hooks/useActorController';
 import useStorageStore from '@/store/storage';
-import { SeedRegistryItem } from '@/assets/const';
 import './index.less';
 
 export default function Fangshi() {
@@ -224,63 +229,18 @@ export default function Fangshi() {
     const refresh = () => {
       const realm = get('jingjie') as string;
       const current = get('fangshi') as FangshiSnapshot | null;
-      let materialPoolByGrade = get('materialPoolByGrade') as any;
-      let danfangPoolByGrade = get('danfangPoolByGrade') as any;
-      let seedRegistry = get('seedRegistry') as SeedRegistryItem[] | undefined;
-      if (!materialPoolByGrade) {
-        const { getSync: storageGetSync } = useStorageStore.getState();
-        const keys = get('materialPoolStorageKeysByGrade') as
-          | Record<string, string>
-          | undefined;
-        if (keys && Object.keys(keys).length) {
-          const next: Record<string, { name: string; itype: string }[]> = {};
-          Object.entries(keys).forEach(([grade, key]) => {
-            const loaded = storageGetSync(key);
-            if (!Array.isArray(loaded)) return;
-            if (loaded.length && typeof loaded[0] === 'string') {
-              next[grade] = (loaded as any[]).map((name) => ({
-                name,
-                itype: grade
-              }));
-            } else {
-              next[grade] = loaded as any;
-            }
-          });
-          if (Object.keys(next).length) {
-            materialPoolByGrade = next;
-            set('materialPoolByGrade', next);
-          }
-        }
-      }
-      if (!danfangPoolByGrade) {
-        const { getSync: storageGetSync } = useStorageStore.getState();
-        const keys = get('danfangPoolStorageKeysByGrade') as
-          | Record<string, string>
-          | undefined;
-        if (keys && Object.keys(keys).length) {
-          const next: Record<string, any[]> = {};
-          Object.entries(keys).forEach(([grade, key]) => {
-            const loaded = storageGetSync(key);
-            if (!Array.isArray(loaded)) return;
-            next[grade] = loaded as any[];
-          });
-          if (Object.keys(next).length) {
-            danfangPoolByGrade = next;
-            set('danfangPoolByGrade', next);
-          }
-        }
-      }
-      if (!seedRegistry || !seedRegistry.length) {
-        const { getSync: storageGetSync } = useStorageStore.getState();
-        const key = get('seedRegistryStorageKey') as string | undefined;
-        if (key) {
-          const loaded = storageGetSync(key);
-          if (Array.isArray(loaded)) {
-            seedRegistry = loaded as SeedRegistryItem[];
-            set('seedRegistry', seedRegistry);
-          }
-        }
-      }
+      const { getSync: storageGetSync } = useStorageStore.getState();
+      const materialPoolByGrade = resolveMaterialPoolByGrade({
+        get,
+        set,
+        storageGetSync
+      });
+      const danfangPoolByGrade = resolveDanfangPoolByGrade({
+        get,
+        set,
+        storageGetSync
+      });
+      const seedRegistry = resolveSeedRegistry({ get, set, storageGetSync });
       const next = resolveFangshiSnapshot(
         current,
         realm,

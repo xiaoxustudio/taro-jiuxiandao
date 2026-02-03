@@ -1,4 +1,5 @@
 import { random } from 'lodash-es';
+import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
 
 export type ZhanDouHitResult<D extends { fangyu: number; qixue: number }> = {
   isCrit: boolean;
@@ -125,9 +126,9 @@ export function resolveMaterialPoolByGrade(params: {
   get: (key?: string) => any;
   set: (key: string, data: any) => void;
   storageGetSync: (key?: string) => any;
-}) {
+}): MaterialPoolByGrade | undefined {
   let materialPoolByGrade = params.get('materialPoolByGrade') as
-    | Record<string, { name: string; itype: string }[]>
+    | MaterialPoolByGrade
     | undefined;
   if (!materialPoolByGrade) {
     const keys = params.get('materialPoolStorageKeysByGrade') as
@@ -148,12 +149,61 @@ export function resolveMaterialPoolByGrade(params: {
         }
       });
       if (Object.keys(next).length) {
-        materialPoolByGrade = next;
+        materialPoolByGrade = next as MaterialPoolByGrade;
         params.set('materialPoolByGrade', next);
       }
     }
   }
   return materialPoolByGrade;
+}
+
+export function resolveDanfangPoolByGrade(params: {
+  get: (key?: string) => any;
+  set: (key: string, data: any) => void;
+  storageGetSync: (key?: string) => any;
+}) {
+  let danfangPoolByGrade = params.get('danfangPoolByGrade') as
+    | Record<string, any[]>
+    | undefined;
+  if (!danfangPoolByGrade) {
+    const keys = params.get('danfangPoolStorageKeysByGrade') as
+      | Record<string, string>
+      | undefined;
+    if (keys && Object.keys(keys).length) {
+      const next: Record<string, any[]> = {};
+      Object.entries(keys).forEach(([grade, key]) => {
+        const loaded = params.storageGetSync(key);
+        if (!Array.isArray(loaded)) return;
+        next[grade] = loaded as any[];
+      });
+      if (Object.keys(next).length) {
+        danfangPoolByGrade = next;
+        params.set('danfangPoolByGrade', next);
+      }
+    }
+  }
+  return danfangPoolByGrade;
+}
+
+export function resolveSeedRegistry(params: {
+  get: (key?: string) => any;
+  set: (key: string, data: any) => void;
+  storageGetSync: (key?: string) => any;
+}) {
+  let seedRegistry = params.get('seedRegistry') as
+    | SeedRegistryItem[]
+    | undefined;
+  if (!seedRegistry || !seedRegistry.length) {
+    const key = params.get('seedRegistryStorageKey') as string | undefined;
+    if (key) {
+      const loaded = params.storageGetSync(key);
+      if (Array.isArray(loaded)) {
+        seedRegistry = loaded as SeedRegistryItem[];
+        params.set('seedRegistry', seedRegistry);
+      }
+    }
+  }
+  return seedRegistry;
 }
 
 /**
