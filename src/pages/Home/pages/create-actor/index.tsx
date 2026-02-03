@@ -267,6 +267,7 @@ function Index() {
       max: 30 // 容量
     },
     time1: Date.now(), // 时间1 （计算寿元）
+    xiuxianStartAt: Date.now(),
     shenshiTime: Date.now(), // 计算神识
     qiandao: {
       count: 0,

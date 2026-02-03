@@ -92,6 +92,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   xiulianbeilv: number; // 修炼倍率
   cw: CuWuType; // 储物
   time1: number; // 时间1
+  xiuxianStartAt: number;
   shenshiTime: number; // 神识计算
   fabao: ActorDataConfigForFaBao; // 法宝
   addAttr: ActorDataConfigForZhanDou; // 加成属性（功法，法宝等）

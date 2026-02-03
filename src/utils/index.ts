@@ -3,8 +3,9 @@ import { omit } from 'lodash-es';
 import { REALM_ORDER } from '@/assets/const';
 import { monsterNames, monsterSurnames, nameParts, surnames } from '@/consts';
 import { ActorDataConfigForZhanDou } from '@/types';
+import TimeArray from './TimeArray';
 
-export { default as TimeArray } from './TimeArray';
+export { TimeArray };
 
 let UniqueIndex = 0;
 
@@ -237,6 +238,26 @@ export function ZhouTian(
   if (unit === 'm') divisor = 60000; // 分钟
   if (unit === 's') divisor = 1000; // 秒
   return Math.min(msDiff / divisor, limit);
+}
+
+export function getXiuxianCalendar(startAt: number) {
+  const base =
+    typeof startAt === 'number' && startAt > 0 ? startAt : Date.now();
+  const ms = Math.max(0, Date.now() - base);
+  const dayMs = TimeArray.Map.day;
+  const hourMs = TimeArray.Map.hour;
+  const totalDays = Math.floor(ms / dayMs);
+  const years = Math.floor(totalDays / 360) + 1;
+  const months = Math.floor((totalDays % 360) / 30) + 1;
+  const days = (totalDays % 30) + 1;
+  const hoursToday = Math.floor((ms % dayMs) / hourMs);
+  const shichen = Math.min(12, Math.max(1, Math.floor(hoursToday / 2) + 1));
+  return { years, months, days, shichen, totalDays, hoursToday };
+}
+
+export function formatXiuxianCalendar(startAt: number) {
+  const { years, months, days, shichen } = getXiuxianCalendar(startAt);
+  return `修仙历 ${years}年${months}月${days}日（第${shichen}时辰）`;
 }
 
 /**

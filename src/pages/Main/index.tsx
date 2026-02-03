@@ -16,7 +16,13 @@ import {
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
 import useStorageStore from '@/store/storage';
-import { getGradeColor, navigateTo, TimeArray, ZhouTian } from '@/utils';
+import {
+  getGradeColor,
+  navigateTo,
+  TimeArray,
+  ZhouTian,
+  formatXiuxianCalendar
+} from '@/utils';
 import {
   getJingJieMaxDep,
   getLingQiForJingJie,
@@ -48,6 +54,13 @@ function Main() {
       Taro.reLaunch({ url: '/pages/Main/index' });
     }
   }, []);
+  useEffect(() => {
+    const startAt = get('xiuxianStartAt');
+    if (!startAt) {
+      const base = get('time1') || Date.now();
+      set('xiuxianStartAt', base);
+    }
+  }, [get, set, actor]);
   const xiulian = useMemo(() => get('xiulian') as any, [get]);
   const canRed = useMemo(
     () => get('xiuwei') >= get('max_xiuwei'),
@@ -566,7 +579,9 @@ function Main() {
           <Text color='orange' bold>
             动态
           </Text>
-          <Paragraph>测试</Paragraph>
+          <Paragraph>
+            当前{formatXiuxianCalendar(get('xiuxianStartAt'))}
+          </Paragraph>
         </JXSpace>
         {/* 操作2 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
