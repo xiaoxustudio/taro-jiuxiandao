@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { defineConfig, type UserConfigExport } from '@tarojs/cli';
 
 import path from 'path';
@@ -5,7 +6,7 @@ import devConfig from './dev';
 import prodConfig from './prod';
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
-export default defineConfig<'vite'>(async (merge, {}) => {
+export default defineConfig<'vite'>(async (merge) => {
   const baseConfig: UserConfigExport<'vite'> = {
     projectName: 'taro-jiuxiandao',
     date: '2025-2-20',

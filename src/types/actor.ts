@@ -69,6 +69,71 @@ export type ActorDataConfigForFaBao = {
   [K in keyof typeof FabaoType]: null | undefined | FBItemType;
 };
 
+export type SectRank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 宗门品阶
+
+export type SectRole =
+  | '宗主'
+  | '长老'
+  | '亲传弟子'
+  | '内门弟子'
+  | '外门弟子'
+  | '杂役'; // 宗门职位
+
+export type SectMember = {
+  id: string; // 成员唯一标识
+  name: string; // 成员姓名
+  role: SectRole; // 职位
+  relation: string; // 关系称谓
+  intimacy: number; // 亲密度
+  jingjie: string; // 大境界
+  jingjie1: string; // 小境界
+  jingjie2: string; // 阶段境界
+  attr: Partial<ActorDataConfigForZhanDou>; // 战斗属性
+  joinDay: number; // 入宗日
+  cw: CuWuType; // 储物袋
+};
+
+export type SectElderSeat = {
+  seat: number; // 席位编号
+  memberId: string | null; // 占位成员
+};
+
+export type SectLog = {
+  day: number; // 发生日
+  text: string; // 日志内容
+};
+
+export type SectBuildingStatus = '正常' | '修缮中' | '受损' | '未建';
+
+export type SectBuildingKey = '藏经阁' | '灵池' | '大门' | '演武场' | '丹房';
+
+export type SectBuilding = {
+  id: string;
+  name: SectBuildingKey;
+  level: number;
+  status: SectBuildingStatus;
+  desc: string;
+  effect: string;
+  unlockRank?: SectRank;
+};
+
+export type Sect = {
+  id: string; // 宗门唯一标识
+  name: string; // 宗门名称
+  rank: SectRank; // 品阶
+  capacity: number; // 容纳人数
+  elders: SectElderSeat[]; // 长老席位
+  members: SectMember[]; // 成员列表
+  logs: SectLog[]; // 宗门日志
+  buildings?: SectBuilding[]; // 宗门建筑
+  lastEventDay: number; // 最近一次事件日
+  reputation?: number; // 宗门声望（0-100）
+  injuryRecoveryUntilDay?: number; // 战损后养伤结束日
+  warMeritDays?: number; // 战功奖励持续天数
+  revengeLevel?: number; // 外敌复仇链强度等级
+  revengeNextDay?: number; // 外敌下次来袭日
+};
+
 /**
  * @description: 角色属性
  * @return {*}
@@ -139,4 +204,8 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   gongfaPoolStorageKeysByGrade?: Record<string, string>; // 功法池分品阶存储 key
   danfangDataStorageKey?: string; // 丹方数据存储 key
   seedRegistryStorageKey?: string; // 种子注册表存储 key
+  menpai?: {
+    sects: Sect[];
+    joinedSectId?: string;
+  };
 }
