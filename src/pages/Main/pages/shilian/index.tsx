@@ -81,10 +81,16 @@ export default function Shilian() {
   // eslint-disable-next-line no-undef
   const timer = useRef<NodeJS.Timeout | number>(-1);
   const guajiTimer = useRef<NodeJS.Timeout | number>(-1);
-  const df = useMemo(
-    () => difangData.find((v) => v.name === get('zd.df')) as DiFangType,
-    [get]
-  );
+  const df = useMemo(() => {
+    const target = difangData.find((v) => v.name === get('zd.df'));
+    return (target || difangData[0]) as DiFangType;
+  }, [get]);
+  useEffect(() => {
+    if (!df?.name) return;
+    if (get('zd.df') !== df.name) {
+      set('zd.df', df.name);
+    }
+  }, [df?.name, get, set]);
   const [guajiStats, setGuajiStats] = useState<{
     totalRounds: number;
     wins: number;

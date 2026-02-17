@@ -5,6 +5,7 @@ import {
   JXDivider,
   JXModal,
   JXSpace,
+  JXToast,
   Paragraph,
   Text
 } from '@/components';
@@ -87,7 +88,12 @@ function Home() {
           </JXButton>
           <JXButton
             onClick={() => {
-              isMobile() && window.JXApi.GoToSetting();
+              if (!isMobile()) return;
+              if (window.JXApi?.GoToSetting) {
+                window.JXApi.GoToSetting();
+                return;
+              }
+              JXToast('当前环境不支持设置入口').show();
             }}
           >
             设置

@@ -12,17 +12,35 @@ import { GongFaType } from '@/types/gongfa';
  * @return {*}
  */
 function useActorController() {
-  const { current } = useStore();
+  const { current, set: setCurrent } = useStore();
   const { actors } = useActorStore();
-  const actor = useMemo(() => actors[current], [current, actors]);
-
-  if (!actor) {
-    throw new Error('无法读取存档');
-  } else if (ActorIdents.includes(current)) {
-    throw new Error('无法读取存档(identifier)');
-  }
+  const actorKeys = useMemo(
+    () => Object.keys(actors).filter((key) => !ActorIdents.includes(key)),
+    [actors]
+  );
+  const resolvedKey = useMemo(() => {
+    if (current && !ActorIdents.includes(current) && actors[current]) {
+      return current;
+    }
+    return actorKeys[0] || '';
+  }, [actorKeys, actors, current]);
+  const actor = useMemo(
+    () => (resolvedKey ? actors[resolvedKey] : undefined),
+    [resolvedKey, actors]
+  );
 
   useEffect(() => {
+    if (
+      (!current || ActorIdents.includes(current) || !actors[current]) &&
+      resolvedKey &&
+      resolvedKey !== current
+    ) {
+      setCurrent(resolvedKey);
+    }
+  }, [actors, current, resolvedKey, setCurrent]);
+
+  useEffect(() => {
+    if (!actor) return;
     const { get: load } = useStorageStore.getState();
 
     const run = async () => {
@@ -127,23 +145,25 @@ function useActorController() {
 
     run();
   }, [
-    actor.danfangData,
-    actor.danfangDataStorageKey,
-    actor.danfangPoolByGrade,
-    actor.danfangPoolStorageKey,
-    actor.danfangPoolStorageKeysByGrade,
-    actor.gongfaPoolByGrade,
-    actor.gongfaPoolStorageKeysByGrade,
-    actor.materialPoolByGrade,
-    actor.materialPoolStorageKey,
-    actor.materialPoolStorageKeysByGrade,
-    actor.seedRegistry,
-    actor.seedRegistryStorageKey
+    actor,
+    actor?.danfangData,
+    actor?.danfangDataStorageKey,
+    actor?.danfangPoolByGrade,
+    actor?.danfangPoolStorageKey,
+    actor?.danfangPoolStorageKeysByGrade,
+    actor?.gongfaPoolByGrade,
+    actor?.gongfaPoolStorageKeysByGrade,
+    actor?.materialPoolByGrade,
+    actor?.materialPoolStorageKey,
+    actor?.materialPoolStorageKeysByGrade,
+    actor?.seedRegistry,
+    actor?.seedRegistryStorageKey
   ]);
 
   /**
    * @description: 获取属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
    */
+  const safeActor = useMemo(() => actor ?? ({} as ActorDataConfig), [actor]);
   const get = useCallback(
     (key: NestedKeyOf<ActorDataConfig>, defaultValue: any = null) => {
       // 合法性校验
@@ -152,7 +172,7 @@ function useActorController() {
       }
 
       const pathParts = key.split('.');
-      let currentValue: any = actor;
+      let currentValue: any = safeActor;
 
       // eslint-disable-next-line no-restricted-syntax
       for (const part of pathParts) {
@@ -164,7 +184,7 @@ function useActorController() {
 
       return currentValue ?? defaultValue;
     },
-    [actor]
+    [safeActor]
   );
 
   /**
@@ -179,6 +199,7 @@ function useActorController() {
     useActorStore.setState((state) => {
       const { current: curr } = useStore.getState();
       const currentActor = state.actors[curr];
+      if (!currentActor) return state;
 
       // 深拷贝当前角色数据
       const newActor = cloneDeep(currentActor) as ActorDataConfig;
@@ -236,7 +257,7 @@ function useActorController() {
     });
   }, []);
 
-  const OmitActor = useMemo(() => omit(actor, ActorIdents), [actor]);
+  const OmitActor = useMemo(() => omit(safeActor, ActorIdents), [safeActor]);
 
   const obj = useMemo(
     () => ({ get, set, actor: OmitActor }),
