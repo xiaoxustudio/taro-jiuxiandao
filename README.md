@@ -16,8 +16,10 @@
 基于 Taro + React 的文字修仙题材重构版，覆盖多端构建能力，当前以 H5 开发体验为主。
 
 <p align="center">
-  <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/ccb7e915-d796-4e63-a1d9-3ee78f8b6723" />
-  <img width="423" height="751" alt="image" src="https://github.com/user-attachments/assets/f6db7f7f-9f9c-40a8-8c33-1268bc2efb1c" />
+  <img width="223" height="751" alt="image" src="https://github.com/user-attachments/assets/ccb7e915-d796-4e63-a1d9-3ee78f8b6723" />
+  <img width="223" height="751" alt="image" src="https://github.com/user-attachments/assets/f6db7f7f-9f9c-40a8-8c33-1268bc2efb1c" />
+  <img width="223" height="751" alt="image" src="https://github.com/user-attachments/assets/10014f08-6f30-482e-9077-9f4ef9747b0f" />
+  <img width="223" height="751" alt="image" src="https://github.com/user-attachments/assets/c1a9361a-b5e2-49f3-a2f5-92c6d32a3eff" />
 </p>
 
 ## 技术栈
