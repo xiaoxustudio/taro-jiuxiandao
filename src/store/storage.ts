@@ -16,8 +16,7 @@ const parseStored = (raw: any) => {
   if (typeof raw === 'string') {
     try {
       return JSON.parse(raw);
-    } catch (e) {
-      String(e);
+    } catch {
       return raw;
     }
   }
@@ -49,8 +48,7 @@ const useStorageStore = create<StorageStore>(() => {
         try {
           const res = await anyTaro.getStorage({ key });
           raw = res?.data;
-        } catch (e) {
-          String(e);
+        } catch {
           return undefined;
         }
       } else if (typeof localStorage !== 'undefined') {

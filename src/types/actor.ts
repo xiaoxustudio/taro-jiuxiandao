@@ -207,5 +207,10 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   menpai?: {
     sects: Sect[];
     joinedSectId?: string;
+    playerMemberId?: string;
+    lastContributionDay?: number;
+    lastWelfareDay?: number;
+    lastTaskDay?: number;
+    taskCount?: number;
   };
 }

@@ -1,4 +1,4 @@
-import { REALM_ORDER } from '@/assets/const';
+import { REALM_ORDER, dfGrades } from '@/assets/const';
 import { CWType } from '@/types';
 import type {
   ActorDataConfig,
@@ -9,6 +9,7 @@ import type {
   SectRank,
   SectRole
 } from '@/types';
+import { GongFaPinJie } from '@/types/gongfa';
 import { JingJie1ToNumber } from '@/utils/actor';
 import { numberToChinese } from '@/utils';
 
@@ -29,6 +30,174 @@ export const eventTemplates = [
   '宗门大比热闹非凡',
   '长老讲法门人受益'
 ];
+
+export type SectTaskReward =
+  | { type: 'lingshi'; min: number; max: number }
+  | {
+      type: 'danyao';
+      grade: (typeof dfGrades)[number];
+      countRange: [number, number];
+    }
+  | { type: 'gongfa'; grade: GongFaPinJie };
+
+export type SectTaskConfig = {
+  key: string;
+  name: string;
+  desc: string;
+  reputationGain: number;
+  minRole: SectRole;
+  reward: SectTaskReward;
+};
+
+export type SectExchangeReward =
+  | { type: 'lingshi'; amount: number }
+  | { type: 'danyao'; grade: (typeof dfGrades)[number] }
+  | { type: 'gongfa'; grade: GongFaPinJie };
+
+export type SectExchangeConfig = {
+  key: string;
+  name: string;
+  desc: string;
+  cost: number;
+  reward: SectExchangeReward;
+};
+
+export const roleOrderMap = {
+  宗主: 6,
+  长老: 5,
+  亲传弟子: 4,
+  内门弟子: 3,
+  外门弟子: 2,
+  杂役: 1
+} as const;
+
+export const getRoleLevel = (role?: SectRole) =>
+  roleOrderMap[role || '杂役'] || 1;
+
+export const getMaxTaskCount = (role?: SectRole) => {
+  if (role === '宗主') return 4;
+  if (role === '长老') return 3;
+  if (role === '亲传弟子') return 3;
+  if (role === '内门弟子') return 2;
+  if (role === '外门弟子') return 2;
+  return 1;
+};
+
+export const buildSectTaskList = (): SectTaskConfig[] => [
+  {
+    key: 'xunshan',
+    name: '巡山',
+    desc: '巡查护山大阵',
+    reputationGain: 1,
+    minRole: '杂役',
+    reward: { type: 'lingshi', min: 180, max: 260 }
+  },
+  {
+    key: 'caiji',
+    name: '外出采集',
+    desc: '采集灵材补给宗门',
+    reputationGain: 1,
+    minRole: '外门弟子',
+    reward: { type: 'lingshi', min: 220, max: 320 }
+  },
+  {
+    key: 'yaotian',
+    name: '药田协助',
+    desc: '协助丹房整理药材',
+    reputationGain: 2,
+    minRole: '外门弟子',
+    reward: { type: 'danyao', grade: '二品', countRange: [1, 2] }
+  },
+  {
+    key: 'cangjing',
+    name: '藏经整理',
+    desc: '协助长老整理功法卷宗',
+    reputationGain: 2,
+    minRole: '内门弟子',
+    reward: { type: 'gongfa', grade: GongFaPinJie.四品 }
+  },
+  {
+    key: 'hushan',
+    name: '护山除妖',
+    desc: '击退骚扰宗门的妖物',
+    reputationGain: 3,
+    minRole: '亲传弟子',
+    reward: { type: 'lingshi', min: 520, max: 760 }
+  },
+  {
+    key: 'zhengwu',
+    name: '宗务处理',
+    desc: '协助长老处理宗门事务',
+    reputationGain: 3,
+    minRole: '长老',
+    reward: { type: 'danyao', grade: '五品', countRange: [1, 1] }
+  },
+  {
+    key: 'zhenmen',
+    name: '镇守秘境',
+    desc: '镇守宗门秘境封印',
+    reputationGain: 4,
+    minRole: '宗主',
+    reward: { type: 'gongfa', grade: GongFaPinJie.六品 }
+  }
+];
+
+export const buildSectExchangeList = (): SectExchangeConfig[] => [
+  {
+    key: 'lingshi-small',
+    name: '灵石补给',
+    desc: '消耗宗门声望兑换灵石',
+    cost: 6,
+    reward: { type: 'lingshi', amount: 480 }
+  },
+  {
+    key: 'lingshi-big',
+    name: '灵石供奉',
+    desc: '消耗较多声望换取更多灵石',
+    cost: 12,
+    reward: { type: 'lingshi', amount: 980 }
+  },
+  {
+    key: 'danyao-mid',
+    name: '丹药补给',
+    desc: '兑换丹房炼制的丹药',
+    cost: 14,
+    reward: { type: 'danyao', grade: '三品' }
+  },
+  {
+    key: 'gongfa-mid',
+    name: '藏经阁功法',
+    desc: '兑换藏经阁拓印功法',
+    cost: 18,
+    reward: { type: 'gongfa', grade: GongFaPinJie.四品 }
+  }
+];
+
+export const buildTaskRewardLabel = (task: { reward: SectTaskReward }) => {
+  if (task.reward.type === 'lingshi') {
+    return `奖励：灵石${task.reward.min}-${task.reward.max}`;
+  }
+  if (task.reward.type === 'danyao') {
+    const countText =
+      task.reward.countRange[0] === task.reward.countRange[1]
+        ? `${task.reward.countRange[0]}`
+        : `${task.reward.countRange[0]}-${task.reward.countRange[1]}`;
+    return `奖励：丹药（${task.reward.grade}及以下）×${countText}`;
+  }
+  return `奖励：功法（${task.reward.grade}及以下）`;
+};
+
+export const buildExchangeRewardLabel = (item: {
+  reward: SectExchangeReward;
+}) => {
+  if (item.reward.type === 'lingshi') {
+    return `获得灵石${item.reward.amount}`;
+  }
+  if (item.reward.type === 'danyao') {
+    return `获得丹药（${item.reward.grade}及以下）`;
+  }
+  return `获得功法（${item.reward.grade}及以下）`;
+};
 
 export const sectBuildingTemplates: Array<{
   key: SectBuildingKey;
@@ -433,6 +602,49 @@ export const promoteMemberRole = (member: SectMember, rng: () => number) => {
       intimacy: Math.round(intimacy)
     },
     text: `晋升为${nextRole}`
+  };
+};
+
+export const buildPlayerMember = (
+  actor: Partial<ActorDataConfig> & { uuid: string },
+  day: number,
+  rng: () => number
+) => {
+  const realmValue = actor.jingjie || REALM_ORDER[0];
+  const realmIndex = Math.max(0, REALM_ORDER.indexOf(realmValue));
+  let role: SectRole = '外门弟子';
+  if (realmIndex >= 6) {
+    role = '亲传弟子';
+  } else if (realmIndex >= 4) {
+    role = '内门弟子';
+  }
+  const attr = {
+    qixue: (actor.qixue || 0) + (actor.addAttr?.qixue || 0),
+    gongji: (actor.gongji || 0) + (actor.addAttr?.gongji || 0),
+    fangyu: (actor.fangyu || 0) + (actor.addAttr?.fangyu || 0),
+    sudu: (actor.sudu || 0) + (actor.addAttr?.sudu || 0),
+    baoji: (actor.baoji || 0) + (actor.addAttr?.baoji || 0)
+  };
+  const cw = actor.cw
+    ? {
+        ...actor.cw,
+        fb: [...actor.cw.fb],
+        dy: [...actor.cw.dy],
+        qt: [...actor.cw.qt]
+      }
+    : buildMemberBag(role, rng);
+  return {
+    id: `player-${actor.uuid}`,
+    name: actor.daohao || actor.uuid,
+    role,
+    relation: buildMemberRelation(role, rng),
+    intimacy: buildIntimacy(role, rng),
+    jingjie: realmValue,
+    jingjie1: actor.jingjie1 || '一阶',
+    jingjie2: actor.jingjie2 || '',
+    attr,
+    joinDay: day,
+    cw
   };
 };
 

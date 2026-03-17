@@ -7,15 +7,17 @@ import {
   JXModal,
   JXSpace,
   JXToast,
-  Paragraph,
   Text
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import {
   REALM_ORDER,
   XIUXIAN_TIME_SCALE_DEFAULT,
-  createRng
+  createRng,
+  danfangIds,
+  dfGrades
 } from '@/assets/const';
+import danfangData from '@/assets/danfang.json';
 import {
   UUID,
   generateRandomName,
@@ -27,11 +29,16 @@ import { JJ2_ARR } from '@/utils/zhandou';
 import {
   addMemberLingshi,
   advanceMemberRealm,
+  buildSectExchangeList,
   buildSectBuildings,
   buildEventText,
   buildIntimacy,
   buildMemberBag,
   buildMemberRelation,
+  buildSectTaskList,
+  buildPlayerMember,
+  getMaxTaskCount,
+  getRoleLevel,
   sectBuildingTemplates,
   normalizeSectBuildings,
   growMemberAttr,
@@ -41,7 +48,9 @@ import {
   promoteMemberRole,
   sectNameParts
 } from '@/utils/zongmen';
+import type { SectExchangeConfig, SectTaskConfig } from '@/utils/zongmen';
 import { CWType } from '@/types';
+import { GongFaPinJie } from '@/types/gongfa';
 import type {
   ActorDataConfig,
   Sect,
@@ -51,16 +60,30 @@ import type {
   SectRole
 } from '@/types';
 import chuwu from '@/utils/chuwu';
+import { add as addGongfa } from '@/utils/gongfa';
+import {
+  SectBuildingModal,
+  SectContributeModal,
+  SectExchangeModal,
+  SectLogModal,
+  SectMemberDetailModal,
+  SectMemberModal,
+  SectTaskModal
+} from './components';
 import './index.less';
 
 export default function MenPai() {
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
   const [memberVisible, setMemberVisible] = useState(false);
   const [logVisible, setLogVisible] = useState(false);
   const [memberDetail, setMemberDetail] = useState<SectMember | null>(null);
   const [buildingDetail, setBuildingDetail] = useState<SectBuilding | null>(
     null
   );
+  const [contributeVisible, setContributeVisible] = useState(false);
+  const [contributeAmount, setContributeAmount] = useState(100);
+  const [taskVisible, setTaskVisible] = useState(false);
+  const [exchangeVisible, setExchangeVisible] = useState(false);
 
   const menpai = useMemo(
     () => get('menpai') as ActorDataConfig['menpai'] | undefined,
@@ -75,6 +98,16 @@ export default function MenPai() {
     if (!joinedSectId) return null;
     return sects.find((item) => item.id === joinedSectId) || null;
   }, [joinedSectId, sects]);
+  const playerMemberId = useMemo(
+    () => menpai?.playerMemberId ?? null,
+    [menpai?.playerMemberId]
+  );
+  const playerMember = useMemo(() => {
+    if (!joinedSect || !playerMemberId) return null;
+    return (
+      joinedSect.members.find((member) => member.id === playerMemberId) || null
+    );
+  }, [joinedSect, playerMemberId]);
 
   const memberMap = useMemo(() => {
     const map = new Map<string, SectMember>();
@@ -93,10 +126,48 @@ export default function MenPai() {
   }, [get]);
 
   const totalDays = useMemo(() => calendar.totalDays, [calendar.totalDays]);
+  const lastContributionDay = useMemo(
+    () => menpai?.lastContributionDay ?? 0,
+    [menpai?.lastContributionDay]
+  );
+  const lastWelfareDay = useMemo(
+    () => menpai?.lastWelfareDay ?? 0,
+    [menpai?.lastWelfareDay]
+  );
+  const lastTaskDay = useMemo(
+    () => menpai?.lastTaskDay ?? 0,
+    [menpai?.lastTaskDay]
+  );
+  const taskDoneCount = useMemo(
+    () => (totalDays === lastTaskDay ? (menpai?.taskCount ?? 0) : 0),
+    [lastTaskDay, menpai?.taskCount, totalDays]
+  );
+  const roleLevel = useMemo(
+    () => getRoleLevel(playerMember?.role),
+    [playerMember?.role]
+  );
+  const maxTaskCount = useMemo(() => {
+    return getMaxTaskCount(playerMember?.role);
+  }, [playerMember?.role]);
+  const taskRemaining = useMemo(() => {
+    if (maxTaskCount <= 0) return 0;
+    if (totalDays > lastTaskDay) return maxTaskCount;
+    return Math.max(0, maxTaskCount - taskDoneCount);
+  }, [lastTaskDay, maxTaskCount, taskDoneCount, totalDays]);
+  const welfareAmount = useMemo(() => {
+    if (!joinedSect) return 0;
+    const reputation = joinedSect.reputation ?? 0;
+    return Math.max(
+      120,
+      160 + joinedSect.rank * 120 + Math.floor(reputation * 2)
+    );
+  }, [joinedSect]);
   const lingshi = useMemo(() => {
     get('cw');
     return chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
   }, [get]);
+  const taskList = useMemo(() => buildSectTaskList(), []);
+  const exchangeList = useMemo(() => buildSectExchangeList(), []);
   const buildingTemplateMap = useMemo(() => {
     return new Map(
       sectBuildingTemplates.map((template) => [template.key, template])
@@ -847,6 +918,42 @@ export default function MenPai() {
     totalDays
   ]);
 
+  useEffect(() => {
+    if (!joinedSect || !actor?.uuid) return;
+    const safeActor = actor as Partial<ActorDataConfig> & { uuid: string };
+    const current = get('menpai') as ActorDataConfig['menpai'] | undefined;
+    if (!current?.sects?.length) return;
+    const target = current.sects.find((item) => item.id === joinedSect.id);
+    if (!target) return;
+    const player = buildPlayerMember(
+      safeActor,
+      totalDays,
+      createRng(`${actor.uuid}:menpai:player`)
+    );
+    const alreadyIn = target.members.some((member) => member.id === player.id);
+    const nextPlayerId = current.playerMemberId || player.id;
+    if (alreadyIn && nextPlayerId === current.playerMemberId) return;
+    const members = alreadyIn ? target.members : [...target.members, player];
+    const logs = alreadyIn
+      ? target.logs
+      : [
+          ...(target.logs ?? []),
+          {
+            day: totalDays,
+            text: `第${totalDays}日，${player.name}加入${target.name}`
+          }
+        ];
+    const nextSects = current.sects.map((sect) =>
+      sect.id === target.id ? { ...sect, members, logs } : sect
+    );
+    set('menpai', {
+      ...current,
+      sects: nextSects,
+      joinedSectId: target.id,
+      playerMemberId: nextPlayerId
+    });
+  }, [actor, get, joinedSect, set, totalDays]);
+
   const handleOpenMember = useCallback((member: SectMember) => {
     setMemberDetail(member);
   }, []);
@@ -984,6 +1091,441 @@ export default function MenPai() {
     updateBuilding
   ]);
 
+  const updateJoinedSect = useCallback(
+    (
+      updater: (sect: Sect) => Sect,
+      extra?: Partial<ActorDataConfig['menpai']>
+    ) => {
+      const current = get('menpai') as ActorDataConfig['menpai'] | undefined;
+      if (!current?.sects?.length || !joinedSect) return null;
+      let updated: Sect | null = null;
+      const nextSects = current.sects.map((sect) => {
+        if (sect.id !== joinedSect.id) return sect;
+        const next = updater(sect);
+        updated = next;
+        return next;
+      });
+      set('menpai', { ...current, sects: nextSects, ...extra });
+      return updated;
+    },
+    [get, joinedSect, set]
+  );
+
+  const handleConfirmContribution = useCallback(() => {
+    if (!joinedSect || !playerMember) return;
+    if (totalDays <= lastContributionDay) {
+      JXToast('今日已贡献').show();
+      return;
+    }
+    if (lingshi <= 0) {
+      JXToast('灵石不足').show();
+      return;
+    }
+    const amount = Math.max(1, Math.min(contributeAmount, lingshi));
+    const repGain = Math.max(1, Math.floor(amount / 200));
+    const intimacyGain = Math.max(2, Math.floor(repGain * 2));
+    chuwu.Remove({ name: '灵石', type: CWType.QT, num: amount });
+    updateJoinedSect(
+      (sect) => {
+        const members = sect.members.map((member) => {
+          if (member.id !== playerMember.id) return member;
+          return {
+            ...member,
+            intimacy: Math.min(100, (member.intimacy || 0) + intimacyGain)
+          };
+        });
+        const logs = [
+          ...(sect.logs ?? []),
+          {
+            day: totalDays,
+            text: `第${totalDays}日，${playerMember.name}贡献灵石${amount}，宗门声望上扬`
+          }
+        ];
+        return {
+          ...sect,
+          members,
+          logs,
+          reputation: Math.min(100, (sect.reputation ?? 0) + repGain)
+        };
+      },
+      { lastContributionDay: totalDays }
+    );
+    setContributeVisible(false);
+    JXToast(`已贡献灵石${amount}`).show();
+  }, [
+    contributeAmount,
+    joinedSect,
+    lastContributionDay,
+    lingshi,
+    playerMember,
+    totalDays,
+    updateJoinedSect
+  ]);
+
+  const handleReceiveWelfare = useCallback(() => {
+    if (!joinedSect || !playerMember) return;
+    if (totalDays <= lastWelfareDay) {
+      JXToast('今日已领取').show();
+      return;
+    }
+    if (welfareAmount <= 0) {
+      JXToast('当前无俸禄').show();
+      return;
+    }
+    chuwu.Add({
+      name: '灵石',
+      type: CWType.QT,
+      num: welfareAmount,
+      isPile: true
+    });
+    updateJoinedSect(
+      (sect) => {
+        const logs = [
+          ...(sect.logs ?? []),
+          {
+            day: totalDays,
+            text: `第${totalDays}日，${playerMember.name}领取宗门俸禄灵石${welfareAmount}`
+          }
+        ];
+        return { ...sect, logs };
+      },
+      { lastWelfareDay: totalDays }
+    );
+    JXToast(`领取俸禄灵石${welfareAmount}`).show();
+  }, [
+    joinedSect,
+    lastWelfareDay,
+    playerMember,
+    totalDays,
+    updateJoinedSect,
+    welfareAmount
+  ]);
+
+  const handleTakeTask = useCallback(
+    (task: SectTaskConfig) => {
+      if (!joinedSect || !playerMember) return;
+      const requiredRoleLevel = getRoleLevel(task.minRole);
+      if (roleLevel < requiredRoleLevel) {
+        JXToast('职位不足，无法领取该任务').show();
+        return;
+      }
+      if (taskRemaining <= 0) {
+        JXToast('今日任务已完成').show();
+        return;
+      }
+      const currentDone = totalDays === lastTaskDay ? taskDoneCount : 0;
+      const rng = createRng(
+        `${joinedSect.id}:task:${totalDays}:${task.key}:${currentDone}`
+      );
+      let rewardText = '';
+      if (task.reward.type === 'lingshi') {
+        const reward = Math.max(
+          10,
+          Math.floor(
+            task.reward.min + rng() * (task.reward.max - task.reward.min + 1)
+          )
+        );
+        chuwu.Add({
+          name: '灵石',
+          type: CWType.QT,
+          num: reward,
+          isPile: true
+        });
+        rewardText = `灵石${reward}`;
+      } else if (task.reward.type === 'danyao') {
+        const gradeIndex = dfGrades.indexOf(task.reward.grade);
+        const candidates = danfangIds.filter((id) => {
+          const base = (danfangData as Record<string, any>)[id];
+          const itemGrade = base?.itype;
+          const itemIndex = dfGrades.indexOf(itemGrade);
+          return itemIndex >= 0 && itemIndex <= gradeIndex;
+        });
+        const pickId = candidates[Math.floor(rng() * candidates.length)] || '';
+        const base = (danfangData as Record<string, any>)[pickId];
+        const countMin = task.reward.countRange[0];
+        const countMax = task.reward.countRange[1];
+        const count =
+          countMax <= countMin
+            ? countMin
+            : Math.floor(countMin + rng() * (countMax - countMin + 1));
+        if (base?.name) {
+          chuwu.Add({
+            name: base.name,
+            type: CWType.DY,
+            num: Math.max(1, count),
+            isPile: true
+          });
+          rewardText = `丹药${base.name}×${Math.max(1, count)}`;
+        } else {
+          const fallback = Math.max(180, Math.floor(220 + rng() * 120));
+          chuwu.Add({
+            name: '灵石',
+            type: CWType.QT,
+            num: fallback,
+            isPile: true
+          });
+          rewardText = `灵石${fallback}`;
+        }
+      } else if (task.reward.type === 'gongfa') {
+        const gongfaGrades = [
+          GongFaPinJie.一品,
+          GongFaPinJie.二品,
+          GongFaPinJie.三品,
+          GongFaPinJie.四品,
+          GongFaPinJie.五品,
+          GongFaPinJie.六品,
+          GongFaPinJie.七品,
+          GongFaPinJie.八品
+        ];
+        const maxIndex = Math.max(0, gongfaGrades.indexOf(task.reward.grade));
+        const pool = get('gongfaPoolByGrade') as
+          | Record<string, any[]>
+          | undefined;
+        const candidates = gongfaGrades
+          .slice(0, maxIndex + 1)
+          .flatMap((grade) => pool?.[grade] ?? []);
+        const ownedIds = new Set<string>();
+        (get('gongfa.ls') as any[] | undefined)?.forEach((item) => {
+          if (item?.id) ownedIds.add(item.id);
+        });
+        const current = get('gongfa.current') as any;
+        if (current?.id) ownedIds.add(current.id);
+        const available = candidates.filter(
+          (item) => item?.id && !ownedIds.has(item.id)
+        );
+        const pick =
+          (available.length ? available : candidates)[
+            Math.floor(rng() * candidates.length)
+          ] || null;
+        if (pick?.name) {
+          addGongfa({ ...pick });
+          rewardText = `功法《${pick.name}》`;
+        } else {
+          const fallback = Math.max(320, Math.floor(360 + rng() * 160));
+          chuwu.Add({
+            name: '灵石',
+            type: CWType.QT,
+            num: fallback,
+            isPile: true
+          });
+          rewardText = `灵石${fallback}`;
+        }
+      }
+      const nextTaskCount = totalDays === lastTaskDay ? currentDone + 1 : 1;
+      updateJoinedSect(
+        (sect) => {
+          const logs = [
+            ...(sect.logs ?? []),
+            {
+              day: totalDays,
+              text: `第${totalDays}日，${playerMember.name}完成${task.name}，获得${rewardText}`
+            }
+          ];
+          return {
+            ...sect,
+            logs,
+            reputation: Math.min(
+              100,
+              (sect.reputation ?? 0) + task.reputationGain
+            )
+          };
+        },
+        { lastTaskDay: totalDays, taskCount: nextTaskCount }
+      );
+      JXToast(`完成${task.name}，获得${rewardText}`).show();
+    },
+    [
+      get,
+      joinedSect,
+      lastTaskDay,
+      playerMember,
+      roleLevel,
+      taskDoneCount,
+      taskRemaining,
+      totalDays,
+      updateJoinedSect
+    ]
+  );
+
+  const handleExchange = useCallback(
+    (item: SectExchangeConfig) => {
+      if (!joinedSect || !playerMember) return;
+      const reputation = joinedSect.reputation ?? 0;
+      if (reputation < item.cost) {
+        JXToast('宗门声望不足').show();
+        return;
+      }
+      let rewardText = '';
+      if (item.reward.type === 'lingshi') {
+        chuwu.Add({
+          name: '灵石',
+          type: CWType.QT,
+          num: item.reward.amount,
+          isPile: true
+        });
+        rewardText = `灵石${item.reward.amount}`;
+      } else if (item.reward.type === 'danyao') {
+        const gradeIndex = dfGrades.indexOf(item.reward.grade);
+        const candidates = danfangIds.filter((id) => {
+          const base = (danfangData as Record<string, any>)[id];
+          const itemGrade = base?.itype;
+          const itemIndex = dfGrades.indexOf(itemGrade);
+          return itemIndex >= 0 && itemIndex <= gradeIndex;
+        });
+        const rng = createRng(
+          `${joinedSect.id}:exchange:${totalDays}:${item.key}`
+        );
+        const pickId = candidates[Math.floor(rng() * candidates.length)] || '';
+        const base = (danfangData as Record<string, any>)[pickId];
+        if (base?.name) {
+          chuwu.Add({
+            name: base.name,
+            type: CWType.DY,
+            num: 1,
+            isPile: true
+          });
+          rewardText = `丹药${base.name}×1`;
+        } else {
+          chuwu.Add({
+            name: '灵石',
+            type: CWType.QT,
+            num: 360,
+            isPile: true
+          });
+          rewardText = '灵石360';
+        }
+      } else if (item.reward.type === 'gongfa') {
+        const rng = createRng(
+          `${joinedSect.id}:exchange:${totalDays}:${item.key}`
+        );
+        const gongfaGrades = [
+          GongFaPinJie.一品,
+          GongFaPinJie.二品,
+          GongFaPinJie.三品,
+          GongFaPinJie.四品,
+          GongFaPinJie.五品,
+          GongFaPinJie.六品,
+          GongFaPinJie.七品,
+          GongFaPinJie.八品
+        ];
+        const maxIndex = Math.max(0, gongfaGrades.indexOf(item.reward.grade));
+        const pool = get('gongfaPoolByGrade') as
+          | Record<string, any[]>
+          | undefined;
+        const candidates = gongfaGrades
+          .slice(0, maxIndex + 1)
+          .flatMap((grade) => pool?.[grade] ?? []);
+        const ownedIds = new Set<string>();
+        (get('gongfa.ls') as any[] | undefined)?.forEach((entry) => {
+          if (entry?.id) ownedIds.add(entry.id);
+        });
+        const current = get('gongfa.current') as any;
+        if (current?.id) ownedIds.add(current.id);
+        const available = candidates.filter(
+          (entry) => entry?.id && !ownedIds.has(entry.id)
+        );
+        const pick =
+          (available.length ? available : candidates)[
+            Math.floor(rng() * candidates.length)
+          ] || null;
+        if (pick?.name) {
+          addGongfa({ ...pick });
+          rewardText = `功法《${pick.name}》`;
+        } else {
+          chuwu.Add({
+            name: '灵石',
+            type: CWType.QT,
+            num: 520,
+            isPile: true
+          });
+          rewardText = '灵石520';
+        }
+      }
+      updateJoinedSect((sect) => {
+        const logs = [
+          ...(sect.logs ?? []),
+          {
+            day: totalDays,
+            text: `第${totalDays}日，${playerMember.name}消耗声望${item.cost}兑换${rewardText}`
+          }
+        ];
+        return {
+          ...sect,
+          logs,
+          reputation: Math.max(0, (sect.reputation ?? 0) - item.cost)
+        };
+      });
+      setExchangeVisible(false);
+      JXToast(`已兑换${rewardText}`).show();
+    },
+    [get, joinedSect, playerMember, totalDays, updateJoinedSect]
+  );
+
+  const handleExitSect = useCallback(() => {
+    if (!joinedSect || !playerMember) return;
+    const { close } = JXModal.show({
+      title: '退出宗门',
+      okText: '退出',
+      cancleText: '取消',
+      content: (
+        <JXSpace direction='vertical' gap={6}>
+          <Text>确认退出{joinedSect.name}？</Text>
+          <Text>退出后宗门职位将清空，需要重新申请加入。</Text>
+        </JXSpace>
+      ),
+      onOk() {
+        const current = get('menpai') as ActorDataConfig['menpai'] | undefined;
+        if (!current?.sects?.length) {
+          close();
+          return;
+        }
+        const nextSects = current.sects.map((sect) => {
+          if (sect.id !== joinedSect.id) return sect;
+          const remaining = sect.members.filter(
+            (member) => member.id !== playerMember.id
+          );
+          let members = remaining;
+          const elders = sect.elders.map((seat) =>
+            seat.memberId === playerMember.id
+              ? { ...seat, memberId: null }
+              : seat
+          );
+          if (playerMember.role === '宗主') {
+            const candidate = pickLeaderCandidate(remaining);
+            if (candidate) {
+              members = remaining.map((member) =>
+                member.id === candidate.id
+                  ? {
+                      ...candidate,
+                      role: '宗主',
+                      relation: '宗主',
+                      intimacy: Math.min(100, candidate.intimacy + 10)
+                    }
+                  : member
+              );
+            }
+          }
+          const logs = [
+            ...(sect.logs ?? []),
+            {
+              day: totalDays,
+              text: `第${totalDays}日，${playerMember.name}退出${sect.name}`
+            }
+          ];
+          return { ...sect, members, elders, logs };
+        });
+        set('menpai', {
+          ...current,
+          sects: nextSects,
+          joinedSectId: null,
+          playerMemberId: undefined
+        });
+        JXToast('已退出宗门').show();
+        close();
+      }
+    });
+  }, [get, joinedSect, playerMember, set, totalDays]);
+
   return (
     <Container title='门派'>
       <JXSpace direction='vertical' className='menpai-container' gap={12}>
@@ -1043,206 +1585,98 @@ export default function MenPai() {
                   <Text>暂无建筑</Text>
                 )}
               </View>
-              <JXSpace gap={10}>
+              <JXSpace gap={10} className='menpai-actions'>
                 <JXButton size='mini' onClick={() => setMemberVisible(true)}>
                   宗门成员
                 </JXButton>
                 <JXButton size='mini' onClick={() => setLogVisible(true)}>
                   宗门日志
                 </JXButton>
+                <JXButton
+                  size='mini'
+                  onClick={() => setTaskVisible(true)}
+                  disabled={taskRemaining <= 0}
+                >
+                  宗门任务
+                </JXButton>
+                <JXButton size='mini' onClick={() => setExchangeVisible(true)}>
+                  宗门兑换
+                </JXButton>
+                <JXButton
+                  size='mini'
+                  onClick={() => setContributeVisible(true)}
+                  disabled={totalDays <= lastContributionDay}
+                >
+                  宗门贡献
+                </JXButton>
+                <JXButton
+                  size='mini'
+                  onClick={handleReceiveWelfare}
+                  disabled={totalDays <= lastWelfareDay}
+                >
+                  领取俸禄
+                </JXButton>
+                <JXButton size='mini' onClick={handleExitSect}>
+                  退出宗门
+                </JXButton>
               </JXSpace>
             </JXSpace>
           </View>
         )}
       </JXSpace>
-      <JXModal
+      <SectMemberModal
         visible={memberVisible}
-        okText='关闭'
-        disableCancle
-        onOk={() => setMemberVisible(false)}
-      >
-        <JXSpace direction='vertical' gap={10}>
-          <Text bold>宗门成员</Text>
-          <View className='menpai-modal-list'>
-            {(joinedSect?.members ?? []).map((member) => (
-              <View key={member.id} className='menpai-member-row'>
-                <Text>
-                  {member.name}（{member.role}·{member.jingjie}
-                  {member.jingjie1}
-                  {member.jingjie2}）
-                </Text>
-                <JXButton size='mini' onClick={() => handleOpenMember(member)}>
-                  详情
-                </JXButton>
-              </View>
-            ))}
-          </View>
-        </JXSpace>
-      </JXModal>
-      <JXModal
+        onClose={() => setMemberVisible(false)}
+        members={joinedSect?.members ?? []}
+        onOpenMember={handleOpenMember}
+      />
+      <SectLogModal
         visible={logVisible}
-        okText='关闭'
-        disableCancle
-        onOk={() => setLogVisible(false)}
-      >
-        <JXSpace direction='vertical' gap={10}>
-          <Text bold>宗门日志</Text>
-          <View className='menpai-modal-list'>
-            {(joinedSect?.logs ?? []).map((log, index) => (
-              <View key={`${log.day}-${index}`} className='menpai-log-row'>
-                <Paragraph>
-                  {log?.text || `第${log?.day ?? 0}日，宗门平稳`}
-                </Paragraph>
-              </View>
-            ))}
-          </View>
-        </JXSpace>
-      </JXModal>
-      <JXModal
+        onClose={() => setLogVisible(false)}
+        logs={joinedSect?.logs ?? []}
+      />
+      <SectBuildingModal
         visible={!!buildingDetail}
-        okText='关闭'
-        disableCancle
-        onOk={() => setBuildingDetail(null)}
-      >
-        {buildingDetail && (
-          <JXSpace direction='vertical' gap={6}>
-            <Text bold>{buildingDetail.name}</Text>
-            <Text>
-              等级：{buildingDetail.level > 0 ? buildingDetail.level : '未建'}
-            </Text>
-            <Text>状态：{buildingDetail.status}</Text>
-            <Text>功能：{buildingDetail.desc}</Text>
-            <Text>效果：{buildingDetail.effect}</Text>
-            {buildingDetail.unlockRank && (
-              <Text>解锁：{numberToChinese(buildingDetail.unlockRank)}品</Text>
-            )}
-            <Text>当前灵石：{lingshi}</Text>
-            {buildingCosts && (
-              <JXSpace direction='vertical' gap={6}>
-                {buildingDetail.status === '未建' ? (
-                  <JXButton
-                    onClick={handleUnlockBuilding}
-                    disabled={
-                      (buildingDetail.unlockRank ?? 1) > (joinedSect?.rank ?? 0)
-                    }
-                  >
-                    解锁建筑（{buildingCosts.unlockCost}灵石）
-                  </JXButton>
-                ) : (
-                  <>
-                    <JXButton
-                      onClick={handleRepairBuilding}
-                      disabled={buildingDetail.status === '正常'}
-                    >
-                      修缮建筑（{buildingCosts.repairCost}灵石）
-                    </JXButton>
-                    <JXButton
-                      onClick={handleUpgradeBuilding}
-                      disabled={
-                        buildingDetail.status !== '正常' ||
-                        buildingDetail.level >= 5
-                      }
-                    >
-                      升级建筑（{buildingCosts.upgradeCost}灵石）
-                    </JXButton>
-                  </>
-                )}
-              </JXSpace>
-            )}
-          </JXSpace>
-        )}
-      </JXModal>
-      <JXModal
+        onClose={() => setBuildingDetail(null)}
+        building={buildingDetail}
+        lingshi={lingshi}
+        sectRank={joinedSect?.rank ?? 0}
+        buildingCosts={buildingCosts}
+        onUnlock={handleUnlockBuilding}
+        onRepair={handleRepairBuilding}
+        onUpgrade={handleUpgradeBuilding}
+      />
+      <SectMemberDetailModal
         visible={!!memberDetail}
-        okText='关闭'
-        disableCancle
-        onOk={() => setMemberDetail(null)}
-      >
-        {memberDetail && (
-          <JXSpace direction='vertical' gap={6}>
-            <Text bold>
-              {memberDetail.name}（{memberDetail.role}）
-            </Text>
-            <Text>
-              境界：{memberDetail.jingjie}
-              {memberDetail.jingjie1}
-              {memberDetail.jingjie2}
-            </Text>
-            <Text>关系：{memberDetail.relation}</Text>
-            <Text>亲密度：{memberDetail.intimacy}</Text>
-            <Text>入门日：第{memberDetail.joinDay}日</Text>
-            <Text>气血：{memberDetail.attr.qixue || 0}</Text>
-            <Text>攻击：{memberDetail.attr.gongji || 0}</Text>
-            <Text>防御：{memberDetail.attr.fangyu || 0}</Text>
-            <Text>速度：{memberDetail.attr.sudu || 0}</Text>
-            <Text>暴击：{memberDetail.attr.baoji || 0}</Text>
-            <View className='menpai-bag'>
-              <Text bold>储物袋</Text>
-              <Text>
-                容量：
-                {memberDetail.cw.fb.length +
-                  memberDetail.cw.dy.length +
-                  memberDetail.cw.qt.length}
-                /{memberDetail.cw.max}
-              </Text>
-              <View className='menpai-bag-section'>
-                <Text className='menpai-bag-title'>法宝</Text>
-                <View className='menpai-bag-items'>
-                  {memberDetail.cw.fb.length ? (
-                    memberDetail.cw.fb.map((item, index) => (
-                      <Text
-                        key={`fb-${memberDetail.id}-${index}`}
-                        className='menpai-bag-item'
-                      >
-                        {item.name}
-                        {item.num ? `×${item.num}` : ''}
-                      </Text>
-                    ))
-                  ) : (
-                    <Text className='menpai-bag-empty'>暂无</Text>
-                  )}
-                </View>
-              </View>
-              <View className='menpai-bag-section'>
-                <Text className='menpai-bag-title'>丹药</Text>
-                <View className='menpai-bag-items'>
-                  {memberDetail.cw.dy.length ? (
-                    memberDetail.cw.dy.map((item, index) => (
-                      <Text
-                        key={`dy-${memberDetail.id}-${index}`}
-                        className='menpai-bag-item'
-                      >
-                        {item.name}
-                        {item.num ? `×${item.num}` : ''}
-                      </Text>
-                    ))
-                  ) : (
-                    <Text className='menpai-bag-empty'>暂无</Text>
-                  )}
-                </View>
-              </View>
-              <View className='menpai-bag-section'>
-                <Text className='menpai-bag-title'>其他</Text>
-                <View className='menpai-bag-items'>
-                  {memberDetail.cw.qt.length ? (
-                    memberDetail.cw.qt.map((item, index) => (
-                      <Text
-                        key={`qt-${memberDetail.id}-${index}`}
-                        className='menpai-bag-item'
-                      >
-                        {item.name}
-                        {item.num ? `×${item.num}` : ''}
-                      </Text>
-                    ))
-                  ) : (
-                    <Text className='menpai-bag-empty'>暂无</Text>
-                  )}
-                </View>
-              </View>
-            </View>
-          </JXSpace>
-        )}
-      </JXModal>
+        onClose={() => setMemberDetail(null)}
+        member={memberDetail}
+      />
+      <SectTaskModal
+        visible={taskVisible}
+        onClose={() => setTaskVisible(false)}
+        taskList={taskList}
+        taskDoneCount={taskDoneCount}
+        maxTaskCount={maxTaskCount}
+        taskRemaining={taskRemaining}
+        roleLevel={roleLevel}
+        onTakeTask={handleTakeTask}
+      />
+      <SectExchangeModal
+        visible={exchangeVisible}
+        onClose={() => setExchangeVisible(false)}
+        exchangeList={exchangeList}
+        reputation={joinedSect?.reputation ?? 0}
+        onExchange={handleExchange}
+      />
+      <SectContributeModal
+        visible={contributeVisible}
+        onClose={() => setContributeVisible(false)}
+        onConfirm={handleConfirmContribution}
+        lingshi={lingshi}
+        contributeAmount={contributeAmount}
+        setContributeAmount={setContributeAmount}
+        canContribute={totalDays > lastContributionDay}
+      />
     </Container>
   );
 }

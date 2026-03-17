@@ -46,6 +46,7 @@ import {
   buildIntimacy,
   buildMemberBag,
   buildMemberRelation,
+  buildPlayerMember,
   pickRoleRealmIndex,
   pickWeightedRole,
   sectNameParts
@@ -276,9 +277,54 @@ function Main() {
                   <JXButton
                     size='mini'
                     onClick={() => {
+                      if (!actor?.uuid) return;
+                      const safeActor = actor as Partial<ActorDataConfig> & {
+                        uuid: string;
+                      };
+                      const startAt =
+                        get('xiuxianStartAt') || get('time1') || Date.now();
+                      const flow =
+                        get('xiuxianTimeScale') || XIUXIAN_TIME_SCALE_DEFAULT;
+                      const { totalDays } = getXiuxianCalendar(startAt, flow);
+                      const player = buildPlayerMember(
+                        safeActor,
+                        totalDays,
+                        createRng(`${actor.uuid}:menpai:player`)
+                      );
+                      const target = sectList.find(
+                        (item) => item.id === sect.id
+                      );
+                      if (!target) return;
+                      const alreadyIn = target.members.some(
+                        (member) => member.id === player.id
+                      );
+                      if (
+                        !alreadyIn &&
+                        target.members.length >= target.capacity
+                      ) {
+                        JXToast('宗门已满').show();
+                        return;
+                      }
+                      const nextSects = sectList.map((item) => {
+                        if (item.id !== sect.id) return item;
+                        const members = alreadyIn
+                          ? item.members
+                          : [...item.members, player];
+                        const logs = [
+                          ...(item.logs ?? []),
+                          {
+                            day: totalDays,
+                            text: `第${totalDays}日，${player.name}加入${item.name}`
+                          }
+                        ];
+                        return { ...item, members, logs };
+                      });
                       set('menpai', {
-                        sects: sectList,
-                        joinedSectId: sect.id
+                        sects: nextSects,
+                        joinedSectId: sect.id,
+                        playerMemberId: player.id,
+                        lastContributionDay: current?.lastContributionDay ?? 0,
+                        lastWelfareDay: current?.lastWelfareDay ?? 0
                       });
                       close();
                       navigateTo('Main/pages/menpai/index');
@@ -298,7 +344,7 @@ function Main() {
         close();
       }
     });
-  }, [createInitialMenpai, get, set]);
+  }, [actor, createInitialMenpai, get, set]);
 
   const operaterOptions = [
     {
