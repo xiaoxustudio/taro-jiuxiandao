@@ -1,4 +1,4 @@
-import { random, round } from 'lodash-es';
+import { round } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
 import Taro from '@tarojs/taro';
@@ -17,12 +17,8 @@ import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
 import useStorageStore from '@/store/storage';
 import {
-  UUID,
   getGradeColor,
-  generateRandomName,
   navigateTo,
-  numberToChinese,
-  getXiuxianCalendar,
   TimeArray,
   ZhouTian,
   formatXiuxianCalendar
@@ -39,26 +35,9 @@ import {
 } from '@/utils/actor';
 import TpData from '@/assets/tp.json';
 import danfangData from '@/assets/danfang.json';
-import { JJ2_ARR } from '@/utils/zhandou';
-import {
-  buildSectBuildings,
-  buildEventText,
-  buildIntimacy,
-  buildMemberBag,
-  buildMemberRelation,
-  pickRoleRealmIndex,
-  pickWeightedRole,
-  sectNameParts
-} from '@/utils/zongmen';
 import { CWType } from '@/types';
-import type { ActorDataConfig, SectMember, SectRank, SectRole } from '@/types';
 import { GongFaType } from '@/types/gongfa';
-import {
-  REALM_ORDER,
-  createRng,
-  dfGrades,
-  XIUXIAN_TIME_SCALE_DEFAULT
-} from '@/assets/const';
+import { dfGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import styles from './index.module.less';
 
@@ -91,214 +70,6 @@ function Main() {
     () => get('xiuwei') >= get('max_xiuwei'),
     [get, actor] //eslint-disable-line
   );
-
-  const createSectMember = useCallback(
-    (
-      rank: SectRank,
-      role: SectRole,
-      day: number,
-      usedNames: Set<string>,
-      rng: () => number
-    ) => {
-      let name = generateRandomName();
-      let guard = 0;
-      while (usedNames.has(name) && guard < 10) {
-        name = generateRandomName();
-        guard += 1;
-      }
-      usedNames.add(name);
-      const realmIndex = pickRoleRealmIndex(role, rank, rng);
-      const jingjie = REALM_ORDER[realmIndex] || REALM_ORDER[0];
-      const jingjie1 = `${numberToChinese(Math.floor(rng() * 9) + 1)}阶`;
-      const jingjie2 =
-        JJ2_ARR[Math.floor(rng() * JJ2_ARR.length)] || JJ2_ARR[0];
-      const scale = realmIndex + 1;
-      const attr = {
-        qixue: Math.round(500 + scale * 320 + random(0, 200)),
-        gongji: Math.round(40 + scale * 35 + random(0, 15)),
-        fangyu: Math.round(30 + scale * 28 + random(0, 12)),
-        sudu: Math.round(12 + scale * 14 + random(0, 10)),
-        baoji: Math.max(1, Math.round(scale / 2))
-      };
-      return {
-        id: UUID(),
-        name,
-        role,
-        relation: buildMemberRelation(role, rng),
-        intimacy: buildIntimacy(role, rng),
-        jingjie,
-        jingjie1,
-        jingjie2,
-        attr,
-        joinDay: day,
-        cw: buildMemberBag(role, rng)
-      };
-    },
-    []
-  );
-
-  const createInitialMenpai = useCallback(() => {
-    const seed = get('uuid');
-    const rng = createRng(`${seed}:menpai`);
-    const usedNames = new Set<string>();
-    const startAt = get('xiuxianStartAt') || get('time1') || Date.now();
-    const flow = get('xiuxianTimeScale') || XIUXIAN_TIME_SCALE_DEFAULT;
-    const { totalDays } = getXiuxianCalendar(startAt, flow);
-    const sectsInit = Array.from({ length: 6 }, (_, index) => {
-      const sectId = UUID();
-      const rank = (Math.min(8, Math.max(1, Math.floor(rng() * 8) + 1)) ||
-        1) as SectRank;
-      const name = sectNameParts.map(
-        (part) => part[Math.floor(rng() * part.length)]
-      );
-      let sectName = name.join('');
-      if (usedNames.has(sectName)) {
-        sectName = `${sectName}${index + 1}`;
-      }
-      usedNames.add(sectName);
-      const capacity = Math.max(100, 80 + rank * 60 + random(0, 80));
-      const memberCount = Math.min(
-        capacity,
-        Math.max(100, Math.floor(capacity * (0.6 + rng() * 0.3)))
-      );
-      const memberNames = new Set<string>();
-      const eldersCount = Math.min(5, Math.max(0, Math.floor(rng() * 6)));
-      const members: SectMember[] = [];
-      const leader = createSectMember(
-        rank,
-        '宗主',
-        totalDays,
-        memberNames,
-        rng
-      );
-      members.push(leader);
-      for (let i = 0; i < eldersCount; i += 1) {
-        members.push(
-          createSectMember(rank, '长老', totalDays, memberNames, rng)
-        );
-      }
-      const remaining = Math.max(0, memberCount - members.length);
-      for (let i = 0; i < remaining; i += 1) {
-        const role = pickWeightedRole(rng);
-        members.push(createSectMember(rank, role, totalDays, memberNames, rng));
-      }
-      const elders = Array.from({ length: 5 }, (__, seatIndex) => {
-        const member = seatIndex < eldersCount ? members[seatIndex + 1] : null;
-        return {
-          seat: seatIndex + 1,
-          memberId: member?.id || null
-        };
-      });
-      const logs = [
-        {
-          day: totalDays,
-          text: buildEventText(totalDays, sectName, rng)
-        }
-      ];
-      const buildings = buildSectBuildings(
-        rank,
-        createRng(`${sectId}:buildings`),
-        `${sectId}-`
-      );
-      return {
-        id: sectId,
-        name: sectName,
-        rank,
-        capacity,
-        elders,
-        members,
-        logs,
-        buildings,
-        lastEventDay: totalDays,
-        reputation: Math.floor(40 + rng() * 30),
-        injuryRecoveryUntilDay: 0,
-        warMeritDays: 0,
-        revengeLevel: 0,
-        revengeNextDay: 0
-      };
-    });
-    return { sects: sectsInit, joinedSectId: null };
-  }, [createSectMember, get]);
-
-  const handleOpenMenpai = useCallback(() => {
-    const current = get('menpai') as ActorDataConfig['menpai'] | undefined;
-    if (current?.joinedSectId) {
-      navigateTo('Main/pages/menpai/index');
-      return;
-    }
-    const data =
-      current?.sects && current.sects.length ? current : createInitialMenpai();
-    if (!current?.sects?.length) {
-      set('menpai', data);
-    }
-    const sectList = data.sects;
-    const { close } = JXModal.show({
-      title: '选择宗门加入',
-      disableCancle: true,
-      okText: '关闭',
-      content: (
-        <JXSpace direction='vertical' gap={10}>
-          <Text bold>选择宗门加入</Text>
-          <View
-            style={{
-              maxHeight: '60vh',
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6
-            }}
-          >
-            {sectList.length ? (
-              sectList.map((sect) => (
-                <View
-                  key={sect.id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    background: '#f7f7f7',
-                    padding: '8px 10px',
-                    borderRadius: 4
-                  }}
-                >
-                  <View>
-                    <Text
-                      bold
-                      color={getGradeColor(`${numberToChinese(sect.rank)}品`)}
-                    >
-                      {sect.name}（{numberToChinese(sect.rank)}品）
-                    </Text>
-                    <Text>
-                      弟子：{sect.members.length}/{sect.capacity}
-                    </Text>
-                    <Text>声望：{sect.reputation ?? 0}</Text>
-                  </View>
-                  <JXButton
-                    size='mini'
-                    onClick={() => {
-                      set('menpai', {
-                        sects: sectList,
-                        joinedSectId: sect.id
-                      });
-                      close();
-                      navigateTo('Main/pages/menpai/index');
-                    }}
-                  >
-                    加入
-                  </JXButton>
-                </View>
-              ))
-            ) : (
-              <Text>暂无宗门可选</Text>
-            )}
-          </View>
-        </JXSpace>
-      ),
-      onOk() {
-        close();
-      }
-    });
-  }, [createInitialMenpai, get, set]);
 
   const operaterOptions = [
     {
@@ -447,12 +218,7 @@ function Main() {
       disabeld: true,
       click() {}
     },
-    {
-      name: '门派',
-      click() {
-        handleOpenMenpai();
-      }
-    },
+
     {
       name: '药园',
       click() {
