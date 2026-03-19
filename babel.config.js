@@ -3,7 +3,6 @@
 module.exports = {
   presets: [
     [
-      '@babel/preset-env',
       'taro',
       {
         framework: 'react',
@@ -13,14 +12,6 @@ module.exports = {
           chrome: '49',
           ios: '10'
         }
-      }
-    ],
-    [
-      'import',
-      {
-        libraryName: 'lodash',
-        libraryDirectory: '',
-        camel2DashComponentName: false
       }
     ]
   ]
