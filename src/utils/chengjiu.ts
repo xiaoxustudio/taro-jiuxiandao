@@ -197,7 +197,11 @@ export const getUnclaimedAchievements = (
 };
 
 // 应用成就奖励
-export const applyAchievementReward = (reward: any, set: any, get: any): void => {
+export const applyAchievementReward = (
+  reward: any,
+  set: any,
+  get: any
+): void => {
   const { type, value } = reward;
 
   switch (type) {

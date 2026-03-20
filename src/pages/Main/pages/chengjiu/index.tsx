@@ -126,7 +126,7 @@ export default function Chengjiu() {
 
       JXToast('领取成功！').show();
     },
-    [achievementData, set]
+    [achievementData, get, set]
   );
 
   // 渲染成就项

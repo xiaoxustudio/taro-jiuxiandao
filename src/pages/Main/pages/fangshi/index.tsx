@@ -299,7 +299,7 @@ export default function Fangshi() {
         ))}
       </JXSpace>
       {currentCategory && (
-        <Scroll calc={container.calcHeight + 50}>
+        <Scroll calc={container.calcHeight + 50} bottomBlankSpace={30}>
           <List list={list} noFlex />
         </Scroll>
       )}
