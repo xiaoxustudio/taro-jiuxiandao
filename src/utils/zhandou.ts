@@ -1,5 +1,6 @@
 import { random } from 'lodash-es';
 import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
+import { NestedKeyOf, ActorDataConfig } from '@/types';
 
 export type ZhanDouHitResult<D extends { fangyu: number; qixue: number }> = {
   isCrit: boolean;
@@ -123,8 +124,8 @@ export function pickMaterialNameByGrade(params: {
 }
 
 export function resolveMaterialPoolByGrade(params: {
-  get: (key?: string) => any;
-  set: (key: string, data: any) => void;
+  get: (key: NestedKeyOf<ActorDataConfig>, defaultValue?: any) => any;
+  set: (key: NestedKeyOf<ActorDataConfig>, data: any) => void;
   storageGetSync: (key?: string) => any;
 }): MaterialPoolByGrade | undefined {
   let materialPoolByGrade = params.get('materialPoolByGrade') as
@@ -158,8 +159,8 @@ export function resolveMaterialPoolByGrade(params: {
 }
 
 export function resolveDanfangPoolByGrade(params: {
-  get: (key?: string) => any;
-  set: (key: string, data: any) => void;
+  get: (key: NestedKeyOf<ActorDataConfig>, defaultValue?: any) => any;
+  set: (key: NestedKeyOf<ActorDataConfig>, data: any) => void;
   storageGetSync: (key?: string) => any;
 }) {
   let danfangPoolByGrade = params.get('danfangPoolByGrade') as
@@ -186,8 +187,8 @@ export function resolveDanfangPoolByGrade(params: {
 }
 
 export function resolveSeedRegistry(params: {
-  get: (key?: string) => any;
-  set: (key: string, data: any) => void;
+  get: (key: NestedKeyOf<ActorDataConfig>, defaultValue?: any) => any;
+  set: (key: NestedKeyOf<ActorDataConfig>, data: any) => void;
   storageGetSync: (key?: string) => any;
 }) {
   let seedRegistry = params.get('seedRegistry') as
