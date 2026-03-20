@@ -628,7 +628,7 @@ function Main() {
           </JXGrid.Item>
           <JXGrid.Item align='center'>
             <JXButton disabled size='mini' transparent>
-              <Text textShadow>CDK</Text>
+              <Text textShadow>插件</Text>
             </JXButton>
           </JXGrid.Item>
           <JXGrid.Item align='center'>
