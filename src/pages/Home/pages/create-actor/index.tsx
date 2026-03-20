@@ -307,9 +307,6 @@ function Index() {
       lv: 1,
       plots: createDefaultYaoyuanPlots(getYaoyuanTotalSlots(1)),
       seeds: []
-    },
-    menpai: {
-      sects: []
     }
   });
 
