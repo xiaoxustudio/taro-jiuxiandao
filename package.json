@@ -97,5 +97,6 @@
     "terser": "^5.30.4",
     "typescript": "^5.4.5",
     "vite": "^4.2.0"
-  }
+  },
+  "packageManager": "pnpm@10.32.1"
 }
