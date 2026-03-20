@@ -3,6 +3,7 @@ import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
 import { DAOLV_QUALITIES } from '@/consts';
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
 import { GongFaType } from './gongfa';
+import { AchievementData } from './chengjiu';
 
 /**
  * @description:战斗属性
@@ -139,4 +140,5 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   gongfaPoolStorageKeysByGrade?: Record<string, string>; // 功法池分品阶存储 key
   danfangDataStorageKey?: string; // 丹方数据存储 key
   seedRegistryStorageKey?: string; // 种子注册表存储 key
+  chengjiu?: AchievementData; // 成就数据
 }

@@ -1,0 +1,327 @@
+{
+  "achievements": {
+    "level_10": {
+      "id": "level_10",
+      "name": "初入仙途",
+      "desc": "角色等级达到10级",
+      "category": "cultivation",
+      "points": 10,
+      "condition": {
+        "type": "level",
+        "target": 10,
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 100,
+          "desc": "100修为"
+        }
+      ]
+    },
+    "level_20": {
+      "id": "level_20",
+      "name": "小有成就",
+      "desc": "角色等级达到20级",
+      "category": "cultivation",
+      "points": 20,
+      "condition": {
+        "type": "level",
+        "target": 20,
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 300,
+          "desc": "300修为"
+        }
+      ]
+    },
+    "realm_lianqi": {
+      "id": "realm_lianqi",
+      "name": "练气初成",
+      "desc": "达到练气期",
+      "category": "cultivation",
+      "points": 15,
+      "condition": {
+        "type": "realm",
+        "target": "练气",
+        "field": "jingjie",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 200,
+          "desc": "200修为"
+        }
+      ]
+    },
+    "realm_zhuji": {
+      "id": "realm_zhuji",
+      "name": "筑基有成",
+      "desc": "达到筑基期",
+      "category": "cultivation",
+      "points": 30,
+      "condition": {
+        "type": "realm",
+        "target": "筑基",
+        "field": "jingjie",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 500,
+          "desc": "500修为"
+        },
+        {
+          "type": "lingqi_rate",
+          "value": 0.05,
+          "desc": "5%修炼速度加成"
+        }
+      ]
+    },
+    "realm_jiedan": {
+      "id": "realm_jiedan",
+      "name": "结丹大成",
+      "desc": "达到结丹期",
+      "category": "cultivation",
+      "points": 50,
+      "condition": {
+        "type": "realm",
+        "target": "结丹",
+        "field": "jingjie",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 1000,
+          "desc": "1000修为"
+        },
+        {
+          "type": "lingqi_rate",
+          "value": 0.1,
+          "desc": "10%修炼速度加成"
+        }
+      ]
+    },
+    "realm_yuanying": {
+      "id": "realm_yuanying",
+      "name": "元婴初成",
+      "desc": "达到元婴期",
+      "category": "cultivation",
+      "points": 80,
+      "condition": {
+        "type": "realm",
+        "target": "元婴",
+        "field": "jingjie",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 2000,
+          "desc": "2000修为"
+        },
+        {
+          "type": "lingqi_rate",
+          "value": 0.15,
+          "desc": "15%修炼速度加成"
+        }
+      ]
+    },
+    "battle_10": {
+      "id": "battle_10",
+      "name": "初试锋芒",
+      "desc": "完成10次试炼",
+      "category": "battle",
+      "points": 10,
+      "condition": {
+        "type": "count",
+        "target": 10,
+        "field": "battleCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 150,
+          "desc": "150修为"
+        }
+      ]
+    },
+    "battle_50": {
+      "id": "battle_50",
+      "name": "身经百战",
+      "desc": "完成50次试炼",
+      "category": "battle",
+      "points": 30,
+      "condition": {
+        "type": "count",
+        "target": 50,
+        "field": "battleCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 500,
+          "desc": "500修为"
+        }
+      ]
+    },
+    "battle_win_10": {
+      "id": "battle_win_10",
+      "name": "连胜十场",
+      "desc": "连续赢得10场战斗",
+      "category": "battle",
+      "points": 40,
+      "condition": {
+        "type": "continuous",
+        "target": 10,
+        "field": "winStreak",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 800,
+          "desc": "800修为"
+        },
+        {
+          "type": "shenshi",
+          "value": 50,
+          "desc": "50神识"
+        }
+      ]
+    },
+    "gongfa_5": {
+      "id": "gongfa_5",
+      "name": "功法初窥",
+      "desc": "收集5种功法",
+      "category": "collection",
+      "points": 15,
+      "condition": {
+        "type": "count",
+        "target": 5,
+        "field": "gongfaCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 200,
+          "desc": "200修为"
+        }
+      ]
+    },
+    "gongfa_10": {
+      "id": "gongfa_10",
+      "name": "功法精通",
+      "desc": "收集10种功法",
+      "category": "collection",
+      "points": 30,
+      "condition": {
+        "type": "count",
+        "target": 10,
+        "field": "gongfaCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 500,
+          "desc": "500修为"
+        }
+      ]
+    },
+    "fabao_3": {
+      "id": "fabao_3",
+      "name": "法宝初得",
+      "desc": "收集3件法宝",
+      "category": "collection",
+      "points": 15,
+      "condition": {
+        "type": "count",
+        "target": 3,
+        "field": "fabaoCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 200,
+          "desc": "200修为"
+        }
+      ]
+    },
+    "danfang_5": {
+      "id": "danfang_5",
+      "name": "丹方初识",
+      "desc": "收集5种丹方",
+      "category": "collection",
+      "points": 15,
+      "condition": {
+        "type": "count",
+        "target": 5,
+        "field": "danfangCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 200,
+          "desc": "200修为"
+        }
+      ]
+    },
+    "qiandao_7": {
+      "id": "qiandao_7",
+      "name": "持之以恒",
+      "desc": "连续签到7天",
+      "category": "social",
+      "points": 20,
+      "condition": {
+        "type": "continuous",
+        "target": 7,
+        "field": "qiandaoStreak",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "shouyuan",
+          "value": 30,
+          "desc": "30寿元"
+        }
+      ]
+    },
+    "qiandao_30": {
+      "id": "qiandao_30",
+      "name": "月月不休",
+      "desc": "连续签到30天",
+      "category": "social",
+      "points": 50,
+      "condition": {
+        "type": "continuous",
+        "target": 30,
+        "field": "qiandaoStreak",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "shouyuan",
+          "value": 100,
+          "desc": "100寿元"
+        },
+        {
+          "type": "xiuwei",
+          "value": 500,
+          "desc": "500修为"
+        }
+      ]
+    }
+  }
+}

@@ -233,8 +233,9 @@ function Main() {
     },
     {
       name: '成就',
-      disabeld: true,
-      click() {}
+      click() {
+        navigateTo('Main/pages/chengjiu/index');
+      }
     },
     {
       name: '图鉴',
