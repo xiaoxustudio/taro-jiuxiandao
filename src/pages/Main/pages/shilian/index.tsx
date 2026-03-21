@@ -48,6 +48,7 @@ import {
   createMaterialRegistry,
   SeedRegistryItem
 } from '@/assets/const';
+import { updateAchievementProgress } from '@/utils/chengjiu';
 import styles from './index.module.less';
 
 const renderNameWithRealmColor = (name: string) => {
@@ -354,6 +355,22 @@ export default function Shilian() {
           }
         }, 1200);
         setActorInstance(null);
+        // 成就
+        const currentAchievementData = get('chengjiu') || {
+          achievements: {},
+          claimedIds: [],
+          totalPoints: 0,
+          claimedPoints: 0
+        };
+        const battleCount = (get('battleCount') || 0) + 1;
+        set('battleCount', battleCount);
+        set('winStreak', 0);
+        const updatedAchievementData = updateAchievementProgress(
+          currentAchievementData,
+          { lv: get('lv'), jingjie: get('jingjie') },
+          { battleCount, winStreak: 0 }
+        );
+        set('chengjiu', updatedAchievementData);
         return;
       }
       if (YaoShouInstance.qixue <= 0) {
@@ -480,6 +497,24 @@ export default function Shilian() {
           }
         }, 1200);
         setActorInstance(null);
+        // 成就
+        const currentAchievementData = get('chengjiu') || {
+          achievements: {},
+          claimedIds: [],
+          totalPoints: 0,
+          claimedPoints: 0
+        };
+        const battleCount = (get('battleCount') || 0) + 1;
+        set('battleCount', battleCount);
+        const currentWinStreak = get('winStreak') || 0;
+        const newWinStreak = currentWinStreak + 1;
+        set('winStreak', newWinStreak);
+        const updatedAchievementData = updateAchievementProgress(
+          currentAchievementData,
+          { lv: get('lv'), jingjie: get('jingjie') },
+          { battleCount, winStreak: newWinStreak }
+        );
+        set('chengjiu', updatedAchievementData);
         return;
       }
       // 战斗计算

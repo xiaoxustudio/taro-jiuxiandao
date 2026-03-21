@@ -141,4 +141,6 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   danfangDataStorageKey?: string; // 丹方数据存储 key
   seedRegistryStorageKey?: string; // 种子注册表存储 key
   chengjiu?: AchievementData; // 成就数据
+  battleCount?: number; // 战斗次数
+  winStreak?: number; // 连胜次数
 }

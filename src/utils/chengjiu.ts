@@ -127,7 +127,6 @@ export const updateAchievementProgress = (
       achievement.status = 'completed';
       achievement.completedAt = Date.now();
     }
-
     // 更新进度
     if (
       achievement.condition.field &&

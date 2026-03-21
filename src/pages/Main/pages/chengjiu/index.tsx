@@ -45,8 +45,8 @@ export default function Chengjiu() {
   // 更新成就进度
   const updateProgress = useCallback(() => {
     const progress = {
-      battleCount: get('zd.battleCount' as any) || 0,
-      winStreak: get('zd.winStreak' as any) || 0,
+      battleCount: get('battleCount' as any) || 0,
+      winStreak: get('winStreak' as any) || 0,
       gongfaCount: get('gongfa.ls' as any)?.length || 0,
       fabaoCount: Object.values(get('fabao' as any) || {}).filter(Boolean)
         .length,
