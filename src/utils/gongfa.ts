@@ -91,11 +91,27 @@ function setCurrentGongFa(id: string): void {
   const { current } = useStore.getState();
   const acData = getActor();
   const gf = get(id);
-  if (acData.gongfa.current || !gf) return; // 已存在功法 or gf 不存在
+  if (!gf) return;
+
+  // 如果已经穿戴了功法，先卸下当前功法
+  if (acData.gongfa.current) {
+    const currentGongFa = acData.gongfa.current;
+    // 减少当前功法的属性
+    const currentAdds = currentGongFa.attr;
+    if (currentAdds) {
+      Object.keys(currentAdds).forEach((key) => {
+        acData.addAttr[key] -= currentAdds[key];
+      });
+    }
+    // 将当前功法添加回列表
+    add(currentGongFa);
+  }
+
+  // 从列表中移除新功法并设置为当前功法
   remove(gf);
   gf.time = Date.now();
   acData.gongfa.current = gf;
-  // 增加或减少属性
+  // 增加新功法的属性
   const adds = gf.attr;
   if (adds) {
     Object.keys(adds).forEach((key) => {

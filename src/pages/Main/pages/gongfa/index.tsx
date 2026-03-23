@@ -53,9 +53,10 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 export default function Gongfa() {
   const { get, set, actor } = useActorController();
   const [, select] = useValue('', true);
+  const [refresh, setRefresh] = useState(0); // 添加状态用于强制刷新组件
   const current = useMemo<GongFaType | null>(
     () => get('gongfa.current'),
-    [actor, get] // eslint-disable-line
+    [actor, get, refresh] // eslint-disable-line
   );
 
   const shouldGetExp = useMemo(() => {
@@ -71,6 +72,7 @@ export default function Gongfa() {
       onConfirm() {
         setCurrentGongFa(select.value as string);
         select.set('-1');
+        setRefresh((prev) => prev + 1); // 强制刷新组件
       }
     });
   };
@@ -108,9 +110,14 @@ export default function Gongfa() {
         <JXButton
           disabled={!current}
           onClick={async () => {
-            await putCurrentGongfa().then((s) =>
-              s ? JXToast('卸下成功').show() : JXToast('未穿戴功法').show()
-            );
+            await putCurrentGongfa().then((s) => {
+              if (s) {
+                JXToast('卸下成功').show();
+                setRefresh((prev) => prev + 1); // 强制刷新组件
+              } else {
+                JXToast('未穿戴功法').show();
+              }
+            });
             select.set('');
           }}
         >
