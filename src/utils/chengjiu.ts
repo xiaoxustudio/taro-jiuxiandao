@@ -47,7 +47,7 @@ export const initAchievements = (): AchievementData => {
 };
 
 // 检查成就条件
-const checkCondition = (
+export const checkCondition = (
   condition: any,
   actor: any,
   progress: Record<string, any>
@@ -58,10 +58,10 @@ const checkCondition = (
 
   switch (type) {
     case 'level':
-      currentValue = actor.lv || 0;
+      currentValue = actor?.lv || 0;
       break;
     case 'realm':
-      currentValue = actor[field] || '';
+      currentValue = actor?.[field] || '';
       if (typeof currentValue === 'string') {
         const realmOrder = [
           '练气',
@@ -134,7 +134,7 @@ export const updateAchievementProgress = (
     ) {
       achievement.progress = progress[achievement.condition.field];
     } else if (achievement.condition.type === 'level') {
-      achievement.progress = actor.lv || 0;
+      achievement.progress = actor?.lv || 0;
     }
   });
   return updatedData;

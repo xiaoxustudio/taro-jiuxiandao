@@ -102,6 +102,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     count: number; // 累计
     last: string; // 最后一次签到
     time: string; // 当前时间对比
+    streak: number; // 连续签到天数
   };
   zd: {
     time: number; // 挂机时间

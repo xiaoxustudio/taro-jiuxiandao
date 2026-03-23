@@ -5,6 +5,7 @@ import useActorController from '@/hooks/useActorController';
 import { ActorDataConfig, CWType } from '@/types';
 import { getCurrentDate } from '@/utils';
 import chuwu from '@/utils/chuwu';
+import { checkQiandaoAchievements } from '@/utils/chengjiuHelper';
 
 function QianDao() {
   const { get, set } = useActorController();
@@ -22,10 +23,40 @@ function QianDao() {
       JXToast().show('今天已经签到过了！');
       return;
     }
+
+    // 在更新lastDate之前获取上一次签到日期
+    const lastDate = get('qiandao.last');
+    let streak = get('qiandao.streak') || 0;
+
+    // 计算连续签到天数
+    if (lastDate) {
+      // 计算日期差
+      const lastDateObj = new Date(lastDate);
+      const currentDateObj = new Date(currentDate);
+      const diffTime = currentDateObj.getTime() - lastDateObj.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        // 连续签到，增加连续天数
+        streak += 1;
+      } else if (diffDays > 1) {
+        // 中断签到，重置连续天数
+        streak = 1;
+      }
+    } else {
+      // 第一次签到
+      streak = 1;
+    }
+
     const ls = random(0, 9999);
     set('qiandao.time', currentDate);
     set('qiandao.last', currentDate);
     set('qiandao.count', get('qiandao.count') + 1);
+    set('qiandao.streak', streak);
+
+    // 检查签到成就
+    checkQiandaoAchievements(get, set);
+
     chuwu.Add({ name: '灵石', type: CWType.QT, isPile: true, num: ls });
     JXToast().show(`签到成功，获得灵石：${ls}`);
   }, [get, isSigned, set]);
@@ -34,6 +65,7 @@ function QianDao() {
     <Container title='签到'>
       <JXSpace direction='vertical' style={{ width: '100%' }}>
         <Text>累计签到天数：{qiandao.count} 天</Text>
+        <Text>连续签到天数：{qiandao.streak || 0} 天</Text>
         <Text>上次签到日期：{qiandao.last || ''}</Text>
         <JXSpace center style={{ width: '100%' }}>
           <JXButton disabled={isSigned} width={200} onClick={handleQianDao}>

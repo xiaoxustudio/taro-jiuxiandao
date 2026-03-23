@@ -1,4 +1,5 @@
-import { updateAchievementProgress } from './chengjiu';
+import { AchievementItem } from '@/types/chengjiu';
+import { updateAchievementProgress, checkCondition } from './chengjiu';
 
 /**
  * 检查并更新成就进度
@@ -90,6 +91,43 @@ export const checkCultivationAchievements = (
   const progress = {};
 
   const updated = updateAchievementProgress(chengjiu, actor, progress);
+  set('chengjiu', updated);
+};
+
+/**
+ * 检查签到成就
+ * @param get - 获取角色数据的函数
+ * @param set - 设置角色数据的函数
+ */
+export const checkQiandaoAchievements = (get: any, set: any) => {
+  const chengjiu = get('chengjiu');
+  if (!chengjiu) return;
+
+  const progress = {
+    qiandaoStreak: get('qiandao.streak') || 0
+  };
+
+  // 只更新签到相关的成就
+  const updated = { ...chengjiu };
+  Object.values(updated.achievements).forEach((achievement) => {
+    const typedAchievement = achievement as AchievementItem;
+    if (typedAchievement.condition.field === 'qiandaoStreak') {
+      const isCompleted = checkCondition(
+        typedAchievement.condition,
+        null,
+        progress
+      );
+      if (
+        isCompleted &&
+        typedAchievement.status !== 'completed' &&
+        typedAchievement.status !== 'claimed'
+      ) {
+        typedAchievement.status = 'completed';
+        typedAchievement.completedAt = Date.now();
+      }
+      typedAchievement.progress = progress.qiandaoStreak;
+    }
+  });
   set('chengjiu', updated);
 };
 

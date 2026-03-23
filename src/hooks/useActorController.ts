@@ -46,6 +46,7 @@ function useActorController() {
     const run = async () => {
       const patch: Partial<ActorDataConfig> = {};
 
+      // 加载材料池
       if (!actor.materialPoolByGrade && actor.materialPoolStorageKey) {
         const loaded = await load(actor.materialPoolStorageKey);
         if (loaded) patch.materialPoolByGrade = loaded;
@@ -76,6 +77,7 @@ function useActorController() {
           patch.materialPoolByGrade = next as any;
         }
       }
+      // 加载功法池
       if (!actor.danfangPoolByGrade && actor.danfangPoolStorageKey) {
         const loaded = await load(actor.danfangPoolStorageKey);
         if (loaded) patch.danfangPoolByGrade = loaded;
