@@ -16,8 +16,7 @@ const parseStored = (raw: any) => {
   if (typeof raw === 'string') {
     try {
       return JSON.parse(raw);
-    } catch (e) {
-      String(e);
+    } catch {
       return raw;
     }
   }

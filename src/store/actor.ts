@@ -26,8 +26,9 @@ const useActorStore = create<ActorStore>()(
           const oArray = Array.isArray(store) ? [...store] : [store];
           oArray.forEach((name) => {
             if (ActorIdents.includes(name)) return;
-            const actor = state.actors[name] as any;
+            const actor = state.actors[name];
             if (!actor) return;
+            // 当执行删除角色时，同时删除他们的生成的数据
             const keys: string[] = [];
             if (actor.materialPoolStorageKey)
               keys.push(actor.materialPoolStorageKey);
@@ -38,25 +39,13 @@ const useActorStore = create<ActorStore>()(
             if (actor.seedRegistryStorageKey)
               keys.push(actor.seedRegistryStorageKey);
             if (actor.materialPoolStorageKeysByGrade) {
-              keys.push(
-                ...(Object.values(
-                  actor.materialPoolStorageKeysByGrade
-                ) as string[])
-              );
+              keys.push(...Object.values(actor.materialPoolStorageKeysByGrade));
             }
             if (actor.danfangPoolStorageKeysByGrade) {
-              keys.push(
-                ...(Object.values(
-                  actor.danfangPoolStorageKeysByGrade
-                ) as string[])
-              );
+              keys.push(...Object.values(actor.danfangPoolStorageKeysByGrade));
             }
             if (actor.gongfaPoolStorageKeysByGrade) {
-              keys.push(
-                ...(Object.values(
-                  actor.gongfaPoolStorageKeysByGrade
-                ) as string[])
-              );
+              keys.push(...Object.values(actor.gongfaPoolStorageKeysByGrade));
             }
             keys.forEach((k) => {
               const { remove } = useStorageStore.getState();
