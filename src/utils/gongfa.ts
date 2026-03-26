@@ -4,6 +4,7 @@ import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { getActor } from './actor';
 import TimeArray from './TimeArray';
+import { checkCollectionAchievements } from './chengjiuHelper';
 
 /* 功法相关 */
 
@@ -49,7 +50,7 @@ function remove({ name, id }: { name?: string; id?: string }) {
  * @param {boolean} replace
  * @return {*}
  */
-function add(gf: GongFaType, replace = false) {
+function add(gf: GongFaType, replace = false, checkAchievement = true) {
   const { set } = useActorStore.getState();
   const { current } = useStore.getState();
   const acData = getActor();
@@ -60,6 +61,17 @@ function add(gf: GongFaType, replace = false) {
     acData.gongfa.ls.push(gf);
   }
   set(current, acData);
+  // 检查收集成就
+  if (checkAchievement) {
+    checkCollectionAchievements(
+      (key: string) => acData[key],
+      (key: string, value: any) => {
+        acData[key] = value;
+        set(current, acData);
+      },
+      acData
+    );
+  }
 }
 
 type GongFaTypeEx = GongFaType & { update: () => void };
@@ -103,16 +115,25 @@ function setCurrentGongFa(id: string): void {
         acData.addAttr[key] -= currentAdds[key];
       });
     }
-    // 将当前功法添加回列表
-    add(currentGongFa);
+    // 将当前功法添加回列表（不触发remove操作）
+    const existingIndex = acData.gongfa.ls.findIndex(
+      (v) => v.id === currentGongFa.id
+    );
+    if (existingIndex === -1) {
+      acData.gongfa.ls.push(currentGongFa);
+    } else {
+      acData.gongfa.ls[existingIndex] = currentGongFa;
+    }
   }
 
   // 从列表中移除新功法并设置为当前功法
-  remove(gf);
-  gf.time = Date.now();
-  acData.gongfa.current = gf;
+  acData.gongfa.ls = acData.gongfa.ls.filter((v) => v.id !== gf.id);
+  // 创建新功法副本以避免引用问题
+  const newGongfa = { ...gf, time: Date.now() };
+  acData.gongfa.current = newGongfa;
+
   // 增加新功法的属性
-  const adds = gf.attr;
+  const adds = newGongfa.attr;
   if (adds) {
     Object.keys(adds).forEach((key) => {
       acData.addAttr[key] += adds[key];
@@ -138,7 +159,7 @@ function putCurrentGongfa(): Promise<boolean> {
     const timeArr = new TimeArray(elapsedMs);
     const addExp = timeArr.toZhouTian() * 1000;
     currentGongFa.exp += addExp;
-    add(currentGongFa);
+    add(currentGongFa, false, false);
     acData.gongfa.current = null;
     state = true;
     // 增加或减少属性（+就是-，-就是+）
