@@ -562,11 +562,10 @@ export default function Dongfu() {
           升阶后：{pjMemo}({get('dongfu').lv + 1})
         </View>
         <View>
-          需要灵石：{needUpLingshi}(
-          <Text style={{ color: lingshi >= needUpLingshi ? 'green' : 'red' }}>
-            {lingshi}
+          需要灵石：
+          <Text color={lingshi >= needUpLingshi ? 'green' : 'red'} inline>
+            {needUpLingshi} ({lingshi})
           </Text>
-          )
         </View>
       </JXModal>
       {/* 道侣 */}
