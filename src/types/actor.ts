@@ -70,6 +70,23 @@ export type ActorDataConfigForFaBao = {
   [K in keyof typeof FabaoType]: null | undefined | FBItemType;
 };
 
+// 重生保留配置
+export type RebirthKeepConfig = {
+  keepLinggen?: boolean; // 保留灵根
+  keepZhongzu?: boolean; // 保留种族
+  keepShouyuan?: number; // 保留寿元百分比（0-100）
+  keepXiuwei?: number; // 保留修为百分比（0-100）
+  keepFabao?: boolean; // 保留法宝
+  keepGongfa?: boolean; // 保留功法
+  keepCailiao?: number; // 保留材料数量上限
+};
+
+// 重生奖励
+export type RebirthReward = {
+  type: 'xuanyuan' | 'shenshi';
+  value: number;
+};
+
 /**
  * @description: 角色属性
  * @return {*}
@@ -144,4 +161,6 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   chengjiu?: AchievementData; // 成就数据
   battleCount?: number; // 战斗次数
   winStreak?: number; // 连胜次数
+  rebirthReward?: RebirthReward[]; // 重生奖励
+  rebirthKeepConfig?: RebirthKeepConfig; // 重生保留配置
 }

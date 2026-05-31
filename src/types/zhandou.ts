@@ -5,8 +5,10 @@ import { ActorDataConfigForZhanDou } from './actor';
  * @description: 妖兽战斗数据
  * @return {*}
  */
-export interface YaoShouZDType
-  extends Omit<ActorDataConfigForZhanDou, 'xianyuan' | 'fashu'> {
+export interface YaoShouZDType extends Omit<
+  ActorDataConfigForZhanDou,
+  'xianyuan' | 'fashu'
+> {
   name: string;
   df: string; // 地方
   cl: string; // 掉落材料名称
@@ -19,8 +21,10 @@ export interface YaoShouZDType
  * @description: 角色战斗数据
  * @return {*}
  */
-export interface ActorZDType
-  extends Omit<ActorDataConfigForZhanDou, 'xianyuan' | 'fashu'> {
+export interface ActorZDType extends Omit<
+  ActorDataConfigForZhanDou,
+  'xianyuan' | 'fashu'
+> {
   name: string;
 }
 

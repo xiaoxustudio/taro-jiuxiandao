@@ -15,7 +15,8 @@ export default defineAppConfig({
     'pages/Main/pages/gongfa/index',
     'pages/Main/pages/dongfu/index',
     'pages/Main/pages/yaoyuan/index',
-    'pages/Main/pages/chengjiu/index'
+    'pages/Main/pages/chengjiu/index',
+    'pages/Main/pages/rebirth/index'
   ],
 
   window: {

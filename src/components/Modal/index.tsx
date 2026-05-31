@@ -109,8 +109,8 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
     });
   }
   return Modal.show({
-    ...props,
     closeOnMaskClick: true,
+    ...props,
     actions: Array.isArray(props.actions)
       ? [...action, ...props.actions]
       : action
@@ -119,13 +119,13 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
 
 JXModal.confirm = (props: ModalConfirmProps) => {
   return Modal.confirm({
-    ...props,
-    closeOnMaskClick: true
+    closeOnMaskClick: true,
+    ...props
   });
 };
 
 JXModal.alert = (props: ModalAlertProps) => {
-  return Modal.alert({ ...props, closeOnMaskClick: true });
+  return Modal.alert({ closeOnMaskClick: true, ...props });
 };
 
 export default JXModal;

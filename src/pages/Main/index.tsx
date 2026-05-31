@@ -464,24 +464,35 @@ function Main() {
     // 寿元计算
     const time1 = get('time1');
     const calcShouYuan = (Date.now() - time1) / TimeArray.Map.hour;
-    if (calcShouYuan >= 24) {
-      const calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
-      set('shouyuan', Math.round(calcCache));
-      // 判断寿元是否到期
-      if (calcCache >= get('max_shouyuan')) {
-        JXToast().show('寿元已到极限');
-        // 后续处理todo
-      } else {
-        const needAdd = time1 + (calcShouYuan / 24) * TimeArray.Map.hour * 24;
-        // 计算应增加的时间
-        set('time1', Math.round(needAdd));
-      }
+    const calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
+    set('shouyuan', Math.round(calcCache));
+    // 判断寿元是否到期
+    if (calcCache >= get('max_shouyuan')) {
+      const { close } = JXModal.show({
+        visible: true,
+        title: '重生',
+        closeOnMaskClick: false,
+        content: (
+          <JXSpace direction='vertical' gap={10}>
+            <Text>你的寿元已到极限，修仙之路无法继续前进...</Text>
+            <Text>请选择重生以继续你的修仙之旅</Text>
+          </JXSpace>
+        ),
+        disableCancle: true,
+        okText: '重生',
+        onOk() {
+          close();
+          navigateTo('Main/pages/rebirth/index', { replace: true });
+        },
+        onCancel() {}
+      });
+    } else if (calcShouYuan >= 24) {
+      const needAdd = time1 + (calcShouYuan / 24) * TimeArray.Map.hour * 24;
+      set('time1', Math.round(needAdd));
     }
-    // 神识计算
     const shenshiTime = get('shenshiTime');
     const calcShenShi = (Date.now() - shenshiTime) / TimeArray.Map.hour;
     if (calcShenShi >= 1) {
-      // 计算神识恢复程度
       const maxShenShi = get('max_shenshi');
       let data = get('shenshi') + (maxShenShi * calcShenShi) / 24;
       if (data > maxShenShi) {
@@ -490,6 +501,7 @@ function Main() {
       set('shenshi', Math.round(data));
       set('shenshiTime', Date.now());
     }
+    // set('max_shouyuan', 0);
   }, []); //eslint-disable-line
 
   return (
