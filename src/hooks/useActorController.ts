@@ -146,21 +146,7 @@ function useActorController() {
     };
 
     run();
-  }, [
-    actor,
-    actor?.danfangData,
-    actor?.danfangDataStorageKey,
-    actor?.danfangPoolByGrade,
-    actor?.danfangPoolStorageKey,
-    actor?.danfangPoolStorageKeysByGrade,
-    actor?.gongfaPoolByGrade,
-    actor?.gongfaPoolStorageKeysByGrade,
-    actor?.materialPoolByGrade,
-    actor?.materialPoolStorageKey,
-    actor?.materialPoolStorageKeysByGrade,
-    actor?.seedRegistry,
-    actor?.seedRegistryStorageKey
-  ]);
+  }, [actor]);
 
   /**
    * @description: 获取属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
@@ -231,20 +217,28 @@ function useActorController() {
         const storageKey = `actor:${newActor.uuid}:danfangData`;
         try {
           const { set: setStorage } = useStorageStore.getState();
-          setStorage(storageKey, val).catch((e: any) => String(e));
+          setStorage(storageKey, val).catch(
+            // eslint-disable-next-line no-console
+            (e) => console.error('Failed to save danfangData:', e)
+          );
           newActor.danfangDataStorageKey = storageKey;
         } catch (e) {
-          String(e);
+          // eslint-disable-next-line no-console
+          console.error('Failed to save danfangData:', e);
         }
       }
       if (key === 'seedRegistry') {
         const storageKey = `actor:${newActor.uuid}:seedRegistry`;
         try {
           const { set: setStorage } = useStorageStore.getState();
-          setStorage(storageKey, val).catch((e: any) => String(e));
+          setStorage(storageKey, val).catch(
+            // eslint-disable-next-line no-console
+            (e) => console.error('Failed to save seedRegistry:', e)
+          );
           newActor.seedRegistryStorageKey = storageKey;
         } catch (e) {
-          String(e);
+          // eslint-disable-next-line no-console
+          console.error('Failed to save seedRegistry:', e);
         }
       }
 

@@ -179,9 +179,6 @@ function RebirthPage() {
         seeds: []
       },
       xuanyuan: (actor?.xuanyuan || 0) + (rewards.xuanyuan || 0),
-      shenshi: 100 + (rewards.shenshi || 0),
-      max_shenshi: 100 + (rewards.shenshi || 0),
-      max_xiuwei: 500,
       ...(linggen && { linggen }),
       ...(zhongzu && { zhongzu }),
       chengjiu: undefined,

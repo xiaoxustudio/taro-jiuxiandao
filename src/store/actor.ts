@@ -49,12 +49,17 @@ const useActorStore = create<ActorStore>()(
             }
             keys.forEach((k) => {
               const { remove } = useStorageStore.getState();
-              remove(k).catch((e: any) => String(e));
+              remove(k).catch(
+                // eslint-disable-next-line no-console
+                (e) => console.error('Failed to remove storage key:', e)
+              );
             });
           });
           const om = omit(state.actors, oArray.concat(ActorIdents));
-          state.actors = om;
-          return state;
+          return {
+            ...state,
+            actors: om
+          };
         })
     }),
     {

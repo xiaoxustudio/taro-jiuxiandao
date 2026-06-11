@@ -274,7 +274,8 @@ function Index() {
     qiandao: {
       count: 0,
       last: '',
-      time: ''
+      time: '',
+      streak: 0
     },
     xiulian: null,
     dongfu: {

@@ -161,8 +161,7 @@ function Add({
     case CWType.QT:
       {
         const target = acData.cw.qt[has];
-        // eslint-disable-next-line no-bitwise
-        if (~has && target.num) {
+        if (has !== -1 && target?.num) {
           target.num += num;
         } else {
           acData.cw.qt.push({
@@ -175,8 +174,7 @@ function Add({
     case CWType.FB:
       {
         const target = acData.cw.fb[has];
-        // eslint-disable-next-line no-bitwise
-        if (~has && target.num) {
+        if (has !== -1 && target?.num) {
           target.num += num;
         } else {
           acData.cw.fb.push({
@@ -188,9 +186,8 @@ function Add({
       break;
     case CWType.DY:
       {
-        const target = acData.cw.fb[has];
-        // eslint-disable-next-line no-bitwise
-        if (~has && target.num) {
+        const target = acData.cw.dy[has];
+        if (has !== -1 && target?.num) {
           target.num += num;
         } else {
           acData.cw.dy.push({

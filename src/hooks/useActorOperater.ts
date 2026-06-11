@@ -29,12 +29,12 @@ function useActorOperater(): ActorOperater {
     if (ActorIdents.includes(name)) {
       throw new Error(`[useActorOperater] 受保护角色关键字无法删除: ${name}`);
     }
-    // 只保留一次状态更新
     useActorStore.setState((state) => {
-      const actor = state.actors;
-      const newActor = omit(actor, [name]);
-      state.actors = newActor;
-      return state;
+      const newActors = omit(state.actors, [name]);
+      return {
+        ...state,
+        actors: newActors
+      };
     });
   }, []);
 

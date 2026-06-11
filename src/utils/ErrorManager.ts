@@ -60,10 +60,19 @@ class ErrorController {
    * @return {*}
    */
   emitError(content: string) {
-    const e = new ErrorEvent(this.eventType, { content, type: this.tag });
-    window.document.dispatchEvent(e);
+    const message = `[${ErrorTypeTransform(this.tag)}]：${content}`;
+    if (typeof window !== 'undefined' && window.document) {
+      const e = new ErrorEvent(this.eventType, {
+        content: message,
+        type: this.tag
+      });
+      window.document.dispatchEvent(e);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(message);
+    }
     // eslint-disable-next-line no-throw-literal
-    throw `[${ErrorTypeTransform(this.tag)}]：${content}`;
+    throw message;
   }
 
   /**
@@ -76,7 +85,9 @@ class ErrorController {
     callback: EventListenerOrEventListenerObject,
     options?: AddEventListenerOptions | boolean
   ): void {
-    window.document.addEventListener(this.eventType, callback, options);
+    if (typeof window !== 'undefined' && window.document) {
+      window.document.addEventListener(this.eventType, callback, options);
+    }
   }
 
   /**
@@ -89,7 +100,9 @@ class ErrorController {
     callback: EventListenerOrEventListenerObject,
     options?: AddEventListenerOptions | boolean
   ): void {
-    window.document.removeEventListener(this.eventType, callback, options);
+    if (typeof window !== 'undefined' && window.document) {
+      window.document.removeEventListener(this.eventType, callback, options);
+    }
   }
 }
 export default ErrorController;

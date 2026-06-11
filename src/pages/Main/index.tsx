@@ -65,7 +65,8 @@ function Main() {
       set('xiuxianTimeScale', XIUXIAN_TIME_SCALE_DEFAULT);
     }
   }, [get, set, actor]);
-  const xiulian = useMemo(() => get('xiulian') as any, [get]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const xiulian = useMemo(() => get('xiulian' as any) ?? 0, [get]);
   const canRed = useMemo(
     () => get('xiuwei') >= get('max_xiuwei'),
     [get, actor] //eslint-disable-line

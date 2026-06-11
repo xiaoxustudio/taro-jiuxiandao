@@ -45,12 +45,18 @@ export default function Chengjiu() {
   // 更新成就进度
   const updateProgress = useCallback(() => {
     const progress = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       battleCount: get('battleCount' as any) || 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       winStreak: get('winStreak' as any) || 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       gongfaCount: get('gongfa.ls' as any)?.length || 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fabaoCount: Object.values(get('fabao' as any) || {}).filter(Boolean)
         .length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       danfangCount: get('danfang' as any)?.length || 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       qiandaoStreak: get('qiandao.streak' as any) || 0
     };
 
