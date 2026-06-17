@@ -1,12 +1,18 @@
 import { View } from '@tarojs/components';
+import { useCallback } from 'react';
 import { JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
+import { navigateBack } from '@/utils';
 import './index.less';
 
 export default function ActorInfo() {
   const { get } = useActorController();
+  const handleBack = useCallback(() => navigateBack(), []);
   return (
     <View className='actor-info'>
+      <View className='back-btn' onClick={handleBack}>
+        ← 返回
+      </View>
       <View className='head'>
         <Text textShadow size={20} bold>
           {get('daohao')}

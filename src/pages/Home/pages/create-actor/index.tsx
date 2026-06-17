@@ -1,5 +1,4 @@
 import { View } from '@tarojs/components';
-import Taro from '@tarojs/taro';
 import { DotLoading, Selector } from 'antd-mobile';
 import { useCallback, useMemo, useState } from 'react';
 import {
@@ -14,7 +13,7 @@ import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import useStorageStore from '@/services/storage';
 import { ActorDataConfig, CWType } from '@/types';
-import { UUID } from '@/utils';
+import { UUID, navigateBack } from '@/utils';
 import { HasActor } from '@/utils/actor';
 import { GongFaPinJie, GongFaType } from '@/types/gongfa';
 import {
@@ -839,7 +838,7 @@ function Index() {
         ? {
             ...starter,
             id: UUID(),
-            attr: { ...(starter.attr ?? {}) }
+            attr: { ...starter.attr }
           }
         : undefined;
 
@@ -872,7 +871,7 @@ function Index() {
       setStore(actor.daohao);
       JXToast().show('创建角色成功');
       setTimeout(() => {
-        Taro.navigateBack({ delta: 1 });
+        navigateBack({ delta: 1 });
       }, 1000);
     } catch (e: any) {
       JXToast(e?.message || '创建角色失败').show();
