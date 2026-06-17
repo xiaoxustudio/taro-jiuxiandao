@@ -5,7 +5,7 @@ import { View } from '@tarojs/components';
 import { Container, ItemCounter, JXModal, JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { REALM_ORDER } from '@/assets/const';
-import { DAOLV_QUALITIES } from '@/consts';
+import { DAOLV_QUALITIES } from '@/config';
 import {
   generateRandomName,
   getRealmTierIndex,

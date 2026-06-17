@@ -12,7 +12,7 @@ import {
 } from '@/components';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import useStorageStore from '@/store/storage';
+import useStorageStore from '@/services/storage';
 import { ActorDataConfig, CWType } from '@/types';
 import { UUID } from '@/utils';
 import { HasActor } from '@/utils/actor';

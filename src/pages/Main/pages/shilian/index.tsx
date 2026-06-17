@@ -12,7 +12,7 @@ import {
   Text
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
-import useStorageStore from '@/store/storage';
+import useStorageStore from '@/services/storage';
 import {
   ActorZDType,
   CWType,

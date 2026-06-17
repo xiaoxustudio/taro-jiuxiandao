@@ -29,7 +29,7 @@ import {
 import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
 import useActorController from '@/hooks/useActorController';
-import useStorageStore from '@/store/storage';
+import useStorageStore from '@/services/storage';
 import './index.less';
 
 export default function Fangshi() {

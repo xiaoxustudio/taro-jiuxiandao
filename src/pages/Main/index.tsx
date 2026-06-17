@@ -15,7 +15,7 @@ import {
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
-import useStorageStore from '@/store/storage';
+import useStorageStore from '@/services/storage';
 import {
   getGradeColor,
   navigateTo,

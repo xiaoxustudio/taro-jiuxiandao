@@ -1,6 +1,6 @@
 import type { FangshiSnapshot } from '@/utils/fangshi';
 import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
-import { DAOLV_QUALITIES } from '@/consts';
+import { DAOLV_QUALITIES } from '@/config';
 import { CuWuType, FabaoType, FBItemType } from './chuwu';
 import { GongFaType } from './gongfa';
 import { AchievementData } from './chengjiu';

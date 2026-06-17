@@ -1,7 +1,7 @@
 // hooks/useActorOperater.ts
 import { omit } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
-import { ActorIdents } from '@/consts';
+import { ActorIdents } from '@/config';
 import useActorStore from '@/store/actor';
 import { ActorDataConfig } from '@/types';
 

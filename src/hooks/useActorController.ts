@@ -1,9 +1,9 @@
 import { cloneDeep, omit } from 'lodash-es';
 import { useCallback, useEffect, useMemo } from 'react';
-import { ActorIdents } from '@/consts';
+import { ActorIdents } from '@/config';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import useStorageStore from '@/store/storage';
+import useStorageStore from '@/services/storage';
 import { ActorDataConfig, NestedKeyOf } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 

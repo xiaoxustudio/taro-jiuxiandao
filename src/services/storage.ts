@@ -49,7 +49,6 @@ const useStorageStore = create<StorageStore>(() => {
           const res = await anyTaro.getStorage({ key });
           raw = res?.data;
         } catch (e) {
-          // eslint-disable-next-line no-console
           console.error('Failed to get storage:', e);
           return undefined;
         }

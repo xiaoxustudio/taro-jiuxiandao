@@ -2,8 +2,8 @@ import { omit } from 'lodash-es';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ActorDataConfig } from '@/types';
-import { ActorIdents } from '@/consts';
-import useStorageStore from '@/store/storage';
+import { ActorIdents } from '@/config';
+import useStorageStore from '@/services/storage';
 
 interface ActorStore {
   set: (store: string, newVal: ActorDataConfig) => void;
