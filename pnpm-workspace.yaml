@@ -1,0 +1,12 @@
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  '@tarojs/binding': true
+  '@tarojs/cli': true
+  core-js: false
+  core-js-pure: false
+  esbuild: false
+
+
+catalog:
+  typescript: ">=4.3.5 <5.4.0"
