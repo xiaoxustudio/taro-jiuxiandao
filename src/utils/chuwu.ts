@@ -1,6 +1,7 @@
+import cloneDeep from 'lodash-es/cloneDeep';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { BaseType, CWType, DYItemType, FBItemType, QTItemType } from '@/types';
+import { BaseType, CWType } from '@/types';
 import { getActor } from './actor';
 /* 角色储物相关操作 */
 
@@ -42,15 +43,7 @@ function TR(type: CWType) {
 function Has({ name, type = CWType.FB }: OperaterType) {
   const acData = getActor();
   const cw = acData.cw[TR(type)];
-  let index = -1;
-  cw.some((v: BaseType, ind: number) => {
-    if (v.name === name) {
-      index = ind;
-      return true;
-    }
-    return false;
-  });
-  return index;
+  return (cw as BaseType[]).findIndex((v) => v.name === name);
 }
 /**
  * @description: 判断是否拥有该物品数组
@@ -81,44 +74,23 @@ function Remove(item: OperaterType) {
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();
-  const ItemData = Get(item);
-  const lessNum = (ItemData!.num! || 1) - (item.num || 0);
-  let cw: BaseType[];
-  switch (item.type) {
-    case CWType.QT:
-      cw = acData.cw.qt;
-      break;
-    case CWType.FB:
-      cw = acData.cw.fb;
-      break;
-    case CWType.DY:
-      cw = acData.cw.dy;
-      break;
-  }
-  // 如果为0，，则直接删除
+  const updated = cloneDeep(acData);
+  const typeKey = TR(item.type);
+  const cwArray = updated.cw[typeKey] as BaseType[];
+  const existingIndex = cwArray.findIndex(
+    (v) => v.name === item.name && v.type === item.type
+  );
+  if (existingIndex === -1) return;
+  const currentNum = cwArray[existingIndex]?.num ?? 1;
+  const lessNum = currentNum - (item.num || 0);
   if (lessNum <= 0) {
-    cw = cw.filter((v) => !(JSON.stringify(v) === JSON.stringify(ItemData)));
+    updated.cw[typeKey] = cwArray.filter((_, i) => i !== existingIndex) as any;
   } else {
-    cw = cw.map((v) => {
-      if (v === ItemData) {
-        v.num = lessNum;
-      }
-      return v;
-    });
+    updated.cw[typeKey] = cwArray.map((v, i) =>
+      i === existingIndex ? { ...v, num: lessNum } : v
+    ) as any;
   }
-  switch (item.type) {
-    case CWType.QT:
-      acData.cw.qt = cw as QTItemType[];
-      break;
-    case CWType.FB:
-      acData.cw.fb = cw as FBItemType[];
-      break;
-    case CWType.DY:
-      acData.cw.dy = cw as DYItemType[];
-      break;
-  }
-  // 设置数据
-  set(current, acData);
+  set(current, updated);
 }
 
 /**
@@ -147,58 +119,30 @@ function Add({
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();
-  if (!isPile) {
-    num = 1;
-  }
-  const has = Has({ name, type });
+  const updated = cloneDeep(acData);
+  const safeNum = isPile ? num : 1;
+  const typeKey = TR(type);
+  const cwArray = [...(updated.cw[typeKey] as BaseType[])];
+  const existingIndex = cwArray.findIndex(
+    (v) => v.name === name && v.type === type
+  );
   const baseObject = {
     name,
+    type,
     isPile,
-    num,
+    num: safeNum,
     ...props
   };
-  switch (type) {
-    case CWType.QT:
-      {
-        const target = acData.cw.qt[has];
-        if (has !== -1 && target?.num) {
-          target.num += num;
-        } else {
-          acData.cw.qt.push({
-            type: CWType.QT,
-            ...baseObject
-          });
-        }
-      }
-      break;
-    case CWType.FB:
-      {
-        const target = acData.cw.fb[has];
-        if (has !== -1 && target?.num) {
-          target.num += num;
-        } else {
-          acData.cw.fb.push({
-            type: CWType.FB,
-            ...baseObject
-          } as FBItemType);
-        }
-      }
-      break;
-    case CWType.DY:
-      {
-        const target = acData.cw.dy[has];
-        if (has !== -1 && target?.num) {
-          target.num += num;
-        } else {
-          acData.cw.dy.push({
-            type: CWType.DY,
-            ...baseObject
-          });
-        }
-      }
-      break;
+  if (existingIndex !== -1 && cwArray[existingIndex]?.num) {
+    cwArray[existingIndex] = {
+      ...cwArray[existingIndex],
+      num: (cwArray[existingIndex].num || 0) + safeNum
+    };
+  } else {
+    cwArray.push(baseObject as any);
   }
-  set(current, acData);
+  updated.cw[typeKey] = cwArray as any;
+  set(current, updated);
 }
 
 /**
@@ -213,8 +157,9 @@ function AddDanFang(id: string) {
   if (acData.danfang.some((v) => v.id === id)) {
     return;
   }
-  acData.danfang.push({ id, exp: 0 });
-  set(current, acData);
+  const updated = cloneDeep(acData);
+  updated.danfang.push({ id, exp: 0 });
+  set(current, updated);
 }
 
 /**

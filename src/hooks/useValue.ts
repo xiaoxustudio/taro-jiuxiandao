@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
 export interface IUseValueNotState<T> {
-  _value: T;
-  value: T;
+  readonly value: T;
   set(value: T): void;
 }
 
@@ -15,17 +14,12 @@ function useValue<T>(
   state = false
 ): IUseValueNotState<T> | IUseValueState<T> {
   const [data, setData] = useState(initialdata);
-  const obj = {
-    _value: data,
-    set(value: T) {
-      this._value = value;
-      setData(value);
-    },
+  const obj: IUseValueNotState<T> = {
     get value() {
-      return this._value;
+      return data;
     },
-    set value(value) {
-      this.set(value);
+    set(value: T) {
+      setData(value);
     }
   };
 

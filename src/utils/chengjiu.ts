@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash-es/cloneDeep';
 import achievementConfig from '@/assets/chengjiu.json';
 import {
   AchievementItem,
@@ -114,7 +115,7 @@ export const updateAchievementProgress = (
   actor: any,
   progress: Record<string, any>
 ): AchievementData => {
-  const updatedData = { ...achievementData };
+  const updatedData = cloneDeep(achievementData);
 
   Object.values(updatedData.achievements).forEach((achievement) => {
     const isCompleted = checkCondition(achievement.condition, actor, progress);
@@ -127,7 +128,6 @@ export const updateAchievementProgress = (
       achievement.status = 'completed';
       achievement.completedAt = Date.now();
     }
-    // 更新进度
     if (
       achievement.condition.field &&
       progress[achievement.condition.field] !== undefined
@@ -159,7 +159,7 @@ export const claimAchievementReward = (
     return { success: false, error: '奖励已领取' };
   }
 
-  const updatedData = { ...achievementData };
+  const updatedData = cloneDeep(achievementData);
   updatedData.claimedIds.push(achievementId);
   updatedData.claimedPoints += achievement.points || 0;
   updatedData.achievements[achievementId].status = 'claimed';

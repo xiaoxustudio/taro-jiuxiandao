@@ -5,11 +5,11 @@ import styles from './index.module.less';
 
 export interface JXButtonProps extends Omit<ButtonProps, 'color'> {
   color?: string;
-  width: number | string;
-  height: number;
-  className: string;
-  shadow: boolean; // 阴影
-  transparent: boolean; // 背景透明
+  width?: number | string;
+  height?: number;
+  className?: string;
+  shadow?: boolean;
+  transparent?: boolean;
 }
 
 function JXButton({

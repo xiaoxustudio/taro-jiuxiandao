@@ -1,5 +1,4 @@
 import { View, ViewProps } from '@tarojs/components';
-import { createSelectorQuery, useReady } from '@tarojs/taro';
 import {
   PropsWithChildren,
   useCallback,
@@ -42,7 +41,7 @@ function Scroll({
     if (calc) setHeight(computeHeight(calc));
   }, [calc, computeHeight]);
 
-  useReady(() => {
+  useEffect(() => {
     if (calc) {
       setHeight(computeHeight(calc));
       return;
@@ -50,12 +49,12 @@ function Scroll({
     if (ScrollRef.current && ScrollHook) {
       ScrollHook.scrollRef.current = ScrollRef.current;
     }
-    const select = createSelectorQuery().select(`#${id.current}`);
-    select.boundingClientRect().exec(([res]) => {
-      const top = (res?.top as number) || 0;
+    const el = document.getElementById(id.current);
+    if (el) {
+      const top = el.getBoundingClientRect().top || 0;
       setHeight(computeHeight(top));
-    });
-  });
+    }
+  }, [calc, computeHeight, ScrollHook]);
 
   useEffect(() => {
     const handler = () => {
@@ -63,11 +62,11 @@ function Scroll({
         setHeight(computeHeight(calc));
         return;
       }
-      const select = createSelectorQuery().select(`#${id.current}`);
-      select.boundingClientRect().exec(([res]) => {
-        const top = (res?.top as number) || 0;
+      const el = document.getElementById(id.current);
+      if (el) {
+        const top = el.getBoundingClientRect().top || 0;
         setHeight(computeHeight(top));
-      });
+      }
     };
     handler();
     if (typeof window !== 'undefined') {

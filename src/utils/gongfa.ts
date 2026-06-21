@@ -1,4 +1,5 @@
 import omit from 'lodash-es/omit';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { GongFaType } from '@/types/gongfa';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
@@ -105,41 +106,38 @@ function setCurrentGongFa(id: string): void {
   const gf = get(id);
   if (!gf) return;
 
-  // 如果已经穿戴了功法，先卸下当前功法
-  if (acData.gongfa.current) {
-    const currentGongFa = acData.gongfa.current;
-    // 减少当前功法的属性
+  const updated = cloneDeep(acData);
+
+  if (updated.gongfa.current) {
+    const currentGongFa = updated.gongfa.current;
     const currentAdds = currentGongFa.attr;
     if (currentAdds) {
       Object.keys(currentAdds).forEach((key) => {
-        acData.addAttr[key] -= currentAdds[key];
+        updated.addAttr[key] =
+          (updated.addAttr[key] || 0) - (currentAdds[key] || 0);
       });
     }
-    // 将当前功法添加回列表（不触发remove操作）
-    const existingIndex = acData.gongfa.ls.findIndex(
+    const existingIndex = updated.gongfa.ls.findIndex(
       (v) => v.id === currentGongFa.id
     );
     if (existingIndex === -1) {
-      acData.gongfa.ls.push(currentGongFa);
+      updated.gongfa.ls.push(currentGongFa);
     } else {
-      acData.gongfa.ls[existingIndex] = currentGongFa;
+      updated.gongfa.ls[existingIndex] = currentGongFa;
     }
   }
 
-  // 从列表中移除新功法并设置为当前功法
-  acData.gongfa.ls = acData.gongfa.ls.filter((v) => v.id !== gf.id);
-  // 创建新功法副本以避免引用问题
+  updated.gongfa.ls = updated.gongfa.ls.filter((v) => v.id !== gf.id);
   const newGongfa = { ...gf, time: Date.now() };
-  acData.gongfa.current = newGongfa;
+  updated.gongfa.current = newGongfa;
 
-  // 增加新功法的属性
   const adds = newGongfa.attr;
   if (adds) {
     Object.keys(adds).forEach((key) => {
-      acData.addAttr[key] += adds[key];
+      updated.addAttr[key] = (updated.addAttr[key] || 0) + (adds[key] || 0);
     });
   }
-  set(current, acData);
+  set(current, updated);
 }
 
 /**
@@ -153,25 +151,25 @@ function putCurrentGongfa(): Promise<boolean> {
   const currentGongFa = acData.gongfa.current;
   let state = false;
   if (currentGongFa) {
-    const elapsedMs = currentGongFa?.time
-      ? Math.max(0, Date.now() - currentGongFa.time)
-      : 0;
+    const updated = cloneDeep(acData);
+    const gf = updated.gongfa.current;
+    const elapsedMs = gf?.time ? Math.max(0, Date.now() - gf.time) : 0;
     const timeArr = new TimeArray(elapsedMs);
     const addExp = timeArr.toZhouTian() * 1000;
-    currentGongFa.exp += addExp;
-    add(currentGongFa, false, false);
-    acData.gongfa.current = null;
+    gf!.exp += addExp;
+    add(gf!, false, false);
+    updated.gongfa.current = null;
     state = true;
-    // 增加或减少属性（+就是-，-就是+）
-    const adds = currentGongFa.attr;
+    const adds = gf!.attr;
     if (adds) {
       Object.keys(adds).forEach((key) => {
-        acData.addAttr[key] -= adds[key];
+        updated.addAttr[key] = (updated.addAttr[key] || 0) - (adds[key] || 0);
       });
     }
+    set(current, updated);
+  } else {
+    set(current, acData);
   }
-
-  set(current, acData);
   return Promise.resolve(state);
 }
 

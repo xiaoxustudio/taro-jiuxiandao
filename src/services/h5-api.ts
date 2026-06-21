@@ -23,8 +23,8 @@ const functions = {
       console.warn('[H5Api] clearStore blocked: origin not allowed');
       return false;
     }
-    useActorStore.setState({ actors: {} });
-    useStore.setState({ current: '' });
+    useActorStore.setState((state) => ({ ...state, actors: {} }));
+    useStore.setState((state) => ({ ...state, current: '' }));
     return true;
   }
 };

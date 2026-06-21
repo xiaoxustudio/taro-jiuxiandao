@@ -4,18 +4,18 @@ import { CSSProperties, PropsWithChildren } from 'react';
 import styles from './index.module.less';
 
 export interface TextProps extends ViewProps {
-  size: number; // 文字大小
-  bold: boolean; // 加粗
-  center: boolean; // 居中对齐
-  color: string;
-  className: string;
-  verticalText: boolean; // 垂直排列
-  space: number; // 文字间距
-  inline: boolean; // 行
-  noWrap: boolean; // 不换行
-  textShadow: boolean; // 文字阴影
-  align: 'left' | 'center' | 'right'; // 文字方向
-  style: CSSProperties;
+  size?: number;
+  bold?: boolean;
+  center?: boolean;
+  color?: string;
+  className?: string;
+  verticalText?: boolean;
+  space?: number;
+  inline?: boolean;
+  noWrap?: boolean;
+  textShadow?: boolean;
+  align?: 'left' | 'center' | 'right';
+  style?: CSSProperties;
 }
 
 function Text({

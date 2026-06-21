@@ -1,4 +1,4 @@
-import { round } from 'lodash-es';
+import { cloneDeep, round } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
 import Taro from '@tarojs/taro';
@@ -15,6 +15,8 @@ import {
 } from '@/components';
 import JXGrid from '@/components/Grid';
 import useActorController from '@/hooks/useActorController';
+import useActorStore from '@/store/actor';
+import useStore from '@/store/store';
 import useStorageStore from '@/services/storage';
 import {
   getGradeColor,
@@ -462,13 +464,43 @@ function Main() {
   };
 
   useEffect(() => {
-    // 寿元计算
-    const time1 = get('time1');
-    const calcShouYuan = (Date.now() - time1) / TimeArray.Map.hour;
-    const calcCache = (calcShouYuan / 24) * 2 + get('shouyuan');
-    set('shouyuan', Math.round(calcCache));
-    // 判断寿元是否到期
-    if (calcCache >= get('max_shouyuan')) {
+    const freshGet = (key: string) => {
+      const { actors } = useActorStore.getState();
+      const { current: curr } = useStore.getState();
+      const ac = actors[curr];
+      if (!ac) return null;
+      return key
+        .split('.')
+        .reduce((obj: any, part: string) => obj?.[part] ?? null, ac);
+    };
+    const rawSet = (key: string, val: any) => {
+      const storeActor = useActorStore.getState();
+      const curr = useStore.getState().current;
+      const ac = storeActor.actors[curr];
+      if (!ac) return;
+      const updated = cloneDeep(ac);
+      const parts = key.split('.');
+      let target: any = updated;
+      for (let i = 0; i < parts.length - 1; i++) {
+        if (!target[parts[i]]) target[parts[i]] = {};
+        target = target[parts[i]];
+      }
+      target[parts[parts.length - 1]] = val;
+      useActorStore.setState((state) => ({
+        ...state,
+        actors: { ...state.actors, [curr]: updated }
+      }));
+    };
+
+    const time1 = freshGet('time1') || Date.now();
+    const elapsedHours = (Date.now() - time1) / TimeArray.Map.hour;
+    const shouyuanDelta = (elapsedHours / 24) * 2;
+    const currentShouyuan = freshGet('shouyuan') || 0;
+    const maxShouyuan = freshGet('max_shouyuan') || 0;
+    const newShouyuan = Math.round(currentShouyuan + shouyuanDelta);
+    rawSet('shouyuan', newShouyuan);
+
+    if (newShouyuan >= maxShouyuan) {
       const { close } = JXModal.show({
         visible: true,
         title: '重生',
@@ -487,23 +519,23 @@ function Main() {
         },
         onCancel() {}
       });
-    } else if (calcShouYuan >= 24) {
-      const needAdd = time1 + (calcShouYuan / 24) * TimeArray.Map.hour * 24;
-      set('time1', Math.round(needAdd));
+    } else if (elapsedHours >= 24) {
+      const advance =
+        time1 + Math.floor(elapsedHours / 24) * TimeArray.Map.hour * 24;
+      rawSet('time1', Math.round(advance));
     }
-    const shenshiTime = get('shenshiTime');
-    const calcShenShi = (Date.now() - shenshiTime) / TimeArray.Map.hour;
-    if (calcShenShi >= 1) {
-      const maxShenShi = get('max_shenshi');
-      let data = get('shenshi') + (maxShenShi * calcShenShi) / 24;
-      if (data > maxShenShi) {
-        data = maxShenShi;
-      }
-      set('shenshi', Math.round(data));
-      set('shenshiTime', Date.now());
+
+    const shenshiTime = freshGet('shenshiTime') || Date.now();
+    const shenshiElapsed = (Date.now() - shenshiTime) / TimeArray.Map.hour;
+    if (shenshiElapsed >= 1) {
+      const maxShenShi = freshGet('max_shenshi') || 0;
+      const currentShenshi = freshGet('shenshi') || 0;
+      let newShenshi = currentShenshi + (maxShenShi * shenshiElapsed) / 24;
+      if (newShenshi > maxShenShi) newShenshi = maxShenShi;
+      rawSet('shenshi', Math.round(newShenshi));
+      rawSet('shenshiTime', Date.now());
     }
-    // set('max_shouyuan', 0);
-  }, []); //eslint-disable-line
+  }, []);
 
   return (
     <View>

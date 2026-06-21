@@ -3,6 +3,10 @@
  * @return {*}
  */
 export function isMobile() {
-  return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
+  if (typeof navigator === 'undefined') return false;
+  return (
+    /Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
 }
 export default {};

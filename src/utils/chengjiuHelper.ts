@@ -1,4 +1,5 @@
-import { AchievementItem } from '@/types/chengjiu';
+import cloneDeep from 'lodash-es/cloneDeep';
+import type { AchievementItem, AchievementData } from '@/types/chengjiu';
 import { updateAchievementProgress, checkCondition } from './chengjiu';
 
 /**
@@ -107,27 +108,27 @@ export const checkQiandaoAchievements = (get: any, set: any) => {
     qiandaoStreak: get('qiandao.streak') || 0
   };
 
-  // 只更新签到相关的成就
-  const updated = { ...chengjiu };
-  Object.values(updated.achievements).forEach((achievement) => {
-    const typedAchievement = achievement as AchievementItem;
-    if (typedAchievement.condition.field === 'qiandaoStreak') {
-      const isCompleted = checkCondition(
-        typedAchievement.condition,
-        null,
-        progress
-      );
-      if (
-        isCompleted &&
-        typedAchievement.status !== 'completed' &&
-        typedAchievement.status !== 'claimed'
-      ) {
-        typedAchievement.status = 'completed';
-        typedAchievement.completedAt = Date.now();
+  const updated = cloneDeep(chengjiu) as AchievementData;
+  Object.values(updated.achievements).forEach(
+    (achievement: AchievementItem) => {
+      if (achievement.condition.field === 'qiandaoStreak') {
+        const isCompleted = checkCondition(
+          achievement.condition,
+          null,
+          progress
+        );
+        if (
+          isCompleted &&
+          achievement.status !== 'completed' &&
+          achievement.status !== 'claimed'
+        ) {
+          achievement.status = 'completed';
+          achievement.completedAt = Date.now();
+        }
+        achievement.progress = progress.qiandaoStreak;
       }
-      typedAchievement.progress = progress.qiandaoStreak;
     }
-  });
+  );
   set('chengjiu', updated);
 };
 

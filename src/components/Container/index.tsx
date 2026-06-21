@@ -8,7 +8,6 @@ import {
   useRef,
   useState
 } from 'react';
-import { useReady, createSelectorQuery } from '@tarojs/taro';
 import { CreateUniqueIndex, navigateBack } from '@/utils';
 import JXDivider from '../Divider';
 import JXSpace from '../Space';
@@ -52,14 +51,12 @@ function Container({
     context?.setCalcHeight(height);
   }, [context, height]);
 
-  useReady(() => {
-    createSelectorQuery()
-      .select(`#${id.current}`)
-      .boundingClientRect()
-      .exec(([res]) => {
-        setHeight(res.height);
-      });
-  });
+  useEffect(() => {
+    const el = document.getElementById(id.current);
+    if (el) {
+      setHeight(el.offsetHeight);
+    }
+  }, []);
 
   return (
     <View className={classNames(styles.Container, className)} {...props}>

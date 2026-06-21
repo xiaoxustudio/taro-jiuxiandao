@@ -29,12 +29,16 @@ export enum FabaoPinjie {
   大乘 = '通天灵宝'
 }
 
-// 工具类型：生成嵌套路径的联合类型（如 "a" | "a.b" | "a.b.c"）
-export type NestedKeyOf<Obj> = Obj extends object
+// 工具类型：生成嵌套路径的联合类型（支持 2 层嵌套）
+type NestedKeys<T, Prefix extends string = ''> = T extends object
   ? {
-      [K in keyof Obj & string]: `${K}` | `${K}.${NestedKeyOf<Obj[K]>}`;
-    }[keyof Obj & string]
+      [K in keyof T & string]:
+        | `${Prefix}${K}`
+        | (T[K] extends object ? NestedKeys<T[K], `${Prefix}${K}.`> : never);
+    }[keyof T & string]
   : never;
+
+export type NestedKeyOf<Obj extends object> = NestedKeys<Obj>;
 
 /**
  * @description: 基础储物类型
