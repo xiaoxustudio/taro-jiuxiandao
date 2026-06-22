@@ -314,18 +314,26 @@ export const MATERIAL_BASE_LIST: MaterialRegistryItem[] = [
   { name: '玄纹髓', itype: '五品' },
   { name: '霜魄晶', itype: '六品' },
   { name: '幽炎砂', itype: '七品' },
-  { name: '残·龙魂', itype: '八品' }
+  { name: '残·龙魂', itype: '八品' },
+  { name: '凤凰翎', itype: '五品' },
+  { name: '麒麟角', itype: '五品' },
+  { name: '万年温玉', itype: '六品' },
+  { name: '九天玄铁', itype: '六品' },
+  { name: '星辰砂', itype: '七品' },
+  { name: '混沌之气', itype: '七品' },
+  { name: '鸿蒙紫气', itype: '八品' },
+  { name: '天道碎片', itype: '八品' }
 ];
 export const MATERIAL_GRADE_COUNTS: Record<(typeof clGrades)[number], number> =
   {
     一品: 10,
     二品: 8,
     三品: 6,
-    四品: 5,
-    五品: 4,
-    六品: 3,
-    七品: 2,
-    八品: 2
+    四品: 6,
+    五品: 6,
+    六品: 5,
+    七品: 4,
+    八品: 4
   };
 const UINT32_MAX = 4294967296;
 const seedToNumber = (seed: string) => {

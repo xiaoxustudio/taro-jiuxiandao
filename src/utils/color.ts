@@ -33,8 +33,41 @@ export const realmColorMap: Record<string, string> = {
   大乘: gradeColorList[7]
 };
 
+const fabaoGradeColorMap: Record<string, string> = {
+  法器: gradeColorList[0],
+  灵器: gradeColorList[1],
+  法宝: gradeColorList[2],
+  古宝: gradeColorList[3],
+  灵宝: gradeColorList[4],
+  后天灵宝: gradeColorList[5],
+  先天灵宝: gradeColorList[6],
+  通天灵宝: gradeColorList[7]
+};
+
+const gongfaGradeColorMap: Record<string, string> = {
+  一品: gradeColorList[0],
+  二品: gradeColorList[1],
+  三品: gradeColorList[2],
+  四品: gradeColorList[3],
+  五品: gradeColorList[4],
+  六品: gradeColorList[5],
+  七品: gradeColorList[6],
+  八品: gradeColorList[7],
+  九品: gradeColorList[7],
+  十品: gradeColorList[7],
+  十一品: gradeColorList[7],
+  十二品: gradeColorList[7],
+  十三品: gradeColorList[7],
+  十四品: gradeColorList[7],
+  十五品: gradeColorList[7]
+};
+
 export const getGradeColor = (label?: string) =>
-  (label && gradeColorMap[label]) || (label && realmColorMap[label]) || '';
+  (label && gradeColorMap[label]) ||
+  (label && realmColorMap[label]) ||
+  (label && fabaoGradeColorMap[label]) ||
+  (label && gongfaGradeColorMap[label]) ||
+  '';
 
 export function splitNameByRealm(name: string) {
   const realm = REALM_ORDER.find((item) => name.includes(item));

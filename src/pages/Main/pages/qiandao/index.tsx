@@ -48,7 +48,7 @@ function QianDao() {
       streak = 1;
     }
 
-    const ls = random(0, 9999);
+    const ls = random(10, 50) + streak * 20;
     set('qiandao.time', currentDate);
     set('qiandao.last', currentDate);
     set('qiandao.count', get('qiandao.count') + 1);

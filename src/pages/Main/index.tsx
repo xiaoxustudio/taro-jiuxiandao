@@ -26,12 +26,9 @@ import {
   formatXiuxianCalendar
 } from '@/utils';
 import {
-  getJingJieMaxDep,
   getLingQiForJingJie,
   getLingQiForRate,
   getLingQiToNumber,
-  JingJie1ToNumber,
-  JingJie1Transform,
   JingJie2Transform,
   JingJieTransform
 } from '@/utils/actor';
@@ -67,6 +64,36 @@ function Main() {
       set('xiuxianTimeScale', XIUXIAN_TIME_SCALE_DEFAULT);
     }
   }, [get, set, actor]);
+
+  useEffect(() => {
+    const lastTime = get('time1');
+    if (!lastTime) return;
+    const elapsedHours = (Date.now() - lastTime) / TimeArray.Map.hour;
+    if (elapsedHours < 1) return;
+
+    const maxShenshi = get('max_shenshi') || 0;
+    const currentShenshi = get('shenshi') || 0;
+    const shenshiRecover = Math.round(
+      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 24)
+    );
+    if (shenshiRecover > 0) {
+      set('shenshi', currentShenshi + shenshiRecover);
+      set('shenshiTime', Date.now());
+      JXModal.show({
+        title: '离线收益',
+        content: (
+          <JXSpace direction='vertical'>
+            <Text>你离开了 {Math.round(elapsedHours)} 小时</Text>
+            <Text>神识自动恢复：{shenshiRecover} 点</Text>
+          </JXSpace>
+        ),
+        closeOnMaskClick: true,
+        disableCancle: true,
+        disableOk: true
+      });
+    }
+  }, [get, set]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const xiulian = useMemo(() => get('xiulian' as any) ?? 0, [get]);
   const canRed = useMemo(
@@ -105,10 +132,15 @@ function Main() {
           JXToast('修为不足，无法升阶！').show();
           return;
         }
-        // 计算
+        // 计算（对数曲线避免后期膨胀）
+        const lv = get('lv');
+        const jjBase = getLingQiForJingJie();
+        const jjIdx = getLingQiToNumber();
+        const logFactor = 1 + Math.log(Math.max(1, lv)) / 5;
         const calc = Math.ceil(
-          getLingQiForJingJie() * get('lv') +
-            (getLingQiToNumber() + 1) * get('max_xiuwei') * 0.7
+          jjBase * logFactor +
+            (jjIdx + 1) *
+              Math.max(jjBase * 0.5, get('max_xiuwei') * 0.4 * logFactor)
         );
         set('lv', get('lv') + 1);
         set('xiuwei', Math.ceil(get('xiuwei') - get('max_xiuwei')));
@@ -147,16 +179,13 @@ function Main() {
           练气: '20001',
           筑基: '20002',
           结丹: '20003',
-          元婴: '20004'
-          // 化神: '20005',
-          // 返虚: '20006',
-          // 合体: '20007'
+          元婴: '20004',
+          化神: '20005',
+          返虚: '20006',
+          合体: '20007'
         };
         // 大阶段境界
-        if (
-          get('jingjie2') === '大圆满' &&
-          JingJie1ToNumber(get('jingjie2')) === getJingJieMaxDep()
-        ) {
+        if (get('jingjie2') === '大圆满') {
           if (!tpdata) {
             JXToast().show(`天道压制，无法突破更高境界！`);
             return;
@@ -175,7 +204,7 @@ function Main() {
           const isCl = need.length > 0 && chuwu.HasArr(need);
           if (isCl) {
             const jj = JingJieTransform(get('jingjie'));
-            set('jingjie1', JingJie1Transform(get('jingjie1')));
+            set('jingjie1', '一阶');
             set('jingjie', jj); // 大境界转换
             const lv1 = get('lv') / 20 + 1;
             const calcGongji =
@@ -463,79 +492,85 @@ function Main() {
     });
   };
 
-  useEffect(() => {
-    const freshGet = (key: string) => {
-      const { actors } = useActorStore.getState();
-      const { current: curr } = useStore.getState();
-      const ac = actors[curr];
-      if (!ac) return null;
-      return key
-        .split('.')
-        .reduce((obj: any, part: string) => obj?.[part] ?? null, ac);
-    };
-    const rawSet = (key: string, val: any) => {
-      const storeActor = useActorStore.getState();
-      const curr = useStore.getState().current;
-      const ac = storeActor.actors[curr];
-      if (!ac) return;
-      const updated = cloneDeep(ac);
-      const parts = key.split('.');
-      let target: any = updated;
-      for (let i = 0; i < parts.length - 1; i++) {
-        if (!target[parts[i]]) target[parts[i]] = {};
-        target = target[parts[i]];
-      }
-      target[parts[parts.length - 1]] = val;
-      useActorStore.setState((state) => ({
-        ...state,
-        actors: { ...state.actors, [curr]: updated }
-      }));
-    };
-
-    const time1 = freshGet('time1') || Date.now();
-    const elapsedHours = (Date.now() - time1) / TimeArray.Map.hour;
-    const shouyuanDelta = (elapsedHours / 24) * 2;
-    const currentShouyuan = freshGet('shouyuan') || 0;
-    const maxShouyuan = freshGet('max_shouyuan') || 0;
-    const newShouyuan = Math.round(currentShouyuan + shouyuanDelta);
-    rawSet('shouyuan', newShouyuan);
-
-    if (newShouyuan >= maxShouyuan) {
-      const { close } = JXModal.show({
-        visible: true,
-        title: '重生',
-        closeOnMaskClick: false,
-        content: (
-          <JXSpace direction='vertical' gap={10}>
-            <Text>你的寿元已到极限，修仙之路无法继续前进...</Text>
-            <Text>请选择重生以继续你的修仙之旅</Text>
-          </JXSpace>
-        ),
-        disableCancle: true,
-        okText: '重生',
-        onOk() {
-          close();
-          navigateTo('Main/pages/rebirth/index', { replace: true });
-        },
-        onCancel() {}
-      });
-    } else if (elapsedHours >= 24) {
-      const advance =
-        time1 + Math.floor(elapsedHours / 24) * TimeArray.Map.hour * 24;
-      rawSet('time1', Math.round(advance));
-    }
-
-    const shenshiTime = freshGet('shenshiTime') || Date.now();
-    const shenshiElapsed = (Date.now() - shenshiTime) / TimeArray.Map.hour;
-    if (shenshiElapsed >= 1) {
-      const maxShenShi = freshGet('max_shenshi') || 0;
-      const currentShenshi = freshGet('shenshi') || 0;
-      let newShenshi = currentShenshi + (maxShenShi * shenshiElapsed) / 24;
-      if (newShenshi > maxShenShi) newShenshi = maxShenShi;
-      rawSet('shenshi', Math.round(newShenshi));
-      rawSet('shenshiTime', Date.now());
-    }
+  const freshGet = useCallback((key: string) => {
+    const { actors } = useActorStore.getState();
+    const { current: curr } = useStore.getState();
+    const ac = actors[curr];
+    if (!ac) return null;
+    return key
+      .split('.')
+      .reduce((obj: any, part: string) => obj?.[part] ?? null, ac);
   }, []);
+
+  const rawSet = useCallback((key: string, val: any) => {
+    const storeActor = useActorStore.getState();
+    const curr = useStore.getState().current;
+    const ac = storeActor.actors[curr];
+    if (!ac) return;
+    const updated = cloneDeep(ac);
+    const parts = key.split('.');
+    let target: any = updated;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!target[parts[i]]) target[parts[i]] = {};
+      target = target[parts[i]];
+    }
+    target[parts[parts.length - 1]] = val;
+    useActorStore.setState((state) => ({
+      ...state,
+      actors: { ...state.actors, [curr]: updated }
+    }));
+  }, []);
+
+  useEffect(() => {
+    const tick = () => {
+      const shenshiTime = freshGet('shenshiTime') || Date.now();
+      const shenshiElapsed = (Date.now() - shenshiTime) / TimeArray.Map.hour;
+      if (shenshiElapsed >= 1) {
+        const maxShenShi = freshGet('max_shenshi') || 0;
+        const currentShenshi = freshGet('shenshi') || 0;
+        let newShenshi = currentShenshi + (maxShenShi * shenshiElapsed) / 24;
+        if (newShenshi > maxShenShi) newShenshi = maxShenShi;
+        rawSet('shenshi', Math.round(newShenshi));
+        rawSet('shenshiTime', Date.now());
+      }
+
+      const time1 = freshGet('time1') || Date.now();
+      const elapsedHours = (Date.now() - time1) / TimeArray.Map.hour;
+      if (elapsedHours >= 24) {
+        const advance =
+          time1 + Math.floor(elapsedHours / 24) * TimeArray.Map.hour * 24;
+        rawSet('time1', Math.round(advance));
+        const currentShouyuan = freshGet('shouyuan') || 0;
+        const maxShouyuan = freshGet('max_shouyuan') || 0;
+        const newShouyuan = Math.round(currentShouyuan + 2);
+        rawSet('shouyuan', Math.min(newShouyuan, maxShouyuan));
+        if (newShouyuan >= maxShouyuan) {
+          const { close } = JXModal.show({
+            visible: true,
+            title: '重生',
+            closeOnMaskClick: false,
+            content: (
+              <JXSpace direction='vertical' gap={10}>
+                <Text>你的寿元已到极限，修仙之路无法继续前进...</Text>
+                <Text>请选择重生以继续你的修仙之旅</Text>
+              </JXSpace>
+            ),
+            disableCancle: true,
+            okText: '重生',
+            onOk() {
+              close();
+              navigateTo('Main/pages/rebirth/index', { replace: true });
+            },
+            onCancel() {}
+          });
+        }
+      }
+    };
+
+    tick();
+    const id = setInterval(tick, 60000);
+    return () => clearInterval(id);
+  }, [freshGet, rawSet]);
 
   return (
     <View>

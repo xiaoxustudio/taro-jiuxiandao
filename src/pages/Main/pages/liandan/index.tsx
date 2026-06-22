@@ -51,8 +51,8 @@ export default function Liandan() {
     [get, customDanfang]
   );
 
-  const isComplate = useMemo(() => {
-    if (!get('liandan.time')) return false;
+  const complateInfo = useMemo(() => {
+    if (!get('liandan.time')) return { done: false, text: '无' };
     const startTime = get('liandan.time') as number;
     const id = get('liandan.danyao.id') as string;
     const base = (danfangData as Record<string, any>)[id] || customDanfang[id];
@@ -64,12 +64,12 @@ export default function Liandan() {
     const remainingMs = endTime - currentTime();
 
     if (remainingMs <= 0) {
-      return '已完成';
+      return { done: true, text: '已完成' };
     }
 
     const last = new TimeArray(remainingMs);
 
-    return `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）`;
+    return { done: false, text: `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）` };
   }, [get, customDanfang]);
 
   const getNum = (item: [string, number]) => {
@@ -98,7 +98,7 @@ export default function Liandan() {
         </Text>
         <Text>
           剩余时间:
-          {isComplate || '无'}
+          {complateInfo.text}
         </Text>
         <Text>
           预计收获:
@@ -123,7 +123,7 @@ export default function Liandan() {
         <JXButton>升阶丹炉</JXButton>
         <JXButton
           onClick={() => {
-            if (isComplate) {
+            if (complateInfo.done) {
               const dy = get('liandan.danyao');
               if (dy) {
                 const { id, num: dNum } = dy;
@@ -188,7 +188,7 @@ export default function Liandan() {
             JXToast().show('正则炼制丹药，不可重复炼制！');
           } else if (hasCl) {
             set('liandan.danyao.id', data.id);
-            set('liandan.danyao.num', 1);
+            set('liandan.danyao.num', num);
             set('liandan.time', currentTime());
             JXToast().show(`开始炼制丹药：${data.name}`);
           } else {
