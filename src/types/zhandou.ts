@@ -7,7 +7,7 @@ import { ActorDataConfigForZhanDou } from './actor';
  */
 export interface YaoShouZDType extends Omit<
   ActorDataConfigForZhanDou,
-  'xianyuan' | 'fashu'
+  'xianyuan'
 > {
   name: string;
   df: string; // 地方
@@ -23,7 +23,7 @@ export interface YaoShouZDType extends Omit<
  */
 export interface ActorZDType extends Omit<
   ActorDataConfigForZhanDou,
-  'xianyuan' | 'fashu'
+  'xianyuan'
 > {
   name: string;
 }

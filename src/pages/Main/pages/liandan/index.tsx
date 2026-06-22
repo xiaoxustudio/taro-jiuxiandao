@@ -52,16 +52,10 @@ export default function Liandan() {
   );
 
   const complateInfo = useMemo(() => {
-    if (!get('liandan.time')) return { done: false, text: '无' };
-    const startTime = get('liandan.time') as number;
-    const id = get('liandan.danyao.id') as string;
-    const base = (danfangData as Record<string, any>)[id] || customDanfang[id];
-    const danTimeArray = (base?.time ?? []) as number[];
+    const completeTime = get('liandan.completeTime') as number | undefined;
+    if (!completeTime) return { done: false, text: '无' };
 
-    const totalNeededMs = new TimeArray(danTimeArray).milliseconds;
-    const endTime = startTime + totalNeededMs;
-
-    const remainingMs = endTime - currentTime();
+    const remainingMs = completeTime - currentTime();
 
     if (remainingMs <= 0) {
       return { done: true, text: '已完成' };
@@ -82,6 +76,7 @@ export default function Liandan() {
   const reset = useCallback(() => {
     set('liandan.danyao', null);
     set('liandan.time', 0);
+    set('liandan.completeTime', 0);
     setData(null);
     setNum(1);
   }, [set]);
@@ -197,6 +192,8 @@ export default function Liandan() {
             chuwu.RemoveArr(needItems);
             set('liandan.danyao.id', data.id);
             set('liandan.danyao.num', num);
+            const totalMs = new TimeArray(data.time).milliseconds;
+            set('liandan.completeTime', currentTime() + totalMs);
             set('liandan.time', currentTime());
             JXToast().show(`开始炼制丹药：${data.name}`);
           } else {

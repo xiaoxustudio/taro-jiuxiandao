@@ -15,7 +15,7 @@ import {
   RebirthKeepConfig,
   RebirthReward
 } from '@/types/actor';
-import { CuWuType } from '@/types';
+import { CuWuType, FBItemType } from '@/types';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { getLunhuiBuffs } from '@/utils/actor';
@@ -24,13 +24,23 @@ const defaultRebirthKeep: RebirthKeepConfig = {
   keepLinggen: true,
   keepZhongzu: true,
   keepShouyuan: 10,
-  keepXiuwei: 10
+  keepXiuwei: 10,
+  keepFabao: false,
+  keepGongfa: false
 };
 
 const rebirthRewardOptions: RebirthReward[] = [
   { type: 'xianyuan', value: 60 },
   { type: 'shenshi', value: 50 }
 ];
+
+const SHOUYUAN_OPTIONS = [0, 10, 25, 50];
+const XIUWEI_OPTIONS = [0, 10, 25, 50];
+
+function cycleValue(current: number, options: number[]) {
+  const idx = options.indexOf(current);
+  return options[(idx + 1) % options.length];
+}
 
 function RebirthPage() {
   const { get, actor } = useActorController();
@@ -55,11 +65,19 @@ function RebirthPage() {
     const keptXiuwei = Math.round(
       (maxXiuwei * (keepConfig.keepXiuwei || 0)) / 100
     );
+    const keptFabao = keepConfig.keepFabao
+      ? (Object.values(get('fabao') || {})
+          .filter(Boolean)
+          .slice(0, 2) as FBItemType[])
+      : [];
+    const keptGongfa = keepConfig.keepGongfa ? get('gongfa.current') : null;
     return {
       shouyuan: keptShouyuan,
       xiuwei: keptXiuwei,
       linggen: keepConfig.keepLinggen ? get('linggen') : null,
-      zhongzu: keepConfig.keepZhongzu ? get('zhongzu') : null
+      zhongzu: keepConfig.keepZhongzu ? get('zhongzu') : null,
+      fabao: keptFabao,
+      gongfa: keptGongfa
     };
   }, [get, keepConfig, maxShouyuan, maxXiuwei]);
 
@@ -78,7 +96,9 @@ function RebirthPage() {
       shouyuan,
       xiuwei: keptXiuwei,
       linggen,
-      zhongzu
+      zhongzu,
+      fabao: keptFabao,
+      gongfa: keptGongfa
     } = calculateKeptItems();
 
     const baseFabao: ActorDataConfigForFaBao = {
@@ -100,6 +120,17 @@ function RebirthPage() {
       qt: [],
       max: Math.max(30, prevMax, lunhuiCount * 20 + 30)
     };
+
+    if (keptFabao.length > 0) {
+      const slotKeys = Object.keys(
+        baseFabao
+      ) as (keyof ActorDataConfigForFaBao)[];
+      keptFabao.forEach((item, i) => {
+        if (i < slotKeys.length) {
+          (baseFabao as any)[slotKeys[i]] = item;
+        }
+      });
+    }
 
     const rewards: Record<string, number> = {};
     if (selectReward.value > 0) rewards[selectReward.type] = selectReward.value;
@@ -145,12 +176,7 @@ function RebirthPage() {
       time1: Date.now(),
       shenshiTime: Date.now(),
       xiulian: null,
-      qiandao: {
-        count: 0,
-        last: '',
-        time: '',
-        streak: 0
-      },
+      qiandao: { count: 0, last: '', time: '', streak: 0 },
       dongfu: {
         lingchi: 1000,
         lv: 1,
@@ -158,10 +184,7 @@ function RebirthPage() {
         daolvMarket: null,
         shuangxiu: null
       },
-      zd: {
-        time: 0,
-        df: ''
-      },
+      zd: { time: 0, df: '' },
       liandan: {
         chenghao: '丹徒',
         exp: 0,
@@ -173,8 +196,8 @@ function RebirthPage() {
       },
       danfang: [],
       gongfa: {
-        ls: [],
-        current: null
+        ls: keptGongfa ? [keptGongfa] : [],
+        current: keptGongfa || null
       },
       yaoyuan: {
         lv: 1,
@@ -201,8 +224,7 @@ function RebirthPage() {
         <>
           <Text>重生后将重置以下内容：</Text>
           <Text>• 等级、境界、属性将重置为初始值</Text>
-          <Text>• 所有法宝、功法将被清空</Text>
-          <Text>• 储物中的材料将被清空</Text>
+          <Text>• 储物中的材料、丹药将被清空</Text>
           <Text>• 丹方、药园、洞府数据将被重置</Text>
           <Box style={{ height: 8 }} />
           <Text>保留配置：</Text>
@@ -210,9 +232,14 @@ function RebirthPage() {
           {keepConfig.keepZhongzu && <Text>• 种族：{zhongzu}</Text>}
           {keepConfig.keepShouyuan! > 0 && <Text>• 寿元：{shouyuan}</Text>}
           {keepConfig.keepXiuwei! > 0 && <Text>• 修为：{keptXiuwei}</Text>}
+          {keptFabao.length > 0 && (
+            <Text>• 法宝：{keptFabao.map((f) => f.name).join('、')}</Text>
+          )}
+          {keptGongfa && <Text>• 功法：{keptGongfa.name}</Text>}
           <Box style={{ height: 8 }} />
           <Text>
-            重生奖励：{selectReward.type} +{selectReward.value}
+            重生奖励：{selectReward.type === 'xianyuan' ? '仙缘' : '神识上限'} +
+            {selectReward.value}
           </Text>
         </>
       ),
@@ -265,7 +292,7 @@ function RebirthPage() {
           <Text size={16} bold>
             保留选项
           </Text>
-          <JXSpace gap={10} style={{ marginTop: 8 }}>
+          <JXSpace gap={10} style={{ marginTop: 8, flexWrap: 'wrap' }}>
             <JXButton
               size='mini'
               onClick={() =>
@@ -289,28 +316,58 @@ function RebirthPage() {
               种族 {keepConfig.keepZhongzu ? '✓' : '○'} {get('zhongzu')}
             </JXButton>
           </JXSpace>
-          <JXSpace gap={10} style={{ marginTop: 8 }}>
+          <JXSpace gap={10} style={{ marginTop: 8, flexWrap: 'wrap' }}>
             <JXButton
               size='mini'
               onClick={() =>
                 setKeepConfig({
                   ...keepConfig,
-                  keepShouyuan: keepConfig.keepShouyuan === 0 ? 10 : 0
+                  keepShouyuan: cycleValue(
+                    keepConfig.keepShouyuan || 0,
+                    SHOUYUAN_OPTIONS
+                  )
                 })
               }
             >
-              寿元 +{keepConfig.keepShouyuan || 0}%
+              寿元 {keepConfig.keepShouyuan || 0}%
             </JXButton>
             <JXButton
               size='mini'
               onClick={() =>
                 setKeepConfig({
                   ...keepConfig,
-                  keepXiuwei: keepConfig.keepXiuwei === 0 ? 10 : 0
+                  keepXiuwei: cycleValue(
+                    keepConfig.keepXiuwei || 0,
+                    XIUWEI_OPTIONS
+                  )
                 })
               }
             >
-              修为 +{keepConfig.keepXiuwei || 0}%
+              修为 {keepConfig.keepXiuwei || 0}%
+            </JXButton>
+          </JXSpace>
+          <JXSpace gap={10} style={{ marginTop: 8, flexWrap: 'wrap' }}>
+            <JXButton
+              size='mini'
+              onClick={() =>
+                setKeepConfig({
+                  ...keepConfig,
+                  keepFabao: !keepConfig.keepFabao
+                })
+              }
+            >
+              法宝 {keepConfig.keepFabao ? '✓ 保留前2件' : '○ 不保留'}
+            </JXButton>
+            <JXButton
+              size='mini'
+              onClick={() =>
+                setKeepConfig({
+                  ...keepConfig,
+                  keepGongfa: !keepConfig.keepGongfa
+                })
+              }
+            >
+              功法 {keepConfig.keepGongfa ? '✓ 保留当前' : '○ 不保留'}
             </JXButton>
           </JXSpace>
         </Box>

@@ -10,6 +10,7 @@
     "add": {
       "qixue": 100,
       "gongji": 10,
+      "fashu": 5,
       "shouyuan": 100
     }
   },
@@ -24,6 +25,7 @@
     "add": {
       "qixue": 500,
       "gongji": 50,
+      "fashu": 10,
       "shouyuan": 500
     }
   },
@@ -38,6 +40,7 @@
     "add": {
       "qixue": 1000,
       "gongji": 100,
+      "fashu": 20,
       "shouyuan": 1000
     }
   },
@@ -52,6 +55,7 @@
     "add": {
       "qixue": 2000,
       "gongji": 200,
+      "fashu": 40,
       "shouyuan": 2000
     }
   },
@@ -66,6 +70,7 @@
     "add": {
       "qixue": 3500,
       "gongji": 350,
+      "fashu": 70,
       "shouyuan": 3500
     }
   },
@@ -80,6 +85,7 @@
     "add": {
       "qixue": 5000,
       "gongji": 500,
+      "fashu": 100,
       "shouyuan": 5000
     }
   },
@@ -94,6 +100,7 @@
     "add": {
       "qixue": 7500,
       "gongji": 750,
+      "fashu": 150,
       "shouyuan": 7500
     }
   }

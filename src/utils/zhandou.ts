@@ -4,6 +4,7 @@ import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
 export type ZhanDouHitResult<D extends { fangyu: number; qixue: number }> = {
   isCrit: boolean;
   damage: number;
+  fashuBonus: number;
   defender: D;
 };
 
@@ -99,10 +100,11 @@ export function buildMonsterBaseAttributes(params: {
     50,
     rnd(4, 10 + params.tier + Math.floor(params.jj1 / 3))
   );
+  const rawFashu = Math.round(rnd(5, 20) * scale);
   const xw = Math.round(
     rnd(100, 220) * params.tier * (1 + (params.jj1 - 1) * 0.07) * stageCoef
   );
-  return { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, xw };
+  return { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, rawFashu, xw };
 }
 export function pickMaterialNameByGrade(params: {
   materialPoolByGrade?: Record<string, { name: string; itype: string }[]>;
@@ -214,7 +216,7 @@ export function resolveSeedRegistry(params: {
  * @return {*}
  */
 export function calcZhanDouHit<
-  A extends { gongji: number; baoji: number },
+  A extends { gongji: number; baoji: number; fashu?: number },
   D extends { fangyu: number; qixue: number }
 >(
   attacker: A,
@@ -223,19 +225,30 @@ export function calcZhanDouHit<
     randomInt?: (min: number, max: number) => number;
     critMul?: number;
     minDamage?: number;
+    fashuMul?: number;
   }
 ) {
   const randomInt = options?.randomInt ?? random;
   const isCrit = randomInt(1, 100) <= attacker.baoji;
   const critMul = options?.critMul ?? 1.5;
   const minDamage = options?.minDamage ?? 1;
+  const fashuMul = options?.fashuMul ?? 0.3;
   const baseAtk = Math.max(
     0,
     Math.round(attacker.gongji * (isCrit ? critMul : 1))
   );
+  const fashuBonus = Math.round((attacker.fashu ?? 0) * fashuMul);
   const def = Math.max(0, defender.fangyu);
-  const damage = Math.max(minDamage, Math.round(baseAtk * (100 / (100 + def))));
+  const damage = Math.max(
+    minDamage,
+    Math.round(baseAtk * (100 / (100 + def)) + fashuBonus)
+  );
   const newHp = Math.max(0, Math.round(defender.qixue - damage));
   const nextDefender = { ...defender, qixue: newHp } as D;
-  return { isCrit, damage, defender: nextDefender } as ZhanDouHitResult<D>;
+  return {
+    isCrit,
+    damage,
+    fashuBonus,
+    defender: nextDefender
+  } as ZhanDouHitResult<D>;
 }

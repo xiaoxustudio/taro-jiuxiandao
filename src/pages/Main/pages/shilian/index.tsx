@@ -32,7 +32,6 @@ import {
   buildMonsterBaseAttributes,
   calcAttrScale,
   calcZhanDouHit,
-  calcWinStreakFromHistory,
   compositeDifficultyCoef,
   navigateTo,
   numberToChinese,
@@ -80,8 +79,8 @@ export default function Shilian() {
   const { get, set } = useActorController();
   const [isGuaji, setGuaji] = useState(false);
   // eslint-disable-next-line no-undef
-  const timer = useRef<NodeJS.Timeout | number>(-1);
-  const guajiTimer = useRef<NodeJS.Timeout | number>(-1);
+  const timer = useRef<number>(-1);
+  const guajiTimer = useRef<number>(-1);
   const df = useMemo(() => {
     const target = difangData.find((v) => v.name === get('zd.df'));
     return (target || difangData[0]) as DiFangType;
@@ -170,11 +169,9 @@ export default function Shilian() {
       targetGrade,
       rnd: random
     });
-    const { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, xw } =
+    const { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, rawFashu, xw } =
       buildMonsterBaseAttributes({ tier, jj1, jj2, rnd: random });
-    const winStreak = isGuaji
-      ? calcWinStreakFromHistory(guajiStats.history || [])
-      : 0;
+    const winStreak = (get('winStreak') as number) || 0;
     const locationAndStreakCoef = compositeDifficultyCoef(tier, winStreak);
     const addAttr = get('addAttr');
     const qixueScale = calcAttrScale(get('qixue'), addAttr.qixue, 0.7, 0.8);
@@ -182,6 +179,7 @@ export default function Shilian() {
     const fangyuScale = calcAttrScale(get('fangyu'), addAttr.fangyu, 0.7, 0.8);
     const suduScale = calcAttrScale(get('sudu'), addAttr.sudu, 0.6, 0.7);
     const baojiScale = calcAttrScale(get('baoji'), addAttr.baoji, 0.6, 0.6);
+    const fashuScale = calcAttrScale(get('fashu'), addAttr.fashu, 0.5, 0.6);
     const qixue = Math.round(rawQixue * locationAndStreakCoef * qixueScale);
     const gongji = Math.round(rawGongji * locationAndStreakCoef * gongjiScale);
     const fangyu = Math.round(rawFangyu * locationAndStreakCoef * fangyuScale);
@@ -190,6 +188,7 @@ export default function Shilian() {
       60,
       Math.round(rawBaoji * locationAndStreakCoef * baojiScale)
     );
+    const fashu = Math.round(rawFashu * locationAndStreakCoef * fashuScale);
     const jj1Label = `${numberToChinese(jj1)}阶`;
     return {
       name: `${na}${nb}`,
@@ -198,6 +197,7 @@ export default function Shilian() {
       fangyu,
       sudu,
       baoji,
+      fashu,
       jingjie: df.jingjie,
       jingjie1: jj1Label,
       jingjie2: jj2,
@@ -205,7 +205,7 @@ export default function Shilian() {
       xw,
       df: df.name
     };
-  }, [df.jingjie, df.name, get, guajiStats, isGuaji, set]);
+  }, [df.jingjie, df.name, get, set]);
   const [YaoShouInstance, setYaoShouInstance] = useState<YaoShouZDType | null>(
     null
   ); // 妖兽实例
@@ -220,7 +220,7 @@ export default function Shilian() {
   });
   const endRef = useRef(HuiheState.end);
   const guajiLockRef = useRef(false);
-  const autoBattleTimer = useRef<NodeJS.Timeout | number>(-1);
+  const autoBattleTimer = useRef<number>(-1);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
   const fightSeqRef = useRef(0);
   const [yaoshouMaxQixue, setYaoshouMaxQixue] = useState(0);
@@ -245,7 +245,7 @@ export default function Shilian() {
    */
   const zhandouLogic = useCallback(
     (zd1: YaoShouZDType | ActorZDType, zd2: YaoShouZDType | ActorZDType) => {
-      const { isCrit, damage, defender } = calcZhanDouHit(zd1, zd2);
+      const { isCrit, damage, fashuBonus, defender } = calcZhanDouHit(zd1, zd2);
       const isEnemyAttacker = 'df' in zd1;
       const isEnemyDefender = 'df' in zd2;
       const attackerColor = isEnemyAttacker ? 'orange' : 'blue';
@@ -273,7 +273,17 @@ export default function Shilian() {
                     <Text color='red' inline bold>
                       {damage}
                     </Text>
-                    点伤害；
+                    点伤害
+                    {fashuBonus > 0 ? (
+                      <>
+                        （含法术
+                        <Text color='purple' inline>
+                          {fashuBonus}
+                        </Text>
+                        ）
+                      </>
+                    ) : null}
+                    ；
                   </>
                 ) : (
                   <>
@@ -281,7 +291,17 @@ export default function Shilian() {
                     <Text color='red' inline>
                       {damage}
                     </Text>
-                    点伤害；
+                    点伤害
+                    {fashuBonus > 0 ? (
+                      <>
+                        （含法术
+                        <Text color='purple' inline>
+                          {fashuBonus}
+                        </Text>
+                        ）
+                      </>
+                    ) : null}
+                    ；
                   </>
                 )}
                 <Text color={defenderColor} inline>
@@ -557,7 +577,8 @@ export default function Shilian() {
       gongji: get('gongji') + get('addAttr.gongji'),
       fangyu: get('fangyu') + get('addAttr.fangyu'),
       sudu: get('sudu') + get('addAttr.sudu'),
-      baoji: get('baoji') + get('addAttr.baoji')
+      baoji: get('baoji') + get('addAttr.baoji'),
+      fashu: get('fashu') + get('addAttr.fashu')
     });
 
     // 使用同步生成的妖兽名称

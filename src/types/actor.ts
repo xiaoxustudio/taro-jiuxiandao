@@ -131,6 +131,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   dongfu: DongfuData | null; // 洞府
   liandan: {
     time: number; // 炼丹开始时间
+    completeTime: number; // 炼丹预计完成时间戳
     chenghao: string; // 炼丹称号
     danyun: number; // 丹韵
     exp: number; // 炼丹经验

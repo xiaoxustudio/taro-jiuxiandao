@@ -160,9 +160,13 @@ function Main() {
         set('jingjie2', JingJie2Transform(get('jingjie2')));
         const calcGongji = get('gongji') + 10 * lv1;
         const calcQixue = get('qixue') + 100 * lv1;
+        const calcFashu = get('fashu') + 1 * lv1;
         set('gongji', calcGongji);
         set('qixue', calcQixue);
-        JXToast().show(`目前气血：${calcQixue}，攻击：${calcGongji}`);
+        set('fashu', calcFashu);
+        JXToast().show(
+          `目前气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
+        );
       }
     },
     {
@@ -327,15 +331,18 @@ function Main() {
             const calcGongji =
               get('gongji') + 10 * lv1 + tpdata.add.gongji * 0.5;
             const calcQixue = get('qixue') + 100 * lv1 + tpdata.add.qixue * 0.5;
+            const calcFashu =
+              get('fashu') + 1 * lv1 + (tpdata.add.fashu ?? 0) * 0.5;
             set('gongji', calcGongji);
             set('qixue', calcQixue);
+            set('fashu', calcFashu);
             const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
             set('max_shouyuan', addShouyuan);
             const cw = get('cw');
             const newMax = (cw?.max || 30) + 10;
             set('cw', { ...cw, max: newMax });
             JXToast(
-              `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n目前气血：${calcQixue}，攻击：${calcGongji}`
+              `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
             ).show();
           } else {
             JXToast(`缺少突破丹药，请先炼制对应丹药！`).show();
@@ -346,9 +353,25 @@ function Main() {
       }
     },
     {
-      name: '法术',
-      disabled: true,
-      click() {}
+      name: `法术(${get('fashu')})`,
+      click() {
+        const fashuTotal = get('fashu') + get('addAttr.fashu');
+        JXModal.show({
+          title: '法术',
+          content: (
+            <JXSpace direction='vertical'>
+              <Text>法术强度：{get('fashu')}</Text>
+              <Text>加成（含装备）：{fashuTotal}</Text>
+              <Box style={{ height: 4 }} />
+              <Text size={14} bold>
+                法术效果
+              </Text>
+              <Text>战斗中每击附加法术伤害：{fashuTotal * 0.3}</Text>
+            </JXSpace>
+          ),
+          actions: [{ text: '知道了', key: 'ok' }]
+        });
+      }
     }
   ];
   const operaterOptions2 = [

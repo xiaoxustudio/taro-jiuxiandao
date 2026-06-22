@@ -295,6 +295,7 @@ function Index() {
       danlu: null,
       danyao: null,
       danyun: 0,
+      completeTime: 0,
       time: 0
     },
     danfang: [],
