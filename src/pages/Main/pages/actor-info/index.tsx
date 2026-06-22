@@ -2,12 +2,15 @@ import { View } from '@tarojs/components';
 import { useCallback } from 'react';
 import { JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
+import { getLunhuiBuffs } from '@/utils/actor';
 import { navigateBack } from '@/utils';
 import './index.less';
 
 export default function ActorInfo() {
   const { get } = useActorController();
   const handleBack = useCallback(() => navigateBack(), []);
+  const lunhuiCount = (get('lunhuiCount') as number) || 0;
+  const lunhuiBuffs = getLunhuiBuffs(lunhuiCount);
   return (
     <View className='actor-info'>
       <View className='back-btn' onClick={handleBack}>
@@ -17,6 +20,11 @@ export default function ActorInfo() {
         <Text textShadow size={20} bold>
           {get('daohao')}
         </Text>
+        {lunhuiCount > 0 && (
+          <Text color='gold' size={14}>
+            【轮回第{lunhuiCount}世】
+          </Text>
+        )}
       </View>
       <JXSpace
         style={{ background: 'white', marginBottom: '10px' }}
@@ -59,6 +67,25 @@ export default function ActorInfo() {
           寿元：{get('shouyuan')}/{get('max_shouyuan')}
         </Text>
       </JXSpace>
+      {lunhuiBuffs && (
+        <JXSpace
+          style={{
+            background: '#fff8e1',
+            marginBottom: '10px',
+            padding: '8px'
+          }}
+          direction='vertical'
+        >
+          <Text size={14} bold color='orange'>
+            轮回印记（{lunhuiCount}层）
+          </Text>
+          <Text>修炼倍率 +{lunhuiBuffs.xiulianbeilvBonus * 10}%</Text>
+          <Text>神识上限 +{lunhuiBuffs.maxShenshiBonus}</Text>
+          <Text>寿元上限 +{lunhuiBuffs.shouyuanBonus}</Text>
+          <Text>初始修为 +{lunhuiBuffs.initialXiuweiBonus}</Text>
+          <Text>全属性 +{lunhuiBuffs.shangxianBonus}%</Text>
+        </JXSpace>
+      )}
       <JXSpace style={{ background: 'white' }} direction='vertical'>
         <Text className='item' size={16} bold>
           修仙约吗？道友！

@@ -5,6 +5,7 @@ import Taro from '@tarojs/taro';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import title from '@/assets/logo.png';
 import {
+  Box,
   JXButton,
   JXInput,
   JXModal,
@@ -30,7 +31,8 @@ import {
   getLingQiForRate,
   getLingQiToNumber,
   JingJie2Transform,
-  JingJieTransform
+  JingJieTransform,
+  LUNHUI_BUFF_PER_COUNT
 } from '@/utils/actor';
 import TpData from '@/assets/tp.json';
 import danfangData from '@/assets/danfang.json';
@@ -172,8 +174,139 @@ function Main() {
     {
       name: '突破',
       click() {
-        const tpdata = TpData[get('jingjie')];
-        if (get('jingjie2') === '大圆满') {
+        const jingjie = get('jingjie');
+        const jingjie2 = get('jingjie2');
+        const tpdata = TpData[jingjie];
+        if (jingjie2 === '大圆满') {
+          if (jingjie === '大乘') {
+            const count = (get('lunhuiCount') as number) || 0;
+            JXModal.confirm({
+              title: '天道感应·轮回',
+              content: (
+                <JXSpace direction='vertical'>
+                  <Text>大乘已至巅峰，感应天道，可轮回重修！</Text>
+                  <Text>轮回后将重置为练气初期，但将获得永久轮回印记：</Text>
+                  <Box style={{ height: 4 }} />
+                  <Text>
+                    • 修炼倍率 +{LUNHUI_BUFF_PER_COUNT.xiulianbeilvBonus * 10}%
+                  </Text>
+                  <Text>
+                    • 神识上限 +{LUNHUI_BUFF_PER_COUNT.maxShenshiBonus}
+                  </Text>
+                  <Text>• 寿元上限 +{LUNHUI_BUFF_PER_COUNT.shouyuanBonus}</Text>
+                  <Text>
+                    • 初始修为 +{LUNHUI_BUFF_PER_COUNT.initialXiuweiBonus}
+                  </Text>
+                  <Text>
+                    • 全属性加成 +{LUNHUI_BUFF_PER_COUNT.shangxianBonus}%
+                  </Text>
+                  <Box style={{ height: 4 }} />
+                  <Text color='orange'>当前轮回次数：{count}</Text>
+                  <Text color='orange'>轮回后次数：{count + 1}</Text>
+                </JXSpace>
+              ),
+              onConfirm() {
+                const daohao = get('daohao');
+                const linggen = get('linggen');
+                const zhongzu = get('zhongzu');
+                const xianyuan = get('xianyuan') || 0;
+                const newLunhuiCount =
+                  ((get('lunhuiCount') as number) || 0) + 1;
+                const {
+                  maxShenshiBonus,
+                  shouyuanBonus,
+                  initialXiuweiBonus,
+                  xiulianbeilvBonus
+                } = LUNHUI_BUFF_PER_COUNT;
+                const nextActor = {
+                  ...(actor as any),
+                  lv: 1,
+                  xiuwei: initialXiuweiBonus * newLunhuiCount,
+                  max_xiuwei: 500,
+                  shenshi: 100 + maxShenshiBonus * newLunhuiCount,
+                  max_shenshi: 100 + maxShenshiBonus * newLunhuiCount,
+                  shouyuan: 100 + shouyuanBonus * newLunhuiCount,
+                  max_shouyuan: 100 + shouyuanBonus * newLunhuiCount,
+                  jingjie: '练气',
+                  jingjie1: '一阶',
+                  jingjie2: '初期',
+                  qixue: 1200,
+                  gongji: 80,
+                  fangyu: 40,
+                  baoji: 2,
+                  sudu: 20,
+                  fashu: 0,
+                  xiulianbeilv: 10 + xiulianbeilvBonus * newLunhuiCount,
+                  addAttr: {
+                    qixue: 0,
+                    gongji: 0,
+                    fangyu: 0,
+                    baoji: 0,
+                    sudu: 0,
+                    fashu: 0,
+                    xianyuan: 0
+                  },
+                  fabao: {
+                    手持武器: null,
+                    头戴战盔: null,
+                    身穿战甲: null,
+                    腰带护具: null,
+                    饰品加持: null,
+                    鞋子护腿: null,
+                    魂器镇魂: null,
+                    本名法宝: null
+                  },
+                  cw: { fb: [], dy: [], qt: [], max: 30 },
+                  time1: Date.now(),
+                  xiuxianStartAt: Date.now(),
+                  shenshiTime: Date.now(),
+                  xiulian: null,
+                  qiandao: { count: 0, last: '', time: '', streak: 0 },
+                  dongfu: {
+                    lingchi: 1000,
+                    lv: 1,
+                    daolv: null,
+                    daolvMarket: null,
+                    shuangxiu: null
+                  },
+                  zd: { time: 0, df: '' },
+                  liandan: {
+                    chenghao: '丹徒',
+                    exp: 0,
+                    max_exp: 100,
+                    danlu: null,
+                    danyao: null,
+                    danyun: 0,
+                    time: 0
+                  },
+                  danfang: [],
+                  gongfa: { ls: [], current: null },
+                  yaoyuan: {
+                    lv: 1,
+                    plots: Array.from({ length: 2 }, (_, i) => ({
+                      id: i + 1,
+                      lv: 1,
+                      unlocked: true,
+                      seed: null
+                    })),
+                    seeds: []
+                  },
+                  xianyuan: xianyuan + 30,
+                  linggen,
+                  zhongzu,
+                  lunhuiCount: newLunhuiCount,
+                  chengjiu: undefined,
+                  battleCount: undefined,
+                  winStreak: undefined
+                };
+                useActorStore.getState().set(daohao, nextActor as any);
+                useStore.getState().set(daohao);
+                JXToast(`轮回成功！当前第 ${newLunhuiCount} 世`).show();
+                setTimeout(() => navigateTo('Main/index', { all: true }), 800);
+              }
+            });
+            return;
+          }
           if (!tpdata) {
             JXToast(`天道压制，无法突破更高境界！`).show();
             return;
@@ -536,7 +669,7 @@ function Main() {
         const maxShouyuan = freshGet('max_shouyuan') || 0;
         const newShouyuan = Math.round(currentShouyuan + 2);
         rawSet('shouyuan', Math.min(newShouyuan, maxShouyuan));
-        if (newShouyuan >= maxShouyuan) {
+        if (newShouyuan >= maxShouyuan && currentShouyuan < maxShouyuan) {
           const { close } = JXModal.show({
             visible: true,
             title: '重生',
@@ -581,6 +714,12 @@ function Main() {
               道号：
             </Text>
             {get('daohao')}
+            {((get('lunhuiCount') as number) || 0) > 0 && (
+              <Text color='gold' size={12} inline>
+                {' '}
+                轮回第{get('lunhuiCount')}世
+              </Text>
+            )}
           </Text>
           <Text space={2}>
             <Text className={styles.AttrTitle} bold inline>

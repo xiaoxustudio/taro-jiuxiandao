@@ -18,6 +18,7 @@ import {
 import { CuWuType } from '@/types';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
+import { getLunhuiBuffs } from '@/utils/actor';
 
 const defaultRebirthKeep: RebirthKeepConfig = {
   keepLinggen: true,
@@ -101,17 +102,25 @@ function RebirthPage() {
     const rewards: Record<string, number> = {};
     if (selectReward.value > 0) rewards[selectReward.type] = selectReward.value;
 
+    const lunhuiCount = (actor?.lunhuiCount as number) || 0;
+    const lunhuiBuffs = getLunhuiBuffs(lunhuiCount);
+    const lunhuiShenshiBonus = lunhuiBuffs?.maxShenshiBonus || 0;
+    const lunhuiShouyuanBonus = lunhuiBuffs?.shouyuanBonus || 0;
+    const lunhuiXiulianBonus = lunhuiBuffs?.xiulianbeilvBonus || 0;
+    const lunhuiXiuweiBonus = lunhuiBuffs?.initialXiuweiBonus || 0;
+    const newMaxShouyuan = Math.max(100 + lunhuiShouyuanBonus, shouyuan + 100);
+
     const nextActor = {
       ...actor,
       uuid: actor?.uuid || '',
       daohao: actor?.daohao || '',
       lv: 1,
-      xiuwei: keptXiuwei,
+      xiuwei: keptXiuwei + lunhuiXiuweiBonus,
       max_xiuwei: 500,
-      shenshi: 100 + (rewards.shenshi || 0),
-      max_shenshi: 100 + (rewards.shenshi || 0),
-      shouyuan,
-      max_shouyuan: 100,
+      shenshi: 100 + (rewards.shenshi || 0) + lunhuiShenshiBonus,
+      max_shenshi: 100 + (rewards.shenshi || 0) + lunhuiShenshiBonus,
+      shouyuan: Math.min(shouyuan, newMaxShouyuan),
+      max_shouyuan: newMaxShouyuan,
       jingjie: '练气',
       jingjie1: '一阶',
       jingjie2: '初期',
@@ -121,7 +130,7 @@ function RebirthPage() {
       baoji: 2,
       sudu: 20,
       fashu: 0,
-      xiulianbeilv: 10,
+      xiulianbeilv: 10 + lunhuiXiulianBonus,
       addAttr: {
         qixue: 0,
         gongji: 0,
@@ -180,6 +189,7 @@ function RebirthPage() {
       xianyuan: (actor?.xianyuan || 0) + (rewards.xianyuan || 0),
       ...(linggen && { linggen }),
       ...(zhongzu && { zhongzu }),
+      lunhuiCount,
       chengjiu: undefined,
       battleCount: undefined,
       winStreak: undefined

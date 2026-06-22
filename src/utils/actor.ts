@@ -12,9 +12,18 @@ const MAJOR_REALMS = [
   '合体',
   '大乘'
 ] as const;
-const BASE_XIUWEI_BY_REALM = [800, 1200, 1600, 2000, 2500, 3000, 3600, 4200];
-const RATE_OF_LING_BY_REALM = [600, 800, 1200, 1500, 1800, 2200, 2500, 3000];
+const BASE_XIUWEI_BY_REALM = [800, 1200, 1600, 2000, 2500, 3600, 5000, 7000];
+const RATE_OF_LING_BY_REALM = [600, 800, 1200, 1500, 1800, 2200, 2800, 3500];
 const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
+
+// 轮回印记增益配置（每层）
+export const LUNHUI_BUFF_PER_COUNT = {
+  xiulianbeilvBonus: 2, // 修炼倍率 +2（即最终 +20%）
+  maxShenshiBonus: 20, // 神识上限 +20
+  shouyuanBonus: 50, // 寿元上限 +50
+  initialXiuweiBonus: 200, // 初始修为 +200
+  shangxianBonus: 5 // 全属性伤害加成 +5%
+};
 /* 角色相关操作 */
 
 /**
@@ -185,3 +194,19 @@ export {
   JingJie2Transform,
   JingJieTransform
 };
+
+// ==================== 轮回系统 ====================
+
+/**
+ * 根据轮回次数获取轮回增益描述
+ */
+export function getLunhuiBuffs(count: number = 0) {
+  if (count <= 0) return null;
+  return {
+    xiulianbeilvBonus: LUNHUI_BUFF_PER_COUNT.xiulianbeilvBonus * count,
+    maxShenshiBonus: LUNHUI_BUFF_PER_COUNT.maxShenshiBonus * count,
+    shouyuanBonus: LUNHUI_BUFF_PER_COUNT.shouyuanBonus * count,
+    initialXiuweiBonus: LUNHUI_BUFF_PER_COUNT.initialXiuweiBonus * count,
+    shangxianBonus: LUNHUI_BUFF_PER_COUNT.shangxianBonus * count
+  };
+}
