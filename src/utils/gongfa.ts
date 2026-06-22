@@ -55,7 +55,14 @@ function add(gf: GongFaType, replace = false, checkAchievement = true) {
   const { set } = useActorStore.getState();
   const { current } = useStore.getState();
   const acData = getActor();
-  if (acData.gongfa.ls.find((v) => v.id === gf.id)) return;
+  const existingIndex = acData.gongfa.ls.findIndex((v) => v.id === gf.id);
+  if (existingIndex !== -1) {
+    if (replace) {
+      acData.gongfa.ls[existingIndex] = gf;
+      set(current, acData);
+    }
+    return;
+  }
   if (replace) {
     acData.gongfa.ls = acData.gongfa.ls.map((v) => (v.id === gf.id ? gf : v));
   } else {
@@ -119,10 +126,12 @@ function setCurrentGongFa(id: string): void {
     currentGongFa.time = Date.now();
     const currentAdds = currentGongFa.attr;
     if (currentAdds) {
-      Object.keys(currentAdds).forEach((key) => {
-        updated.addAttr[key] =
-          (updated.addAttr[key] || 0) - (currentAdds[key] || 0);
-      });
+      Object.keys(currentAdds)
+        .filter((k) => k !== 'xianyuan')
+        .forEach((key) => {
+          updated.addAttr[key] =
+            (updated.addAttr[key] || 0) - (currentAdds[key] || 0);
+        });
     }
     const existingIndex = updated.gongfa.ls.findIndex(
       (v) => v.id === currentGongFa.id
@@ -140,9 +149,11 @@ function setCurrentGongFa(id: string): void {
 
   const adds = newGongfa.attr;
   if (adds) {
-    Object.keys(adds).forEach((key) => {
-      updated.addAttr[key] = (updated.addAttr[key] || 0) + (adds[key] || 0);
-    });
+    Object.keys(adds)
+      .filter((k) => k !== 'xianyuan')
+      .forEach((key) => {
+        updated.addAttr[key] = (updated.addAttr[key] || 0) + (adds[key] || 0);
+      });
   }
   set(current, updated);
 }
@@ -169,9 +180,11 @@ function putCurrentGongfa(): Promise<boolean> {
     state = true;
     const adds = gf!.attr;
     if (adds) {
-      Object.keys(adds).forEach((key) => {
-        updated.addAttr[key] = (updated.addAttr[key] || 0) - (adds[key] || 0);
-      });
+      Object.keys(adds)
+        .filter((k) => k !== 'xianyuan')
+        .forEach((key) => {
+          updated.addAttr[key] = (updated.addAttr[key] || 0) - (adds[key] || 0);
+        });
     }
     set(current, updated);
   } else {

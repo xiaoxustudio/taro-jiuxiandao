@@ -16,8 +16,11 @@ export interface ActorDataConfigForZhanDou {
   fashu: number; // 法术
   gongji: number; // 攻击
   sudu: number; // 速度
-  xianyuan: number; // 仙缘
+  xianyuan: number; // 仙缘（装备/功法可带此属性，但不进入 addAttr）
 }
+
+// 加成属性类型（不含仙缘，仙缘为非战斗资源）
+export type AddAttrType = Omit<ActorDataConfigForZhanDou, 'xianyuan'>;
 
 export type DaoLvQuality = (typeof DAOLV_QUALITIES)[number];
 
@@ -67,7 +70,7 @@ export type YaoyuanData = {
   seeds: YaoyuanSeed[];
 };
 export type ActorDataConfigForFaBao = {
-  -readonly [K in keyof typeof FabaoType]: null | undefined | FBItemType;
+  [K in FabaoType]: null | undefined | FBItemType;
 };
 
 // 重生保留配置
@@ -125,7 +128,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   xiuxianTimeScale: number;
   shenshiTime: number; // 神识计算
   fabao: ActorDataConfigForFaBao; // 法宝
-  addAttr: ActorDataConfigForZhanDou; // 加成属性（功法，法宝等）
+  addAttr: AddAttrType; // 加成属性（功法，法宝等，不含仙缘）
   qiandao: {
     count: number; // 累计
     last: string; // 最后一次签到

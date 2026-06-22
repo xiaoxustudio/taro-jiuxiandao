@@ -207,20 +207,27 @@ export const applyAchievementReward = (
     case 'xiuwei':
       set('xiuwei', (get('xiuwei') || 0) + (value as number));
       break;
-    case 'shenshi':
-      set('shenshi', (get('shenshi') || 0) + (value as number));
+    case 'shenshi': {
+      const maxSh = get('max_shenshi') || 100;
+      const curSh = Math.min(maxSh, (get('shenshi') || 0) + (value as number));
+      set('shenshi', curSh);
       break;
-    case 'shouyuan':
-      set('shouyuan', (get('shouyuan') || 0) + (value as number));
+    }
+    case 'shouyuan': {
+      const maxSy = (get('max_shouyuan') || 100) + (value as number);
+      set('max_shouyuan', maxSy);
+      set(
+        'shouyuan',
+        Math.min((get('shouyuan') || 0) + (value as number), maxSy)
+      );
       break;
+    }
     case 'lingqi_rate':
       set('xiulianbeilv', (get('xiulianbeilv') || 0) + (value as number));
       break;
     case 'special':
-      // 特殊奖励处理
       break;
     default:
-      // eslint-disable-next-line no-console
       console.warn('未知的奖励类型:', type);
   }
 };

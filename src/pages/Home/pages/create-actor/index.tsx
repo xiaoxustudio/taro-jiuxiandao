@@ -241,14 +241,12 @@ function Index() {
     shenshi: 100, // 神识
     max_shenshi: 100,
     addAttr: {
-      // 加成属性
-      qixue: 0, // 气血
-      gongji: 0, // 攻击
-      fangyu: 0, // 防御
-      baoji: 0, // 暴击
-      sudu: 0, // 速度
-      fashu: 0,
-      xianyuan: 0 // 仙缘
+      qixue: 0,
+      gongji: 0,
+      fangyu: 0,
+      baoji: 0,
+      sudu: 0,
+      fashu: 0
     },
     fabao: {
       手持武器: null,
@@ -914,7 +912,7 @@ function Index() {
             />
           </JXSpace>
         </JXSpace>
-        {/* 种猪 */}
+        {/* 种族 */}
         <JXSpace direction='vertical'>
           <Text size={16} color='#555' bold>
             请选择你出身种族

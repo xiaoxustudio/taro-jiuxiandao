@@ -35,20 +35,22 @@ function WearFaBao(index: number) {
   if (!fbObj) {
     throw new Error('法宝对象为空');
   }
-  const slotName = fbObj.itype as keyof typeof FabaoType;
+  const slotName = fbObj.itype;
   if (!slotName) {
     throw new Error(`未知的法宝类型: ${fbObj.itype}`);
   }
   const updated = cloneDeep(actor);
   const oldFB = updated.fabao[slotName];
   if (oldFB) {
-    const oldKeys = Object.keys(oldFB.attr || {});
+    const oldKeys = Object.keys(oldFB.attr || {}).filter(
+      (k) => k !== 'xianyuan'
+    );
     for (const k of oldKeys) {
       updated.addAttr[k] = (updated.addAttr[k] || 0) - (oldFB.attr[k] || 0);
     }
   }
   updated.fabao[slotName] = fbObj;
-  const keys = Object.keys(fbObj.attr || {});
+  const keys = Object.keys(fbObj.attr || {}).filter((k) => k !== 'xianyuan');
   for (const k of keys) {
     updated.addAttr[k] = (updated.addAttr[k] || 0) + (fbObj.attr[k] || 0);
   }
@@ -66,12 +68,12 @@ function TakeOffFaBao(type: FabaoType) {
   const { set } = useActorStore.getState();
   const actor = getActor();
   const fabaoData = actor.fabao;
-  const slotKey = type as keyof typeof FabaoType;
+  const slotKey = type;
   if (!fabaoData[slotKey]) return;
   const fbObj = cloneDeep(fabaoData[slotKey]) as FBItemType;
   const updated = cloneDeep(actor);
   updated.fabao[slotKey] = null;
-  const keys = Object.keys(fbObj.attr || {});
+  const keys = Object.keys(fbObj.attr || {}).filter((k) => k !== 'xianyuan');
   for (const k of keys) {
     updated.addAttr[k] = (updated.addAttr[k] || 0) - (fbObj.attr[k] || 0);
   }

@@ -76,7 +76,6 @@ export function calcAttrScale(
   cap: number
 ) {
   const safeBase = Math.max(1, base);
-  if (safeBase <= 0) return 1;
   const ratio = Math.max(0, add / safeBase);
   return 1 + Math.min(cap, ratio * weight);
 }
@@ -89,7 +88,7 @@ export function buildMonsterBaseAttributes(params: {
   const rnd = params.rnd ?? random;
   const j1Coef = 1 + (params.jj1 - 1) * 0.12;
   const stageCoef = STAGE_COEF_MAP[params.jj2] || 1.0;
-  const geomBase = 1.8 ** (params.tier - 1);
+  const geomBase = 1.18 ** (params.tier - 1);
   const scale = geomBase * j1Coef * stageCoef;
   const rawQixue = Math.round(rnd(700, 900) * scale);
   const rawGongji = Math.round(rnd(60, 110) * scale);

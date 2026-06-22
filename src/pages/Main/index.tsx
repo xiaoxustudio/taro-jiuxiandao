@@ -43,6 +43,7 @@ import { GongFaType } from '@/types/gongfa';
 import { dfGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import { createDefaultLingShou } from '@/utils/lingshou';
+import { checkAchievements } from '@/utils/chengjiuHelper';
 import styles from './index.module.less';
 
 function Main() {
@@ -138,16 +139,11 @@ function Main() {
           JXToast('修为不足，无法升阶！').show();
           return;
         }
-        // 计算（对数曲线避免后期膨胀）
         const lv = get('lv');
         const jjBase = getLingQiForJingJie();
         const jjIdx = getLingQiToNumber();
-        const logFactor = 1 + Math.log(Math.max(1, lv)) / 5;
-        const calc = Math.ceil(
-          jjBase * logFactor +
-            (jjIdx + 1) *
-              Math.max(jjBase * 0.5, get('max_xiuwei') * 0.4 * logFactor)
-        );
+        const logFactor = 1 + Math.log(Math.max(1, lv)) / 12;
+        const calc = Math.ceil(jjBase * (1 + jjIdx * 0.3) * logFactor);
         // 阶段境界
         if (get('jingjie2') === '大圆满') {
           JXToast(`目前已达到大圆满，请寻找机缘突破！`).show();
@@ -158,7 +154,7 @@ function Main() {
         set('max_xiuwei', calc);
         const lv1 = get('lv') / 20 + 1;
         if (get('jingjie') !== '练气') {
-          const calcSudu = get('sudu') + 3 * lv1;
+          const calcSudu = Math.round(get('sudu') * (1 + 0.003 * lv1));
           set('sudu', calcSudu);
         }
         const nextJingjie2 = JingJie2Transform(get('jingjie2'));
@@ -171,12 +167,13 @@ function Main() {
           const nextJ1 = Math.min(maxDep, Math.max(1, currentJ1Num + 1));
           set('jingjie1', `${numberToChinese(nextJ1)}阶`);
         }
-        const calcGongji = get('gongji') + 10 * lv1;
-        const calcQixue = get('qixue') + 100 * lv1;
-        const calcFashu = get('fashu') + 1 * lv1;
+        const calcGongji = Math.round(get('gongji') * (1 + 0.006 * lv1));
+        const calcQixue = Math.round(get('qixue') * (1 + 0.01 * lv1));
+        const calcFashu = Math.round(get('fashu') * (1 + 0.004 * lv1));
         set('gongji', calcGongji);
         set('qixue', calcQixue);
         set('fashu', calcFashu);
+        checkAchievements(get, set, actor);
         JXToast().show(
           `目前气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
         );
@@ -260,8 +257,7 @@ function Main() {
                     fangyu: 0,
                     baoji: 0,
                     sudu: 0,
-                    fashu: 0,
-                    xianyuan: 0
+                    fashu: 0
                   },
                   fabao: {
                     手持武器: null,
@@ -360,6 +356,7 @@ function Main() {
             const cw = get('cw');
             const newMax = (cw?.max || 30) + 10;
             set('cw', { ...cw, max: newMax });
+            checkAchievements(get, set, actor);
             JXToast(
               `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
             ).show();
@@ -605,6 +602,26 @@ function Main() {
     });
   }, [tujianGrade, tujianKeyword, tujianList]);
 
+  const handleTujianItemClick = useCallback(
+    (item: { name: string; itype?: string }) => {
+      JXModal.show({
+        title: item.name,
+        content: (
+          <JXSpace direction='vertical'>
+            <Text>名称：{item.name}</Text>
+            <Text color={getGradeColor(item.itype) || '#888'}>
+              品阶：{item.itype || '未知'}
+            </Text>
+          </JXSpace>
+        ),
+        disableCancle: true,
+        disableOk: true,
+        closeOnMaskClick: true
+      });
+    },
+    []
+  );
+
   // 开始修炼
   const handleXiuLian = useCallback(() => {
     if (xiulian) return;
@@ -654,7 +671,7 @@ function Main() {
 
     const zhoutian = ZhouTian(xiulian.time);
 
-    const realmEff = Math.sqrt(needAddXiuWeiJJ * rateOfLing * 0.5) * 50;
+    const realmEff = Math.sqrt(needAddXiuWeiJJ * rateOfLing * 0.5) * 80;
     const shouldGetXiu = realmEff * lvRate * jjRate * xlBeilv;
 
     const zhotianByzhoutian =
@@ -1007,12 +1024,18 @@ function Main() {
                         key={`${item.name}-${item.itype}-${index}`}
                         align='center'
                       >
-                        <JXSpace direction='vertical' gap={2}>
-                          <Text>{item.name}</Text>
-                          <Text color={getGradeColor(item.itype) || '#888'}>
-                            {item.itype}
-                          </Text>
-                        </JXSpace>
+                        <JXButton
+                          size='mini'
+                          transparent
+                          onClick={() => handleTujianItemClick(item)}
+                        >
+                          <JXSpace direction='vertical' gap={2}>
+                            <Text>{item.name}</Text>
+                            <Text color={getGradeColor(item.itype) || '#888'}>
+                              {item.itype}
+                            </Text>
+                          </JXSpace>
+                        </JXButton>
                       </JXGrid.Item>
                     ))}
                   </JXGrid>
