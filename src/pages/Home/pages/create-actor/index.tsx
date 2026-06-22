@@ -15,6 +15,7 @@ import useStorageStore from '@/services/storage';
 import { ActorDataConfig, CWType } from '@/types';
 import { UUID, navigateBack } from '@/utils';
 import { HasActor } from '@/utils/actor';
+import { initAchievements } from '@/utils/chengjiu';
 import { GongFaPinJie, GongFaType } from '@/types/gongfa';
 import {
   clGrades,
@@ -307,7 +308,8 @@ function Index() {
       lv: 1,
       plots: createDefaultYaoyuanPlots(getYaoyuanTotalSlots(1)),
       seeds: []
-    }
+    },
+    chengjiu: initAchievements()
   });
 
   const progressText = useMemo(() => {

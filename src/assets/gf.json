@@ -13,5 +13,235 @@
       "qixue": 100,
       "gongji": 10
     }
+  },
+  "ysj": {
+    "id": "ysj",
+    "name": "引气诀",
+    "pj": "一品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 100,
+    "lg": "无",
+    "limit": "练气",
+    "xl": 3,
+    "attr": {
+      "qixue": 60,
+      "fashu": 5
+    }
+  },
+  "lxb": {
+    "id": "lxb",
+    "name": "灵犀步",
+    "pj": "二品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 200,
+    "lg": "风",
+    "limit": "练气",
+    "xl": 2,
+    "attr": {
+      "sudu": 8,
+      "fangyu": 20
+    }
+  },
+  "hyt": {
+    "id": "hyt",
+    "name": "混元体",
+    "pj": "二品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 200,
+    "lg": "土",
+    "limit": "练气",
+    "xl": 3,
+    "attr": {
+      "qixue": 200,
+      "fangyu": 30
+    }
+  },
+  "zys": {
+    "id": "zys",
+    "name": "紫阳术",
+    "pj": "三品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 400,
+    "lg": "火",
+    "limit": "筑基",
+    "xl": 4,
+    "attr": {
+      "gongji": 50,
+      "baoji": 3
+    }
+  },
+  "hxj": {
+    "id": "hxj",
+    "name": "寒息劲",
+    "pj": "三品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 400,
+    "lg": "水",
+    "limit": "筑基",
+    "xl": 3,
+    "attr": {
+      "gongji": 40,
+      "fashu": 10
+    }
+  },
+  "qxj": {
+    "id": "qxj",
+    "name": "青玄剑经",
+    "pj": "四品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 600,
+    "lg": "金",
+    "limit": "筑基",
+    "xl": 5,
+    "attr": {
+      "gongji": 80,
+      "qixue": 300
+    }
+  },
+  "mhs": {
+    "id": "mhs",
+    "name": "木灵化身",
+    "pj": "四品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 600,
+    "lg": "木",
+    "limit": "结丹",
+    "xl": 5,
+    "attr": {
+      "qixue": 500,
+      "fangyu": 60
+    }
+  },
+  "lyj": {
+    "id": "lyj",
+    "name": "雷音诀",
+    "pj": "五品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 900,
+    "lg": "雷",
+    "limit": "结丹",
+    "xl": 6,
+    "attr": {
+      "gongji": 120,
+      "baoji": 5,
+      "sudu": 10
+    }
+  },
+  "tlf": {
+    "id": "tlf",
+    "name": "太虚灵法",
+    "pj": "五品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 900,
+    "lg": "无",
+    "limit": "元婴",
+    "xl": 6,
+    "attr": {
+      "fashu": 30,
+      "gongji": 100
+    }
+  },
+  "bhs": {
+    "id": "bhs",
+    "name": "不灭体",
+    "pj": "六品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 1200,
+    "lg": "土",
+    "limit": "元婴",
+    "xl": 7,
+    "attr": {
+      "qixue": 1000,
+      "fangyu": 100
+    }
+  },
+  "fhz": {
+    "id": "fhz",
+    "name": "凤火真经",
+    "pj": "六品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 1200,
+    "lg": "火",
+    "limit": "化神",
+    "xl": 8,
+    "attr": {
+      "gongji": 250,
+      "baoji": 8
+    }
+  },
+  "xyp": {
+    "id": "xyp",
+    "name": "星辰月魄",
+    "pj": "七品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 1600,
+    "lg": "水",
+    "limit": "化神",
+    "xl": 8,
+    "attr": {
+      "fashu": 60,
+      "sudu": 20,
+      "qixue": 800
+    }
+  },
+  "tyj": {
+    "id": "tyj",
+    "name": "天羽经",
+    "pj": "七品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 1600,
+    "lg": "风",
+    "limit": "返虚",
+    "xl": 9,
+    "attr": {
+      "sudu": 40,
+      "gongji": 400,
+      "baoji": 5
+    }
+  },
+  "hjf": {
+    "id": "hjf",
+    "name": "混沌剑法",
+    "pj": "八品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 2000,
+    "lg": "无",
+    "limit": "返虚",
+    "xl": 10,
+    "attr": {
+      "gongji": 600,
+      "qixue": 2000,
+      "fangyu": 150
+    }
+  },
+  "twj": {
+    "id": "twj",
+    "name": "太微经",
+    "pj": "八品",
+    "lv": 1,
+    "exp": 0,
+    "max_exp": 2000,
+    "lg": "雷",
+    "limit": "合体",
+    "xl": 10,
+    "attr": {
+      "fashu": 100,
+      "baoji": 12,
+      "gongji": 500
+    }
   }
 }

@@ -35,7 +35,6 @@ import {
   LUNHUI_BUFF_PER_COUNT
 } from '@/utils/actor';
 import TpData from '@/assets/tp.json';
-import danfangData from '@/assets/danfang.json';
 import { CWType } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 import { dfGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
@@ -525,36 +524,24 @@ function Main() {
   }, [get]);
 
   const danyaoList = useMemo(() => {
-    const pool = get('danfangPoolByGrade') as Record<string, any[]> | undefined;
-    if (pool && Object.keys(pool).length) {
+    const cw = get('cw') as
+      | { dy: { name: string; itype?: string }[] }
+      | undefined;
+    if (cw?.dy?.length) {
       const map = new Map<string, { name: string; itype?: string }>();
-      Object.values(pool).forEach((items) => {
-        items.forEach((item: any) => {
-          const key = item?.id || item?.name;
-          if (!key) return;
-          const rawName = item?.name;
-          const name =
-            typeof rawName === 'string'
-              ? rawName.replace(/丹方$/, '丹')
-              : rawName;
-          if (!map.has(key)) {
-            map.set(key, { name, itype: item?.itype });
-          }
-        });
+      cw.dy.forEach((item) => {
+        if (!item?.name) return;
+        const key = item.name;
+        if (!map.has(key)) {
+          map.set(key, {
+            name: item.name,
+            itype: (item as any).itype || '一品'
+          });
+        }
       });
       return [...map.values()];
     }
-    const custom = (get('danfangData') ?? {}) as Record<string, any>;
-    const map = new Map<string, { name: string; itype?: string }>();
-    Object.entries(danfangData as Record<string, any>).forEach(([id, item]) => {
-      if (!item?.name) return;
-      map.set(id, { name: item.name, itype: item.itype });
-    });
-    Object.entries(custom).forEach(([id, item]) => {
-      if (!item?.name) return;
-      map.set(id, { name: item.name, itype: item.itype });
-    });
-    return [...map.values()];
+    return [];
   }, [get]);
 
   const gongfaList = useMemo(() => {

@@ -67,17 +67,13 @@ export default function ActorInfo() {
           种族：{get('zhongzu')}
         </Text>
         <Text className='item' size={14} color='#888'>
-          {get('zhongzu') === '人'
-            ? '人族增益：修炼+10%'
-            : get('zhongzu') === '魔'
-              ? '魔族增益：修炼+15%'
-              : get('zhongzu') === '妖'
-                ? '妖族增益：修炼+5%'
-                : get('zhongzu') === '鬼'
-                  ? '鬼族增益：修炼+8%'
-                  : get('zhongzu') === '灵'
-                    ? '灵族增益：修炼+20%'
-                    : ''}
+          {{
+            人: '人族增益：修炼+10%',
+            魔: '魔族增益：修炼+15%',
+            妖: '妖族增益：修炼+5%',
+            鬼: '鬼族增益：修炼+8%',
+            灵: '灵族增益：修炼+20%'
+          }[get('zhongzu') as string] || ''}
         </Text>
         <Text className='item' size={16} bold>
           寿元：{get('shouyuan')}/{get('max_shouyuan')}

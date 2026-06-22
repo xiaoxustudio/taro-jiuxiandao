@@ -57,8 +57,12 @@ function WearFaBao(index: number) {
     throw new Error(`未知的法宝类型: ${fbObj.itype}`);
   }
   const updated = cloneDeep(actor);
-  if (!updated.fabao[slotName]) {
-    updated.fabao[slotName] = null;
+  const oldFB = updated.fabao[slotName];
+  if (oldFB) {
+    const oldKeys = Object.keys(oldFB.attr || {});
+    for (const k of oldKeys) {
+      updated.addAttr[k] = (updated.addAttr[k] || 0) - (oldFB.attr[k] || 0);
+    }
   }
   updated.fabao[slotName] = fbObj;
   const keys = Object.keys(fbObj.attr || {});

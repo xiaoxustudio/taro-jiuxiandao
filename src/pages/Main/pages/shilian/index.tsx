@@ -80,8 +80,8 @@ export default function Shilian() {
   const { get, set } = useActorController();
   const [isGuaji, setGuaji] = useState(false);
   // eslint-disable-next-line no-undef
-  const timer = useRef<number>(-1);
-  const guajiTimer = useRef<number>(-1);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const guajiTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const df = useMemo(() => {
     const target = difangData.find((v) => v.name === get('zd.df'));
     return (target || difangData[0]) as DiFangType;
@@ -221,7 +221,7 @@ export default function Shilian() {
   });
   const endRef = useRef(HuiheState.end);
   const guajiLockRef = useRef(false);
-  const autoBattleTimer = useRef<number>(-1);
+  const autoBattleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
   const fightSeqRef = useRef(0);
   const [yaoshouMaxQixue, setYaoshouMaxQixue] = useState(0);
@@ -336,7 +336,7 @@ export default function Shilian() {
             }
           ]
         }));
-        clearInterval(timer.current as number);
+        clearInterval(timer.current!);
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
         if (isGuajiRef.current) {
           const rounds = currentGuajiFightRoundsRef.current;
@@ -463,7 +463,7 @@ export default function Shilian() {
             }
           ]
         }));
-        clearInterval(timer.current as number);
+        clearInterval(timer.current!);
         chuwu.Add(clData);
         chuwu.Add({
           name: '灵石',
@@ -760,8 +760,8 @@ export default function Shilian() {
       JXToast('神识不足，无法遁逃').show();
       return;
     }
-    if (typeof timer.current === 'number') {
-      clearInterval(timer.current as number);
+    if (timer.current) {
+      clearInterval(timer.current);
     }
     const baseCost = Math.max(
       2,
@@ -903,8 +903,8 @@ export default function Shilian() {
 
   useEffect(() => {
     const cleanup = () => {
-      if (typeof guajiTimer.current === 'number') {
-        clearInterval(guajiTimer.current as number);
+      if (guajiTimer.current) {
+        clearInterval(guajiTimer.current);
       }
     };
     if (!isGuaji) {
@@ -940,16 +940,16 @@ export default function Shilian() {
       ActorInstance &&
       YaoShouInstance
     ) {
-      if (typeof autoBattleTimer.current === 'number') {
-        clearTimeout(autoBattleTimer.current as number);
+      if (autoBattleTimer.current) {
+        clearTimeout(autoBattleTimer.current);
       }
       autoBattleTimer.current = setTimeout(() => {
         handleStartZD();
       }, 800);
     }
     return () => {
-      if (typeof autoBattleTimer.current === 'number') {
-        clearTimeout(autoBattleTimer.current as number);
+      if (autoBattleTimer.current) {
+        clearTimeout(autoBattleTimer.current);
       }
     };
   }, [

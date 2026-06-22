@@ -51,7 +51,7 @@ export function pickWeightedIndex(
   return 0;
 }
 export function calcRealmDifficulty(tier: number) {
-  return 1 + Math.max(0, (tier - 1) * 0.05);
+  return 1 + Math.max(0, (tier - 1) * 0.12);
 }
 export function calcWinStreakFromHistory(
   history: Array<{ result: string }>
@@ -76,6 +76,7 @@ export function calcAttrScale(
   cap: number
 ) {
   const safeBase = Math.max(1, base);
+  if (safeBase <= 0) return 1;
   const ratio = Math.max(0, add / safeBase);
   return 1 + Math.min(cap, ratio * weight);
 }
@@ -88,17 +89,19 @@ export function buildMonsterBaseAttributes(params: {
   const rnd = params.rnd ?? random;
   const j1Coef = 1 + (params.jj1 - 1) * 0.12;
   const stageCoef = STAGE_COEF_MAP[params.jj2] || 1.0;
-  const scale = params.tier * j1Coef * stageCoef;
+  const geomBase = 1.8 ** (params.tier - 1);
+  const scale = geomBase * j1Coef * stageCoef;
   const rawQixue = Math.round(rnd(700, 900) * scale);
   const rawGongji = Math.round(rnd(60, 110) * scale);
   const rawFangyu = Math.round(rnd(30, 80) * scale);
   const rawSudu = Math.round(
     (22 + rnd(0, 14) + params.tier) *
       (1 + (params.jj1 - 1) * 0.04) *
-      (1 + (stageCoef - 1) * 0.5)
+      (1 + (stageCoef - 1) * 0.5) *
+      geomBase
   );
   const rawBaoji = Math.min(
-    50,
+    60,
     rnd(4, 10 + params.tier + Math.floor(params.jj1 / 3))
   );
   const rawFashu = Math.round(rnd(5, 20) * scale);
@@ -235,15 +238,14 @@ export function calcZhanDouHit<
   const minDamage = options?.minDamage ?? 1;
   const fashuMul = options?.fashuMul ?? 0.3;
   const baseAtk = Math.max(
-    0,
+    10,
     Math.round(attacker.gongji * (isCrit ? critMul : 1))
   );
   const fashuBonus = Math.round((attacker.fashu ?? 0) * fashuMul);
   const def = Math.max(0, defender.fangyu);
-  const damage = Math.max(
-    minDamage,
-    Math.round(baseAtk * (100 / (100 + def)) + fashuBonus)
-  );
+  const pctDamage = Math.round(baseAtk * (100 / (100 + def)));
+  const minPct = Math.max(minDamage, Math.round(baseAtk * 0.05));
+  const damage = Math.max(minPct, pctDamage + fashuBonus);
   const newHp = Math.max(0, Math.round(defender.qixue - damage));
   const nextDefender = { ...defender, qixue: newHp } as D;
   return {

@@ -1,7 +1,5 @@
 // hooks/useActorOperater.ts
-import { omit } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
-import { ActorIdents } from '@/config';
 import useActorStore from '@/store/actor';
 import { ActorDataConfig } from '@/types';
 
@@ -10,7 +8,7 @@ type ActorOperater = {
   delete: (name: string) => void;
   /** 获取单个角色数据 */
   get: <T = ActorDataConfig>(name: string) => T | null;
-  /** 获取所有非受保护角色数据 */
+  /** 获取所有角色数据 */
   getAll: () => Record<string, ActorDataConfig>;
 };
 
@@ -22,37 +20,21 @@ type ActorOperater = {
  * remove('npc1');
  */
 function useActorOperater(): ActorOperater {
-  /**
-   * 安全删除角色（包含受保护角色校验）
-   */
   const deleteActor = useCallback((name: string) => {
-    if (ActorIdents.includes(name)) {
-      throw new Error(`[useActorOperater] 受保护角色关键字无法删除: ${name}`);
-    }
     useActorStore.setState((state) => {
-      const newActors = omit(state.actors, [name]);
-      return {
-        ...state,
-        actors: newActors
-      };
+      const { [name]: _removed, ...rest } = state.actors;
+      return { ...state, actors: rest };
     });
   }, []);
 
-  /**
-   * 获取角色最新数据（绕过闭包问题）
-   */
   const get = useCallback(<T = ActorDataConfig>(name: string): T | null => {
     return (useActorStore.getState().actors[name] as T) ?? null;
   }, []);
 
-  /**
-   * 获取过滤后的角色列表（排除系统预留角色）
-   */
   const getAll = useCallback((): Record<string, ActorDataConfig> => {
-    return omit(useActorStore.getState().actors, ActorIdents);
+    return useActorStore.getState().actors;
   }, []);
 
-  // 稳定返回值引用（避免不必要的组件重渲染）
   return useMemo(
     () => ({
       delete: deleteActor,

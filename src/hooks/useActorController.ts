@@ -1,6 +1,5 @@
-import { cloneDeep, omit } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ActorIdents } from '@/config';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import useStorageStore from '@/services/storage';
@@ -14,12 +13,9 @@ import { GongFaType } from '@/types/gongfa';
 function useActorController() {
   const { current, set: setCurrent } = useStore();
   const { actors } = useActorStore();
-  const actorKeys = useMemo(
-    () => Object.keys(actors).filter((key) => !ActorIdents.includes(key)),
-    [actors]
-  );
+  const actorKeys = useMemo(() => Object.keys(actors), [actors]);
   const resolvedKey = useMemo(() => {
-    if (current && !ActorIdents.includes(current) && actors[current]) {
+    if (current && actors[current]) {
       return current;
     }
     return actorKeys[0] || '';
@@ -31,7 +27,7 @@ function useActorController() {
 
   useEffect(() => {
     if (
-      (!current || ActorIdents.includes(current) || !actors[current]) &&
+      (!current || !actors[current]) &&
       resolvedKey &&
       resolvedKey !== current
     ) {
@@ -258,11 +254,9 @@ function useActorController() {
     [persistStorage]
   );
 
-  const OmitActor = useMemo(() => omit(safeActor, ActorIdents), [safeActor]);
-
   const obj = useMemo(
-    () => ({ get, set, actor: OmitActor }),
-    [OmitActor, get, set]
+    () => ({ get, set, actor: safeActor }),
+    [safeActor, get, set]
   );
 
   return obj;

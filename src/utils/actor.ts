@@ -12,18 +12,22 @@ const MAJOR_REALMS = [
   '合体',
   '大乘'
 ] as const;
-const BASE_XIUWEI_BY_REALM = [800, 1500, 2800, 5000, 9000, 16000, 28000, 50000];
-const RATE_OF_LING_BY_REALM = [600, 900, 1500, 2400, 3800, 6000, 9500, 15000];
+const BASE_XIUWEI_BY_REALM = [
+  800, 3000, 12000, 50000, 200000, 800000, 3200000, 12800000
+];
+const RATE_OF_LING_BY_REALM = [
+  600, 1800, 5400, 16200, 48600, 145800, 437400, 1312200
+];
 const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
 
 // 轮回印记增益配置（每层）
 // 注意: xiulianbeilv 存储值为实际倍率×10（如10表示1.0倍），由 xlBeilv = xiulianbeilv / 10 换算
 export const LUNHUI_BUFF_PER_COUNT = {
-  xiulianbeilvBonus: 1, // 修炼倍率 +1（存储值，即实际 +0.1 倍，最终 +10%）
-  maxShenshiBonus: 10, // 神识上限 +10
-  shouyuanBonus: 20, // 寿元上限 +20
-  initialXiuweiBonus: 50, // 初始修为 +50
-  shangxianBonus: 2 // 全属性伤害加成 +2%
+  xiulianbeilvBonus: 2, // 修炼倍率 +2（存储值，即实际 +0.2 倍，最终 +20%）
+  maxShenshiBonus: 25, // 神识上限 +25
+  shouyuanBonus: 50, // 寿元上限 +50
+  initialXiuweiBonus: 100, // 初始修为 +100
+  shangxianBonus: 3 // 全属性伤害加成 +3%
 };
 /* 角色相关操作 */
 

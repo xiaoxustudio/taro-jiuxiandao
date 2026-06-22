@@ -1,8 +1,14 @@
 import { random, round } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
-import { Button, Toast } from 'antd-mobile';
-import { View } from '@tarojs/components';
-import { Container, ItemCounter, JXModal, JXSpace, Text } from '@/components';
+import { Button, View } from '@tarojs/components';
+import {
+  Container,
+  ItemCounter,
+  JXModal,
+  JXSpace,
+  JXToast,
+  Text
+} from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { REALM_ORDER } from '@/assets/const';
 import { DAOLV_QUALITIES } from '@/config';
@@ -208,11 +214,11 @@ export default function Dongfu() {
     const raw = get('dongfu').daolvMarket || null;
     const refreshCount = raw && raw.date === today ? raw.refreshCount || 0 : 0;
     if (refreshCount >= 3) {
-      Toast.show('今日道侣刷新次数已用完');
+      JXToast('今日道侣刷新次数已用完').show();
       return;
     }
     if (lingshi < 3000) {
-      Toast.show('灵石不足');
+      JXToast('灵石不足').show();
       return;
     }
 
@@ -233,7 +239,7 @@ export default function Dongfu() {
         old.name === candidate.name &&
         old.quality === candidate.quality
       ) {
-        Toast.show(`你与${candidate.name}已是道侣`);
+        JXToast(`你与${candidate.name}已是道侣`).show();
         stateDaolv.setVisiableModal(false);
         return;
       }
@@ -263,7 +269,7 @@ export default function Dongfu() {
 
       if (!old) {
         doSelect();
-        Toast.show(`你与${candidate.name}结为道侣`);
+        JXToast(`你与${candidate.name}结为道侣`).show();
         return;
       }
 
@@ -271,7 +277,7 @@ export default function Dongfu() {
       const hasLingshi =
         (chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0) >= breakupCost;
       if (!hasLingshi) {
-        Toast.show(`灵石不足，分开需要${breakupCost}灵石`);
+        JXToast(`灵石不足，分开需要${breakupCost}灵石`).show();
         return;
       }
 
@@ -306,14 +312,14 @@ export default function Dongfu() {
             (chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0) >=
             breakupCost;
           if (!enough) {
-            Toast.show(`灵石不足，分开需要${breakupCost}灵石`);
+            JXToast(`灵石不足，分开需要${breakupCost}灵石`).show();
             return;
           }
           chuwu.Remove({ name: '灵石', type: CWType.QT, num: breakupCost });
           doSelect();
-          Toast.show(
+          JXToast(
             `你与${old.name}分开（消耗灵石${breakupCost}），并与${candidate.name}结为道侣`
-          );
+          ).show();
           close();
         },
         onCancel() {
@@ -327,7 +333,7 @@ export default function Dongfu() {
   const handleDropDaoLv = useCallback(() => {
     const old = get('dongfu').daolv as DaoLvCandidate | null;
     if (!old) {
-      Toast.show('你还没有道侣');
+      JXToast('你还没有道侣').show();
       return;
     }
 
@@ -357,7 +363,7 @@ export default function Dongfu() {
           (chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0) >=
           breakupCost;
         if (!enough) {
-          Toast.show(`灵石不足，分开需要${breakupCost}灵石`);
+          JXToast(`灵石不足，分开需要${breakupCost}灵石`).show();
           return;
         }
 
@@ -381,7 +387,7 @@ export default function Dongfu() {
         applyDelta(old.attr, -1);
         set('addAttr', nextAddAttr);
         set('dongfu.daolv', null);
-        Toast.show(`你与${old.name}分开（消耗灵石${breakupCost}）`);
+        JXToast(`你与${old.name}分开（消耗灵石${breakupCost}）`).show();
         close();
       },
       onCancel() {
@@ -393,13 +399,13 @@ export default function Dongfu() {
   const handleShuangXiu = useCallback(() => {
     const currentDaoLv = get('dongfu').daolv as any;
     if (!currentDaoLv) {
-      Toast.show('你还没有道侣');
+      JXToast('你还没有道侣').show();
       return;
     }
     const today = getCurrentDate();
     const last = get('dongfu').shuangxiu?.date;
     if (last === today) {
-      Toast.show('今日已双修过了');
+      JXToast('今日已双修过了').show();
       return;
     }
     const affinity = Math.max(
@@ -417,7 +423,7 @@ export default function Dongfu() {
       ...currentDaoLv,
       affinity: Math.min(100, affinity + affinityGain)
     });
-    Toast.show(`双修有成，修为+${gain}，亲密度+${affinityGain}`);
+    JXToast(`双修有成，修为+${gain}，亲密度+${affinityGain}`).show();
   }, [get, lv, set]);
 
   /* 补灵 */
@@ -433,7 +439,7 @@ export default function Dongfu() {
 
   const handleOk = useCallback(() => {
     if (!blNum) {
-      Toast.show('请加注数量');
+      JXToast('请加注数量').show();
       return;
     }
     if (lingshi >= blNum) {
@@ -443,7 +449,7 @@ export default function Dongfu() {
         Math.floor(blNum / 10) + needLingshiNum + get('dongfu.lingchi')
       );
     } else {
-      Toast.show('灵石不足');
+      JXToast('灵石不足').show();
       return;
     }
     stateBuling.setVisiableModal(false);
@@ -456,14 +462,14 @@ export default function Dongfu() {
         chuwu.Remove({ name: '升灵石', type: CWType.QT, num: 1 });
         set('dongfu.lv', lv + 1);
       } else {
-        Toast.show('升灵石不足');
+        JXToast('升灵石不足').show();
         return;
       }
     } else if (lingshi >= needUpLingshi) {
       chuwu.Remove({ name: '灵石', type: CWType.QT, num: needUpLingshi });
       set('dongfu.lv', lv + 1);
     } else {
-      Toast.show('灵石不足');
+      JXToast('灵石不足').show();
       return;
     }
   }, [lingshi, lv, needUpLingshi, set]);

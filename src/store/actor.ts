@@ -2,7 +2,6 @@ import { omit } from 'lodash-es';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ActorDataConfig } from '@/types';
-import { ActorIdents } from '@/config';
 import useStorageStore from '@/services/storage';
 
 interface ActorStore {
@@ -25,10 +24,8 @@ const useActorStore = create<ActorStore>()(
         set((state) => {
           const oArray = Array.isArray(store) ? [...store] : [store];
           oArray.forEach((name) => {
-            if (ActorIdents.includes(name)) return;
             const actor = state.actors[name];
             if (!actor) return;
-            // 当执行删除角色时，同时删除他们的生成的数据
             const keys: string[] = [];
             if (actor.materialPoolStorageKey)
               keys.push(actor.materialPoolStorageKey);
@@ -55,7 +52,7 @@ const useActorStore = create<ActorStore>()(
               );
             });
           });
-          const om = omit(state.actors, oArray.concat(ActorIdents));
+          const om = omit(state.actors, oArray);
           return {
             ...state,
             actors: om

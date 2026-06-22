@@ -214,8 +214,8 @@ export const FANGSHI_CONFIG = {
   dyBaseCount: 10,
   clBaseCount: 10,
   dfBaseCount: 10,
-  dyPriceScale: 0.25,
-  dfPriceScale: 0.25,
+  dyPriceScale: 0.08,
+  dfPriceScale: 0.08,
   randDyCount: 10,
   randClCount: 10,
   randDfCount: 10,
@@ -280,8 +280,8 @@ export const clGradePrice: Record<(typeof clGrades)[number], [number, number]> =
 // ------------------------------
 export const MATERIAL_INIT_COUNT = 1000;
 export const ACTOR_POOL_CONFIG = {
-  countPerGrade: 200,
-  gongfaCountPerGrade: 300
+  countPerGrade: 20,
+  gongfaCountPerGrade: 30
 };
 
 // 材料注册项
