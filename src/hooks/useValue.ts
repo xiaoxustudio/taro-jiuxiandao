@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useMemo } from 'react';
 
 export interface IUseValueNotState<T> {
   readonly value: T;
@@ -14,14 +14,21 @@ function useValue<T>(
   state = false
 ): IUseValueNotState<T> | IUseValueState<T> {
   const [data, setData] = useState(initialdata);
-  const obj: IUseValueNotState<T> = {
-    get value() {
-      return data;
-    },
-    set(value: T) {
-      setData(value);
-    }
-  };
+  const ref = useRef(data);
+  ref.current = data;
+
+  const obj = useMemo<IUseValueNotState<T>>(
+    () => ({
+      get value() {
+        return ref.current;
+      },
+      set(value: T) {
+        ref.current = value;
+        setData(value);
+      }
+    }),
+    []
+  );
 
   if (state) return [data, obj];
   return obj;
