@@ -109,11 +109,23 @@ export function buildMonsterBaseAttributes(params: {
   );
   return { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, rawFashu, xw };
 }
+const clGradesOrder = [
+  '一品',
+  '二品',
+  '三品',
+  '四品',
+  '五品',
+  '六品',
+  '七品',
+  '八品'
+];
+
 export function pickMaterialNameByGrade(params: {
   materialPoolByGrade?: Record<string, { name: string; itype: string }[]>;
   registry: { name: string; itype: string }[];
   targetGrade: string;
   rnd?: (min: number, max: number) => number;
+  maxGradeIdx?: number;
 }) {
   const rnd = params.rnd ?? random;
   const fromMap = params.materialPoolByGrade?.[params.targetGrade] ?? [];
@@ -122,7 +134,17 @@ export function pickMaterialNameByGrade(params: {
     const filtered = params.registry.filter(
       (m) => m.itype === params.targetGrade
     );
-    pool = filtered.length ? filtered : params.registry;
+    if (filtered.length) {
+      pool = filtered;
+    } else {
+      const maxIdx =
+        params.maxGradeIdx ?? clGradesOrder.indexOf(params.targetGrade);
+      const limited = params.registry.filter((m) => {
+        const idx = clGradesOrder.indexOf(m.itype);
+        return idx >= 0 && idx <= maxIdx;
+      });
+      pool = limited.length ? limited : params.registry;
+    }
   }
   return pool[rnd(0, Math.max(0, pool.length - 1))]?.name || '妖丹';
 }

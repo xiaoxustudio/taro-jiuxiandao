@@ -89,7 +89,9 @@ export const checkCultivationAchievements = (
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
-  const progress = {};
+  const progress = {
+    lv: actor?.lv || 0
+  };
 
   const updated = updateAchievementProgress(chengjiu, actor, progress);
   set('chengjiu', updated);

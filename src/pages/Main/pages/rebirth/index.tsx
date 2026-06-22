@@ -166,8 +166,7 @@ function RebirthPage() {
         fangyu: 0,
         baoji: 0,
         sudu: 0,
-        fashu: 0,
-        xianyuan: 0
+        fashu: 0
       },
       fabao: baseFabao,
       cw: baseCW,

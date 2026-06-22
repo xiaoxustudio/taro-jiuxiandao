@@ -222,6 +222,9 @@ export const applyAchievementReward = (
       );
       break;
     }
+    case 'lingqi':
+      set('xiuwei', (get('xiuwei') || 0) + (value as number));
+      break;
     case 'lingqi_rate':
       set('xiulianbeilv', (get('xiulianbeilv') || 0) + (value as number));
       break;

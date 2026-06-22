@@ -168,6 +168,7 @@ export default function Shilian() {
       materialPoolByGrade,
       registry: flatPool,
       targetGrade,
+      maxGradeIdx: gradeIndex,
       rnd: random
     });
     const { rawQixue, rawGongji, rawFangyu, rawSudu, rawBaoji, rawFashu, xw } =
