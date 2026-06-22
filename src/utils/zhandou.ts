@@ -66,7 +66,8 @@ export function calcWinStreakFromHistory(
 export function compositeDifficultyCoef(tier: number, winStreak: number) {
   const realm = calcRealmDifficulty(tier);
   const streak = 1 + Math.min(0.25, winStreak * 0.03);
-  return Math.min(1.6, realm * streak);
+  const cap = 1.2 + tier * 0.05;
+  return Math.min(cap, realm * streak);
 }
 export function calcAttrScale(
   base: number,

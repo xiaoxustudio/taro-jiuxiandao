@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Container, JXButton, JXSpace, JXToast, Text } from '@/components';
 import { FabaoType, FBItemType, CWType } from '@/types';
-import { getFaBao, TakeOffFaBao } from '@/utils/fabao';
+import { FaBaoTypeTransform, getFaBao, TakeOffFaBao } from '@/utils/fabao';
 import useActorController from '@/hooks/useActorController';
 import chuwu from '@/utils/chuwu';
 import './index.less';
 
 export default function Fabao() {
-  const { get } = useActorController();
+  const { get, set } = useActorController();
   const [type, setType] = useState(FabaoType.头戴战盔);
   const [targetFB, setTargetFB] = useState<FBItemType | null>(null);
 
@@ -32,14 +32,12 @@ export default function Fabao() {
     if (Math.random() < successRate) {
       chuwu.Remove({ name: '灵石', type: CWType.QT, num: costLs });
       const updatedFB: FBItemType = { ...targetFB, lv: targetFB.lv + 1 };
-      const idx = get('cw.fb').findIndex(
-        (v: any) => v.name === targetFB.name && v.type === CWType.FB
-      );
-      if (idx !== -1) {
-        chuwu.Remove({ name: targetFB.name, type: CWType.FB });
-      }
-      chuwu.Add({ ...updatedFB, type: CWType.FB });
-      TakeOffFaBao(type);
+      const slotName =
+        typeof targetFB.itype === 'number'
+          ? FaBaoTypeTransform(targetFB.itype)
+          : targetFB.itype;
+      const currentFabao = get('fabao');
+      set('fabao', { ...currentFabao, [slotName]: updatedFB });
       JXToast(`强化成功！${targetFB.name} 提升至 +${updatedFB.lv}`).show();
     } else {
       chuwu.Remove({
@@ -50,7 +48,7 @@ export default function Fabao() {
       JXToast(`强化失败，消耗${Math.floor(costLs * 0.5)}灵石`).show();
     }
     updateInfo();
-  }, [targetFB, updateInfo, get, type]);
+  }, [targetFB, updateInfo, get, set]);
 
   const handleUpgrade = useCallback(() => {
     if (!targetFB) return;
@@ -88,17 +86,12 @@ export default function Fabao() {
         updatedFB.attr[key] = Math.round(updatedFB.attr[key] * 1.3) as any;
       }
     });
-    const idx = get('cw.fb').findIndex(
-      (v: any) => v.name === targetFB.name && v.type === CWType.FB
-    );
-    if (idx !== -1) {
-      chuwu.Remove({ name: targetFB.name, type: CWType.FB });
-    }
-    chuwu.Add({ ...updatedFB, type: CWType.FB });
     TakeOffFaBao(type);
+    chuwu.Remove({ name: targetFB.name, type: CWType.FB });
+    chuwu.Add({ ...updatedFB, type: CWType.FB });
     JXToast(`升阶成功！${targetFB.name} 晋升为${nextPj}`).show();
     updateInfo();
-  }, [targetFB, get, updateInfo, type]);
+  }, [targetFB, updateInfo, type]);
 
   useEffect(() => {
     updateInfo();

@@ -136,6 +136,10 @@ function useActorController() {
         if (!cancelled && loaded) patch.seedRegistry = loaded;
       }
 
+      if (!actor.xiulianbeilv) {
+        patch.xiulianbeilv = 10;
+      }
+
       if (cancelled || !Object.keys(patch).length) return;
 
       useActorStore.setState((state) => {

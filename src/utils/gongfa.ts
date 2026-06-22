@@ -110,6 +110,13 @@ function setCurrentGongFa(id: string): void {
 
   if (updated.gongfa.current) {
     const currentGongFa = updated.gongfa.current;
+    const elapsedMs = currentGongFa.time
+      ? Math.max(0, Date.now() - currentGongFa.time)
+      : 0;
+    const timeArr = new TimeArray(elapsedMs);
+    const addExp = timeArr.toZhouTian() * 1000;
+    currentGongFa.exp += addExp;
+    currentGongFa.time = Date.now();
     const currentAdds = currentGongFa.attr;
     if (currentAdds) {
       Object.keys(currentAdds).forEach((key) => {

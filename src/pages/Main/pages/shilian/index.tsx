@@ -48,6 +48,7 @@ import {
   SeedRegistryItem
 } from '@/assets/const';
 import { updateAchievementProgress } from '@/utils/chengjiu';
+import { addLingShouExp, getLingShouBonus } from '@/utils/lingshou';
 import styles from './index.module.less';
 
 const renderNameWithRealmColor = (name: string) => {
@@ -418,6 +419,10 @@ export default function Shilian() {
           Math.max(1, Math.round(YaoShouInstance.xw * 0.7)),
           Math.max(1, Math.round(YaoShouInstance.xw * 1.2))
         );
+        const lingShiDrop = random(
+          Math.max(1, (TIER_MAP[YaoShouInstance.jingjie] || 1) * 10),
+          Math.max(2, (TIER_MAP[YaoShouInstance.jingjie] || 1) * 25)
+        );
         setHuiheState((v) => ({
           ...v,
           logs: [
@@ -443,6 +448,9 @@ export default function Shilian() {
                 </>
               )
             },
+            {
+              text: <>获得灵石：{lingShiDrop}</>
+            },
             ...(seedDrop
               ? [
                   {
@@ -457,6 +465,12 @@ export default function Shilian() {
         }));
         clearInterval(timer.current as number);
         chuwu.Add(clData);
+        chuwu.Add({
+          name: '灵石',
+          type: CWType.QT,
+          isPile: true,
+          num: lingShiDrop
+        });
         if (seedDrop) {
           const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
           if (currentYaoyuan) {
@@ -475,6 +489,13 @@ export default function Shilian() {
           }
         }
         set('xiuwei', get('xiuwei') + reward);
+        const currentLingShou = get('lingShou') as any;
+        if (currentLingShou) {
+          set(
+            'lingShou',
+            addLingShouExp(currentLingShou, Math.round(reward * 0.3))
+          );
+        }
         setSessionLoot((prev) => ({
           ...prev,
           [clData.name]: (prev[clData.name] || 0) + clData.num!
@@ -571,11 +592,15 @@ export default function Shilian() {
     fightSeqRef.current += 1;
     setYaoShouInstance(newYaoShou);
     setYaoshouMaxQixue(newYaoShou.qixue);
+    const ls = get('lingShou') as any;
+    const lsBonus = ls
+      ? getLingShouBonus(ls)
+      : { gongji: 0, fangyu: 0, qixue: 0 };
     setActorInstance({
       name: get('daohao'),
-      qixue: get('qixue') + get('addAttr.qixue'),
-      gongji: get('gongji') + get('addAttr.gongji'),
-      fangyu: get('fangyu') + get('addAttr.fangyu'),
+      qixue: get('qixue') + get('addAttr.qixue') + lsBonus.qixue,
+      gongji: get('gongji') + get('addAttr.gongji') + lsBonus.gongji,
+      fangyu: get('fangyu') + get('addAttr.fangyu') + lsBonus.fangyu,
       sudu: get('sudu') + get('addAttr.sudu'),
       baoji: get('baoji') + get('addAttr.baoji'),
       fashu: get('fashu') + get('addAttr.fashu')

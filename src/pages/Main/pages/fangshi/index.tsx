@@ -133,78 +133,94 @@ export default function Fangshi() {
               JXToast('已拥有该物品！').show();
               return;
             }
-            if (chuwu.LingShiThan(v.ls)) {
-              if (action === 'danfang') {
-                if (v.id) {
-                  if (!(danfangData as Record<string, any>)[v.id]) {
-                    if (v.cl && v.time) {
-                      const baseName = v.name.endsWith('丹方')
-                        ? v.name.slice(0, -2)
-                        : v.name;
-                      const current = (get('danfangData') ?? {}) as Record<
-                        string,
-                        any
-                      >;
-                      if (!current[v.id]) {
-                        set('danfangData', {
-                          ...current,
-                          [v.id]: {
-                            name: baseName,
-                            type: v.type,
-                            attr: v.attr ?? {},
-                            cl: v.cl,
-                            time: v.time,
-                            itype: v.itype,
-                            isPile: true,
-                            desc: v.desc,
-                            ls: v.baseLs ?? v.ls
-                          }
-                        });
-                      }
+            const curLS =
+              chuwu.Get({ name: '灵石', type: CWType.QT })?.num ?? 0;
+            if (curLS < v.ls) {
+              JXToast(`灵石不足，还差${v.ls - curLS}`).show();
+              return;
+            }
+            chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
+            if (action === 'danfang') {
+              if (v.id) {
+                if (!(danfangData as Record<string, any>)[v.id]) {
+                  if (v.cl && v.time) {
+                    const baseName = v.name.endsWith('丹方')
+                      ? v.name.slice(0, -2)
+                      : v.name;
+                    const current = (get('danfangData') ?? {}) as Record<
+                      string,
+                      any
+                    >;
+                    if (!current[v.id]) {
+                      set('danfangData', {
+                        ...current,
+                        [v.id]: {
+                          name: baseName,
+                          type: v.type,
+                          attr: v.attr ?? {},
+                          cl: v.cl,
+                          time: v.time,
+                          itype: v.itype,
+                          isPile: true,
+                          desc: v.desc,
+                          ls: v.baseLs ?? v.ls
+                        }
+                      });
                     }
                   }
-                  chuwu.AddDanFang(v.id);
-                  JXToast(`购买丹方：${v.name}`).show();
-                } else {
-                  JXToast('丹方数据异常').show();
+                }
+                chuwu.AddDanFang(v.id);
+                JXToast(`购买丹方：${v.name}`).show();
+              } else {
+                JXToast('丹方数据异常').show();
+              }
+            } else {
+              const isSeed = v.name.endsWith('种子') && Array.isArray(v.time);
+              if (isSeed) {
+                const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
+                if (currentYaoyuan) {
+                  const nextSeeds = currentYaoyuan.seeds ?? [];
+                  const existing = nextSeeds.find(
+                    (item) => item.name === v.name
+                  );
+                  const seedBase = {
+                    name: v.name,
+                    material: v.material || v.name.replace(/种子$/, ''),
+                    itype: v.itype,
+                    time: v.time
+                  };
+                  const updatedSeeds = existing
+                    ? nextSeeds.map((item) =>
+                        item.name === v.name
+                          ? { ...item, num: item.num + 1 }
+                          : item
+                      )
+                    : [...nextSeeds, { ...seedBase, num: 1 }];
+                  set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
+                } else if (!chuwu.Add(v)) {
+                  chuwu.Add({
+                    name: '灵石',
+                    type: CWType.QT,
+                    isPile: true,
+                    num: v.ls
+                  });
+                  JXToast('背包已满，购买失败').show();
                   return;
                 }
+                JXToast(`购买种子：${v.name}`).show();
               } else {
-                const isSeed = v.name.endsWith('种子') && Array.isArray(v.time);
-                if (isSeed) {
-                  const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
-                  if (currentYaoyuan) {
-                    const nextSeeds = currentYaoyuan.seeds ?? [];
-                    const existing = nextSeeds.find(
-                      (item) => item.name === v.name
-                    );
-                    const seedBase = {
-                      name: v.name,
-                      material: v.material || v.name.replace(/种子$/, ''),
-                      itype: v.itype,
-                      time: v.time
-                    };
-                    const updatedSeeds = existing
-                      ? nextSeeds.map((item) =>
-                          item.name === v.name
-                            ? { ...item, num: item.num + 1 }
-                            : item
-                        )
-                      : [...nextSeeds, { ...seedBase, num: 1 }];
-                    set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
-                  } else {
-                    chuwu.Add(v);
-                  }
-                  JXToast(`购买种子：${v.name}`).show();
-                } else {
-                  chuwu.Add(v);
-                  JXToast(`购买物品：${v.name}`).show();
+                if (!chuwu.Add(v)) {
+                  chuwu.Add({
+                    name: '灵石',
+                    type: CWType.QT,
+                    isPile: true,
+                    num: v.ls
+                  });
+                  JXToast('背包已满，购买失败').show();
+                  return;
                 }
+                JXToast(`购买物品：${v.name}`).show();
               }
-              chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
-            } else {
-              const needLS = chuwu.Get({ name: '灵石', type: CWType.QT });
-              JXToast(`灵石不足，还差${v.ls - needLS!.num!}`).show();
             }
           },
           onCancel() {

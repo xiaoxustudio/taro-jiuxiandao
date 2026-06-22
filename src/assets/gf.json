@@ -9,11 +9,9 @@
     "lg": "无",
     "limit": "练气",
     "xl": 2,
-    "attr": [
-      {
-        "qixue": 100,
-        "gongji": 10
-      }
-    ]
+    "attr": {
+      "qixue": 100,
+      "gongji": 10
+    }
   }
 }

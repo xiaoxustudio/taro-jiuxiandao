@@ -78,7 +78,7 @@
         },
         {
           "type": "lingqi_rate",
-          "value": 0.05,
+          "value": 0.5,
           "desc": "5%修炼速度加成"
         }
       ]
@@ -103,7 +103,7 @@
         },
         {
           "type": "lingqi_rate",
-          "value": 0.1,
+          "value": 1.0,
           "desc": "10%修炼速度加成"
         }
       ]
@@ -128,7 +128,7 @@
         },
         {
           "type": "lingqi_rate",
-          "value": 0.15,
+          "value": 1.5,
           "desc": "15%修炼速度加成"
         }
       ]

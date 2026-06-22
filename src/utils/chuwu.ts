@@ -2,6 +2,7 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { BaseType, CWType } from '@/types';
+import danfangData from '@/assets/danfang.json';
 import { getActor } from './actor';
 /* 角色储物相关操作 */
 
@@ -177,11 +178,55 @@ function LingShiThan(num: number = 0) {
   const lsStruct = { name: '灵石', type: CWType.QT };
   const lsData = Get(lsStruct);
   if (!lsData) {
-    return false;
+    return num <= 0;
   }
-  // eslint-disable-next-line no-underscore-dangle
-  const _num = lsData.num ? lsData.num : 1;
+  const _num = lsData.num ?? 0;
   return _num >= num;
+}
+
+function UsePill(name: string): boolean {
+  const entry = Object.values(danfangData as Record<string, any>).find(
+    (v: any) => v.name === name && v.attr
+  );
+  if (!entry) return false;
+  const { current } = useStore.getState();
+  const acData = getActor();
+  const { set } = useActorStore.getState();
+  const updated = cloneDeep(acData);
+  const attr = entry.attr as Record<string, number>;
+  Object.entries(attr).forEach(([key, val]) => {
+    if (key === 'shouyuan') {
+      updated.max_shouyuan = (updated.max_shouyuan || 100) + val;
+      updated.shouyuan = Math.min(
+        (updated.shouyuan || 0) + val,
+        updated.max_shouyuan
+      );
+    } else if (key === 'shenshi') {
+      const maxShenshi = updated.max_shenshi || 100;
+      updated.shenshi = Math.min((updated.shenshi || 0) + val, maxShenshi);
+    } else {
+      const currentVal = (updated as any)[key];
+      if (typeof currentVal === 'number') {
+        (updated as any)[key] = currentVal + val;
+      }
+    }
+  });
+  const typeKey = TR(CWType.DY);
+  const cwArray = updated.cw[typeKey] as BaseType[];
+  const idx = cwArray.findIndex((v) => v.name === name);
+  if (idx !== -1) {
+    const item = cwArray[idx];
+    const newNum = (item.num || 1) - 1;
+    if (newNum <= 0) {
+      updated.cw[typeKey] = cwArray.filter((_, i) => i !== idx) as any;
+    } else {
+      updated.cw[typeKey] = cwArray.map((v, i) =>
+        i === idx ? { ...v, num: newNum } : v
+      ) as any;
+    }
+  }
+  set(current, updated);
+  return true;
 }
 
 export default {
@@ -192,6 +237,7 @@ export default {
   Get,
   Remove,
   RemoveArr,
+  UsePill,
   getActor,
   TR,
   LingShiThan

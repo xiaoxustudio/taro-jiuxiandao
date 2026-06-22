@@ -87,6 +87,17 @@ export type RebirthReward = {
   value: number;
 };
 
+export interface LingShouData {
+  name: string;
+  lv: number;
+  exp: number;
+  maxExp: number;
+  gongji: number;
+  fangyu: number;
+  qixue: number;
+  active: boolean;
+}
+
 /**
  * @description: 角色属性
  * @return {*}
@@ -156,6 +167,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   materialPoolStorageKeysByGrade?: Record<string, string>; // 材料池分品阶存储 key
   danfangPoolStorageKey?: string; // 丹方池存储 key
   danfangPoolStorageKeysByGrade?: Record<string, string>; // 丹方池分品阶存储 key
+  lingShou?: LingShouData; // 灵兽
   gongfaPoolStorageKeysByGrade?: Record<string, string>; // 功法池分品阶存储 key
   danfangDataStorageKey?: string; // 丹方数据存储 key
   seedRegistryStorageKey?: string; // 种子注册表存储 key

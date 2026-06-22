@@ -113,12 +113,13 @@ function RebirthPage() {
     };
 
     const lunhuiCount = (actor?.lunhuiCount as number) || 0;
+    const newLunhuiCount = lunhuiCount + 1;
     const prevMax = (actor?.cw?.max as number) || 30;
     const baseCW: CuWuType = {
       fb: [],
       dy: [],
       qt: [],
-      max: Math.max(30, prevMax, lunhuiCount * 20 + 30)
+      max: Math.max(30, prevMax, newLunhuiCount * 20 + 30)
     };
 
     if (keptFabao.length > 0) {
@@ -134,7 +135,7 @@ function RebirthPage() {
 
     const rewards: Record<string, number> = {};
     if (selectReward.value > 0) rewards[selectReward.type] = selectReward.value;
-    const lunhuiBuffs = getLunhuiBuffs(lunhuiCount);
+    const lunhuiBuffs = getLunhuiBuffs(newLunhuiCount);
     const lunhuiShenshiBonus = lunhuiBuffs?.maxShenshiBonus || 0;
     const lunhuiShouyuanBonus = lunhuiBuffs?.shouyuanBonus || 0;
     const lunhuiXiulianBonus = lunhuiBuffs?.xiulianbeilvBonus || 0;
@@ -212,7 +213,7 @@ function RebirthPage() {
       xianyuan: (actor?.xianyuan || 0) + (rewards.xianyuan || 0),
       ...(linggen && { linggen }),
       ...(zhongzu && { zhongzu }),
-      lunhuiCount,
+      lunhuiCount: newLunhuiCount,
       chengjiu: undefined,
       battleCount: undefined,
       winStreak: undefined

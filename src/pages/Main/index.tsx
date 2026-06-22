@@ -40,6 +40,7 @@ import { CWType } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 import { dfGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
+import { createDefaultLingShou } from '@/utils/lingshou';
 import styles from './index.module.less';
 
 function Main() {
@@ -325,8 +326,14 @@ function Main() {
           if (hasPill) {
             chuwu.RemoveArr(need);
             const jj = JingJieTransform(get('jingjie'));
+            const prevJingjie = get('jingjie');
             set('jingjie1', '一阶');
+            set('jingjie2', '初期');
             set('jingjie', jj);
+            if (jj === '筑基' && prevJingjie === '练气' && !get('lingShou')) {
+              set('lingShou', createDefaultLingShou(0));
+              JXToast('突破筑基，灵兽感应降临！').show();
+            }
             const lv1 = get('lv') / 20 + 1;
             const calcGongji =
               get('gongji') + 10 * lv1 + tpdata.add.gongji * 0.5;
@@ -356,7 +363,7 @@ function Main() {
       name: `法术(${get('fashu')})`,
       click() {
         const fashuTotal = get('fashu') + get('addAttr.fashu');
-        JXModal.show({
+        JXModal.alert({
           title: '法术',
           content: (
             <JXSpace direction='vertical'>
@@ -369,7 +376,7 @@ function Main() {
               <Text>战斗中每击附加法术伤害：{fashuTotal * 0.3}</Text>
             </JXSpace>
           ),
-          actions: [{ text: '知道了', key: 'ok' }]
+          confirmText: '知道了'
         });
       }
     }
@@ -389,8 +396,39 @@ function Main() {
     },
     {
       name: '灵兽',
-      disabled: true,
-      click() {}
+      click() {
+        const ls = get('lingShou') as any;
+        if (!ls) {
+          JXModal.alert({
+            title: '灵兽',
+            content: <Text>尚未获得灵兽。突破至筑基后将获得灵兽。</Text>,
+            confirmText: '知道了'
+          });
+          return;
+        }
+        JXModal.alert({
+          title: ls.name,
+          content: (
+            <JXSpace direction='vertical'>
+              <Text>等级：{ls.lv}</Text>
+              <Text>
+                经验：{ls.exp}/{ls.maxExp}
+              </Text>
+              <Text>气血：{ls.qixue}</Text>
+              <Text>攻击：{ls.gongji}</Text>
+              <Text>防御：{ls.fangyu}</Text>
+              <Box style={{ height: 4 }} />
+              <Text size={14} bold>
+                战斗加成（30%）
+              </Text>
+              <Text>气血 +{Math.round(ls.qixue * 0.3)}</Text>
+              <Text>攻击 +{Math.round(ls.gongji * 0.3)}</Text>
+              <Text>防御 +{Math.round(ls.fangyu * 0.3)}</Text>
+            </JXSpace>
+          ),
+          confirmText: '知道了'
+        });
+      }
     },
 
     {
@@ -579,7 +617,14 @@ function Main() {
   const handleOpenXiuLian = () => {
     const needAddXiuWeiJJ = getLingQiForJingJie();
 
-    const zhongzuRate = get('zhongzu') === '灵' ? 0.2 : 0; // 种族增益系数
+    const zhongzuRates: Record<string, number> = {
+      人: 0.1,
+      魔: 0.15,
+      妖: 0.05,
+      鬼: 0.08,
+      灵: 0.2
+    };
+    const zhongzuRate = zhongzuRates[get('zhongzu') as string] ?? 0;
 
     const rateOfLing = getLingQiForRate();
 
@@ -593,14 +638,14 @@ function Main() {
         ? gongfaCurrent.xl
         : Number((gongfaCurrent?.xl || '').toString().replace('%', '')) || 0;
     const gongfaRate = Math.max(0, gongfaXL) / 100;
-    const xlBeilv = ((get('xiulianbeilv') as number) || 0) / 10;
+    const xlBeilv = ((get('xiulianbeilv') as number) || 10) / 10;
 
     const dfLingchi = get('dongfu') ? get('dongfu').lingchi : 0;
 
     const zhoutian = ZhouTian(xiulian.time);
 
-    const shouldGetXiu =
-      needAddXiuWeiJJ * 0.05 * rateOfLing * lvRate * jjRate * xlBeilv;
+    const realmEff = Math.sqrt(needAddXiuWeiJJ * rateOfLing * 0.5) * 50;
+    const shouldGetXiu = realmEff * lvRate * jjRate * xlBeilv;
 
     const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate);
 
@@ -688,16 +733,19 @@ function Main() {
 
       const time1 = freshGet('time1') || Date.now();
       const elapsedHours = (Date.now() - time1) / TimeArray.Map.hour;
-      if (elapsedHours >= 24) {
-        const advance =
-          time1 + Math.floor(elapsedHours / 24) * TimeArray.Map.hour * 24;
+      const daysElapsed = Math.floor(elapsedHours / 24);
+      if (daysElapsed >= 1) {
+        const advance = time1 + daysElapsed * TimeArray.Map.hour * 24;
         rawSet('time1', Math.round(advance));
-        const currentShouyuan = freshGet('shouyuan') || 0;
         const maxShouyuan = freshGet('max_shouyuan') || 0;
-        const newShouyuan = Math.round(currentShouyuan + 2);
-        rawSet('shouyuan', Math.min(newShouyuan, maxShouyuan));
-        if (newShouyuan >= maxShouyuan && currentShouyuan < maxShouyuan) {
-          const { close } = JXModal.show({
+        let currentShouyuan = freshGet('shouyuan') || 0;
+        for (let d = 0; d < daysElapsed && currentShouyuan > 0; d++) {
+          currentShouyuan = Math.round(currentShouyuan - 1);
+        }
+        const newShouyuan = Math.max(0, Math.min(currentShouyuan, maxShouyuan));
+        rawSet('shouyuan', newShouyuan);
+        if (newShouyuan <= 0 && (freshGet('shouyuan') || 0) <= 0) {
+          JXModal.show({
             visible: true,
             title: '重生',
             closeOnMaskClick: false,
@@ -710,7 +758,6 @@ function Main() {
             disableCancle: true,
             okText: '重生',
             onOk() {
-              close();
               navigateTo('Main/pages/rebirth/index', { replace: true });
             },
             onCancel() {}
@@ -721,6 +768,7 @@ function Main() {
 
     tick();
     const id = setInterval(tick, 60000);
+    // rawSet('xiuwei', 9999999);
     return () => clearInterval(id);
   }, [freshGet, rawSet]);
 
@@ -791,7 +839,7 @@ function Main() {
         </JXSpace>
         {/* 操作 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
-          {operaterOptions.map((v) => (
+          {(operaterOptions as any[]).map((v: any) => (
             <JXGrid.Item key={v.name} align='center'>
               <JXButton
                 disabled={v.disabled}
@@ -828,7 +876,7 @@ function Main() {
         </JXSpace>
         {/* 操作2 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
-          {operaterOptions2.map((v, index) => (
+          {(operaterOptions2 as any[]).map((v: any, index) => (
             <JXGrid.Item key={v.name + index} align='center'>
               <JXButton
                 disabled={v.disabled}

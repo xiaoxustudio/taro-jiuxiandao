@@ -89,11 +89,19 @@ export default function Gongfa() {
       updatedGongfa.lv += 1;
       updatedGongfa.max_exp += 1000;
       const keys = Object.keys(updatedGongfa.attr || {});
+      const oldAttr = { ...updatedGongfa.attr };
       keys.forEach((key) => {
         if (updatedGongfa.attr[key]) {
           updatedGongfa.attr[key] += 0.1 * updatedGongfa.lv;
         }
       });
+      const currentAddAttr = get('addAttr') || {};
+      const nextAddAttr = { ...currentAddAttr };
+      keys.forEach((key) => {
+        const delta = (updatedGongfa.attr[key] || 0) - (oldAttr[key] || 0);
+        nextAddAttr[key] = (nextAddAttr[key] || 0) + delta;
+      });
+      set('addAttr', nextAddAttr);
     }
     updatedGongfa.time = Date.now();
     set('gongfa.current', updatedGongfa);
@@ -151,7 +159,14 @@ export default function Gongfa() {
           </Text>
         </Box>
         <Box>
-          属性：<Text inline>无</Text>
+          属性：
+          <Text inline>
+            {current?.attr
+              ? Object.entries(current.attr)
+                  .map(([k, v]) => `${k}: ${v}`)
+                  .join(' ')
+              : '无'}
+          </Text>
         </Box>
         <Box>
           限制境界：<Text inline>{current?.limit || '无'}</Text>

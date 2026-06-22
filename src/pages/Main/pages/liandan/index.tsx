@@ -67,7 +67,7 @@ export default function Liandan() {
       done: false,
       text: `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）`
     };
-  }, [get, customDanfang]);
+  }, [get]);
 
   const getNum = (item: [string, number]) => {
     return chuwu.Get({ name: item[0], type: CWType.QT })?.num || 0;
@@ -100,16 +100,14 @@ export default function Liandan() {
         </Text>
         <Text>
           预计收获:
-          {get('liandan.danyao') ? (
+          {get('liandan.danyao')?.id ? (
             <Text color='green' bold inline>
-              {
-                (
-                  (danfangData as Record<string, any>)[
-                    get('liandan.danyao.id')
-                  ] || customDanfang[get('liandan.danyao.id')]
-                ).name
-              }{' '}
-              X{get('liandan.danyao.num')}
+              {(
+                (danfangData as Record<string, any>)[
+                  get('liandan.danyao.id')
+                ] || customDanfang[get('liandan.danyao.id')]
+              )?.name ?? '未知丹药'}{' '}
+              X{get('liandan.danyao.num') ?? 1}
             </Text>
           ) : (
             '无'
@@ -123,21 +121,26 @@ export default function Liandan() {
           onClick={() => {
             if (complateInfo.done) {
               const dy = get('liandan.danyao');
-              if (dy) {
-                const { id, num: dNum } = dy;
+              const id = dy?.id;
+              if (id) {
+                const dNum = dy.num ?? 1;
                 const base =
                   (danfangData as Record<string, any>)[id] || customDanfang[id];
-                const { name } = base;
+                if (!base) {
+                  JXToast().show('丹药数据异常');
+                  reset();
+                  return;
+                }
                 chuwu.Add({
-                  name,
+                  name: base.name,
                   type: CWType.DY,
                   num: dNum,
                   isPile: true
                 });
-                JXToast().show(`获得丹药：${name} X ${dNum}`);
+                JXToast().show(`获得丹药：${base.name} X ${dNum}`);
                 reset();
               } else {
-                JXToast().show('丹药尚未炼制完成！');
+                JXToast().show('未在炼制丹药');
               }
             }
           }}

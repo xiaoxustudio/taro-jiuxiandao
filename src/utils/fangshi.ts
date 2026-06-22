@@ -27,6 +27,7 @@ import {
   PJ_BY_REALM,
   FANGSHI_REFRESH_INTERVAL
 } from '@/assets/const';
+import { pickWeightedIndex } from '@/utils';
 
 export { FANGSHI_REFRESH_INTERVAL } from '@/assets/const';
 
@@ -258,17 +259,6 @@ export const fangshiCategories = [
 export const getRealmIndex = (realm: string) => {
   const idx = REALM_ORDER.indexOf(realm);
   return idx === -1 ? 0 : idx;
-};
-
-const pickWeightedIndex = (weights: number[]) => {
-  const sumW = weights.reduce((a, b) => a + b, 0) || 1;
-  const rPick = random(1, sumW);
-  let acc = 0;
-  for (let i = 0; i < weights.length; i += 1) {
-    acc += weights[i];
-    if (rPick <= acc) return i;
-  }
-  return 0;
 };
 
 const pickMaterialsFromPoolByGrade = (

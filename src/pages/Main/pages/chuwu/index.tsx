@@ -6,7 +6,8 @@ import {
   JXModal,
   JXSpace,
   Scroll,
-  Text
+  Text,
+  JXToast
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import {
@@ -17,6 +18,7 @@ import {
 } from '@/types';
 import { AttrTransformChinese } from '@/utils';
 import { WearFaBao } from '@/utils/fabao';
+import chuwu from '@/utils/chuwu';
 import useScroll from '@/hooks/useScroll';
 import './index.less';
 
@@ -120,6 +122,32 @@ export default function Chuwu() {
                       onOk() {
                         WearFaBao(index);
                         updateChuWu();
+                        close();
+                      },
+                      onCancel() {
+                        close();
+                      }
+                    });
+                  } else if (v.type === CWType.DY) {
+                    content = (
+                      <>
+                        <Text size={20} bold>
+                          {v.name}
+                        </Text>
+                        <Text>数量：{v.num}</Text>
+                      </>
+                    );
+                    const { close } = JXModal.show({
+                      content,
+                      okText: '使用',
+                      onOk() {
+                        const ok = chuwu.UsePill(v.name);
+                        if (ok) {
+                          JXToast(`使用${v.name}成功！`).show();
+                          updateChuWu();
+                        } else {
+                          JXToast('使用失败！').show();
+                        }
                         close();
                       },
                       onCancel() {

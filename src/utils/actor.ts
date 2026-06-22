@@ -17,8 +17,9 @@ const RATE_OF_LING_BY_REALM = [600, 800, 1200, 1500, 1800, 2200, 2800, 3500];
 const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
 
 // 轮回印记增益配置（每层）
+// 注意: xiulianbeilv 存储值为实际倍率×10（如10表示1.0倍），由 xlBeilv = xiulianbeilv / 10 换算
 export const LUNHUI_BUFF_PER_COUNT = {
-  xiulianbeilvBonus: 2, // 修炼倍率 +2（即最终 +20%）
+  xiulianbeilvBonus: 2, // 修炼倍率 +2（存储值，即实际 +0.2 倍，最终 +20%）
   maxShenshiBonus: 20, // 神识上限 +20
   shouyuanBonus: 50, // 寿元上限 +50
   initialXiuweiBonus: 200, // 初始修为 +200
@@ -114,7 +115,10 @@ export function TransformToJingJie1(
   let current: number = 0;
   if (typeof s === 'string') {
     current = chineseToNumber(s);
-    if (current === undefined) {
+    if (
+      Number.isNaN(current) ||
+      (current === 0 && s.trim() !== '' && !s.includes('零'))
+    ) {
       return s;
     }
   }
