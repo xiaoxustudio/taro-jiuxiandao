@@ -139,10 +139,16 @@ function Add({
       num: (cwArray[existingIndex].num || 0) + safeNum
     };
   } else {
+    const totalSlots =
+      updated.cw.fb.length + updated.cw.dy.length + updated.cw.qt.length;
+    if (totalSlots >= (updated.cw.max || 30)) {
+      return false;
+    }
     cwArray.push(baseObject as any);
   }
   updated.cw[typeKey] = cwArray as any;
   set(current, updated);
+  return true;
 }
 
 /**

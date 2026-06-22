@@ -76,7 +76,7 @@ function Main() {
     const maxShenshi = get('max_shenshi') || 0;
     const currentShenshi = get('shenshi') || 0;
     const shenshiRecover = Math.round(
-      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 24)
+      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 12)
     );
     if (shenshiRecover > 0) {
       set('shenshi', currentShenshi + shenshiRecover);
@@ -256,7 +256,7 @@ function Main() {
                     魂器镇魂: null,
                     本名法宝: null
                   },
-                  cw: { fb: [], dy: [], qt: [], max: 30 },
+                  cw: { fb: [], dy: [], qt: [], max: 30 + newLunhuiCount * 20 },
                   time1: Date.now(),
                   xiuxianStartAt: Date.now(),
                   shenshiTime: Date.now(),
@@ -331,8 +331,11 @@ function Main() {
             set('qixue', calcQixue);
             const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
             set('max_shouyuan', addShouyuan);
+            const cw = get('cw');
+            const newMax = (cw?.max || 30) + 10;
+            set('cw', { ...cw, max: newMax });
             JXToast(
-              `突破至：${jj}，寿元：${addShouyuan}\n目前气血：${calcQixue}，攻击：${calcGongji}`
+              `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n目前气血：${calcQixue}，攻击：${calcGongji}`
             ).show();
           } else {
             JXToast(`缺少突破丹药，请先炼制对应丹药！`).show();
@@ -648,14 +651,15 @@ function Main() {
 
   useEffect(() => {
     const tick = () => {
-      const shenshiTime = freshGet('shenshiTime') || Date.now();
-      const shenshiElapsed = (Date.now() - shenshiTime) / TimeArray.Map.hour;
-      if (shenshiElapsed >= 1) {
-        const maxShenShi = freshGet('max_shenshi') || 0;
-        const currentShenshi = freshGet('shenshi') || 0;
-        let newShenshi = currentShenshi + (maxShenShi * shenshiElapsed) / 24;
-        if (newShenshi > maxShenShi) newShenshi = maxShenShi;
-        rawSet('shenshi', Math.round(newShenshi));
+      const maxShenShi = freshGet('max_shenshi') || 0;
+      const currentShenshi = freshGet('shenshi') || 0;
+      if (currentShenshi < maxShenShi) {
+        const passiveRecovery = Math.max(1, Math.round(maxShenShi / 180));
+        const newShenshi = Math.min(
+          maxShenShi,
+          currentShenshi + passiveRecovery
+        );
+        rawSet('shenshi', newShenshi);
         rawSet('shenshiTime', Date.now());
       }
 

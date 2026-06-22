@@ -45,7 +45,7 @@ import { JingJie1ToNumber } from '@/utils/actor';
 import {
   REALM_GRADE_WEIGHTS,
   clGrades,
-  createMaterialRegistry,
+  flattenMaterialPool,
   SeedRegistryItem
 } from '@/assets/const';
 import { updateAchievementProgress } from '@/utils/chengjiu';
@@ -148,11 +148,6 @@ export default function Shilian() {
       set,
       storageGetSync
     });
-    const registry = (
-      (get('materialRegistry') || []) as { name: string; itype: string }[]
-    ).length
-      ? ((get('materialRegistry') || []) as { name: string; itype: string }[])
-      : createMaterialRegistry({ seed: get('uuid') });
     const weights =
       REALM_GRADE_WEIGHTS[df.jingjie as keyof typeof REALM_GRADE_WEIGHTS] ||
       REALM_GRADE_WEIGHTS['练气'];
@@ -168,9 +163,10 @@ export default function Shilian() {
       }
     }
     const targetGrade = clGrades[gradeIndex] || clGrades[0];
+    const flatPool = flattenMaterialPool(materialPoolByGrade);
     const clName = pickMaterialNameByGrade({
       materialPoolByGrade,
-      registry,
+      registry: flatPool,
       targetGrade,
       rnd: random
     });
@@ -240,14 +236,6 @@ export default function Shilian() {
   } | null>(null);
   const isGuajiRef = useRef(isGuaji);
   const currentGuajiFightRoundsRef = useRef(0);
-  useEffect(() => {
-    const existing = get('materialRegistry') as
-      | { name: string; itype: string }[]
-      | undefined;
-    if (!existing || !existing.length) {
-      set('materialRegistry', createMaterialRegistry({ seed: get('uuid') }));
-    }
-  }, [get, set]);
   useEffect(() => {
     isGuajiRef.current = isGuaji;
   }, [isGuaji]);
@@ -381,13 +369,14 @@ export default function Shilian() {
           num: random(1, 4)
         } as QTItemType;
         const seedRegistry = (get('seedRegistry') as SeedRegistryItem[]) || [];
-        const materialRegistry =
-          ((get('materialRegistry') || []) as {
-            name: string;
-            itype: string;
-          }[]) || [];
+        const materialPool = resolveMaterialPoolByGrade({
+          get,
+          set,
+          storageGetSync: useStorageStore.getState().getSync
+        });
+        const flatPool = materialPool ? flattenMaterialPool(materialPool) : [];
         const materialGrade =
-          materialRegistry.find((item) => item.name === clData.name)?.itype ||
+          flatPool.find((item) => item.name === clData.name)?.itype ||
           seedRegistry.find((item) => item.material === clData.name)?.itype ||
           clGrades[0];
         const seedDropRate = seedDropRates[materialGrade] ?? 0;

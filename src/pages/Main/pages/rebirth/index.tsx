@@ -92,17 +92,17 @@ function RebirthPage() {
       本名法宝: null
     };
 
+    const lunhuiCount = (actor?.lunhuiCount as number) || 0;
+    const prevMax = (actor?.cw?.max as number) || 30;
     const baseCW: CuWuType = {
       fb: [],
       dy: [],
       qt: [],
-      max: 30
+      max: Math.max(30, prevMax, lunhuiCount * 20 + 30)
     };
 
     const rewards: Record<string, number> = {};
     if (selectReward.value > 0) rewards[selectReward.type] = selectReward.value;
-
-    const lunhuiCount = (actor?.lunhuiCount as number) || 0;
     const lunhuiBuffs = getLunhuiBuffs(lunhuiCount);
     const lunhuiShenshiBonus = lunhuiBuffs?.maxShenshiBonus || 0;
     const lunhuiShouyuanBonus = lunhuiBuffs?.shouyuanBonus || 0;
