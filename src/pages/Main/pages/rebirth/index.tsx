@@ -53,10 +53,7 @@ function RebirthPage() {
   const xiuwei = useMemo(() => get('xiuwei'), [get]);
   const maxXiuwei = useMemo(() => get('max_xiuwei'), [get]);
 
-  const canRebirth = useMemo(
-    () => get('shouyuan') >= maxShouyuan,
-    [get, maxShouyuan]
-  );
+  const canRebirth = useMemo(() => get('shouyuan') <= 0, [get]);
 
   const calculateKeptItems = useCallback(() => {
     const keptShouyuan = Math.round(

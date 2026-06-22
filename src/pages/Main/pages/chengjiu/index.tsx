@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Container,
   JXButton,
@@ -36,14 +36,11 @@ export default function Chengjiu() {
     }
   );
 
-  // 使用 ref 存储最新的 achievementData，避免 updateProgress 依赖 achievementData
-  const achievementDataRef = useRef(achievementData);
-  useEffect(() => {
-    achievementDataRef.current = achievementData;
-  }, [achievementData]);
-
   // 更新成就进度
   const updateProgress = useCallback(() => {
+    const saved = get('chengjiu') as AchievementData | null | undefined;
+    const data = saved || achievementData;
+
     const progress = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       battleCount: get('battleCount' as any) || 0,
@@ -60,30 +57,15 @@ export default function Chengjiu() {
       qiandaoStreak: get('qiandao.streak' as any) || 0
     };
 
-    const updated = updateAchievementProgress(
-      achievementDataRef.current,
-      actor,
-      progress
-    );
+    const updated = updateAchievementProgress(data, actor, progress);
     setAchievementData(updated);
     set('chengjiu', updated);
-  }, [actor, get, set]);
+  }, [actor, get, set, achievementData]);
 
-  // 使用 ref 存储 updateProgress 函数的最新引用
-  const updateProgressRef = useRef(updateProgress);
+  // 页面挂载时刷新一次（其他页面操作已通过 chengjiuHelper 同步写入 store）
   useEffect(() => {
-    updateProgressRef.current = updateProgress;
+    updateProgress();
   }, [updateProgress]);
-
-  // 初始化时更新进度，并在页面显示时自动刷新
-  useEffect(() => {
-    // 使用 ref.current 来调用最新的 updateProgress
-    const tick = () => updateProgressRef.current();
-    tick();
-    // 设置定时器，每5秒刷新一次成就进度
-    const timer = setInterval(tick, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   // 获取当前分类的成就列表
   const achievements = useMemo(() => {

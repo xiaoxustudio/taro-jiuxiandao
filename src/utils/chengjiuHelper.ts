@@ -13,8 +13,8 @@ export const checkAchievements = (get: any, set: any, actor: any) => {
   if (!chengjiu) return;
 
   const progress = {
-    battleCount: get('zd.battleCount') || 0,
-    winStreak: get('zd.winStreak') || 0,
+    battleCount: get('battleCount') || 0,
+    winStreak: get('winStreak') || 0,
     gongfaCount: get('gongfa.ls')?.length || 0,
     fabaoCount: Object.values(get('fabao') || {}).filter(Boolean).length,
     danfangCount: get('danfang')?.length || 0,
@@ -41,8 +41,8 @@ export const checkBattleAchievements = (
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
-  const currentBattleCount = get('zd.battleCount') || 0;
-  const currentWinStreak = get('zd.winStreak') || 0;
+  const currentBattleCount = get('battleCount') || 0;
+  const currentWinStreak = get('winStreak') || 0;
 
   const progress = {
     battleCount: currentBattleCount + 1,
@@ -51,8 +51,8 @@ export const checkBattleAchievements = (
 
   const updated = updateAchievementProgress(chengjiu, actor, progress);
   set('chengjiu', updated);
-  set('zd.battleCount', progress.battleCount);
-  set('zd.winStreak', progress.winStreak);
+  set('battleCount', progress.battleCount);
+  set('winStreak', progress.winStreak);
 };
 
 /**

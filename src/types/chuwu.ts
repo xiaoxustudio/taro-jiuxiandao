@@ -54,9 +54,7 @@ export interface BaseType {
 
 export interface FBItemType extends BaseType {
   type: CWType.FB;
-  attr: {
-    [K in keyof ActorDataConfigForZhanDou]: number;
-  }; // 属性
+  attr: Partial<ActorDataConfigForZhanDou>; // 属性
   itype: FabaoType; // 法宝类型
   pj: string; // 法宝品级
   lv: number; // 强化等级

@@ -505,7 +505,7 @@ export default function Shilian() {
             set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
           }
         }
-        set('xiuwei', get('xiuwei') + reward);
+        set('xiuwei', Math.min(get('max_xiuwei'), get('xiuwei') + reward));
         const currentLingShou = get('lingShou') as any;
         if (currentLingShou) {
           set(

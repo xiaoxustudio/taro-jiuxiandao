@@ -82,8 +82,8 @@ export default function Fabao() {
     };
     Object.keys(updatedFB.attr).forEach((k) => {
       const key = k as keyof typeof updatedFB.attr;
-      if (typeof updatedFB.attr[key] === 'number') {
-        const val = updatedFB.attr[key];
+      const val = updatedFB.attr[key];
+      if (typeof val === 'number') {
         updatedFB.attr[key] = Math.round(
           val >= 0 ? val * 1.3 : val / 1.3
         ) as any;
@@ -146,22 +146,22 @@ export default function Fabao() {
           品阶：{targetFB?.pj || '空'}
         </Text>
         <Text className='item' color='#888' bold>
-          攻击：{targetFB?.attr.gongji || 0}
+          攻击：{targetFB?.attr?.gongji || 0}
         </Text>
         <Text className='item' color='#888' bold>
-          防御：{targetFB?.attr.fangyu || 0}
+          防御：{targetFB?.attr?.fangyu || 0}
         </Text>
         <Text className='item' color='#888' bold>
-          气血：{targetFB?.attr.qixue || 0}
+          气血：{targetFB?.attr?.qixue || 0}
         </Text>
         <Text className='item' color='#888' bold>
-          攻速：{targetFB?.attr.sudu || 0}
+          攻速：{targetFB?.attr?.sudu || 0}
         </Text>
         <Text className='item' color='#888' bold>
-          暴击：{targetFB?.attr.baoji || 0}
+          暴击：{targetFB?.attr?.baoji || 0}
         </Text>
         <Text className='item' color='#888' bold>
-          仙缘：{targetFB?.attr.xianyuan || 0}
+          仙缘：{targetFB?.attr?.xianyuan || 0}
         </Text>
       </JXSpace>
       <JXSpace flexOne>

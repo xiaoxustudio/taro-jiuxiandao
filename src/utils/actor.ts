@@ -19,11 +19,11 @@ const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
 // 轮回印记增益配置（每层）
 // 注意: xiulianbeilv 存储值为实际倍率×10（如10表示1.0倍），由 xlBeilv = xiulianbeilv / 10 换算
 export const LUNHUI_BUFF_PER_COUNT = {
-  xiulianbeilvBonus: 2, // 修炼倍率 +2（存储值，即实际 +0.2 倍，最终 +20%）
-  maxShenshiBonus: 20, // 神识上限 +20
-  shouyuanBonus: 50, // 寿元上限 +50
-  initialXiuweiBonus: 200, // 初始修为 +200
-  shangxianBonus: 5 // 全属性伤害加成 +5%
+  xiulianbeilvBonus: 1, // 修炼倍率 +1（存储值，即实际 +0.1 倍，最终 +10%）
+  maxShenshiBonus: 10, // 神识上限 +10
+  shouyuanBonus: 20, // 寿元上限 +20
+  initialXiuweiBonus: 50, // 初始修为 +50
+  shangxianBonus: 2 // 全属性伤害加成 +2%
 };
 /* 角色相关操作 */
 
@@ -182,10 +182,9 @@ const JingJieTransform = (j: string) => {
       return '合体';
     case '合体':
       return '大乘';
-    case '大乘':
-      return '';
+    default:
+      return j;
   }
-  return '';
 };
 
 export {

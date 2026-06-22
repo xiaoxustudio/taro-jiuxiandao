@@ -119,8 +119,9 @@ function Main() {
     },
     {
       name: '炼器',
-      disabled: true,
-      click() {}
+      click() {
+        JXToast('开发中，敬请期待').show();
+      }
     },
     {
       name: '法宝',
@@ -923,7 +924,11 @@ function Main() {
             </JXButton>
           </JXGrid.Item>
           <JXGrid.Item align='center'>
-            <JXButton disabled size='mini' transparent>
+            <JXButton
+              size='mini'
+              transparent
+              onClick={() => JXToast().show('开发中，敬请期待')}
+            >
               <Text textShadow>插件</Text>
             </JXButton>
           </JXGrid.Item>

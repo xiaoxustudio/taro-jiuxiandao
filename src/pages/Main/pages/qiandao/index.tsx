@@ -49,16 +49,47 @@ function QianDao() {
     }
 
     const ls = random(10, 50) + streak * 20;
+    const totalCount = get('qiandao.count') + 1;
     set('qiandao.time', currentDate);
     set('qiandao.last', currentDate);
-    set('qiandao.count', get('qiandao.count') + 1);
+    set('qiandao.count', totalCount);
     set('qiandao.streak', streak);
 
     // 检查签到成就
     checkQiandaoAchievements(get, set);
 
     chuwu.Add({ name: '灵石', type: CWType.QT, isPile: true, num: ls });
-    JXToast().show(`签到成功，获得灵石：${ls}`);
+    let toastMsg = `签到成功，获得灵石：${ls}`;
+
+    // 累计签到特殊奖励
+    if (totalCount === 7) {
+      chuwu.Add({ name: '筑基丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得筑基丹！';
+    } else if (totalCount === 30) {
+      chuwu.Add({ name: '结金丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得结金丹！';
+    } else if (totalCount === 60) {
+      chuwu.Add({ name: '元婴丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得元婴丹！';
+    } else if (totalCount === 100) {
+      chuwu.Add({ name: '化神丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得化神丹！';
+    } else if (totalCount === 150) {
+      chuwu.Add({ name: '返虚丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得返虚丹！';
+    } else if (totalCount === 200) {
+      chuwu.Add({ name: '合体丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得合体丹！';
+    } else if (totalCount === 300) {
+      chuwu.Add({ name: '大乘丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得大乘丹！';
+    } else if (totalCount % 10 === 0 && streak >= totalCount) {
+      // 每连续签到10天额外赠送寿元丹
+      chuwu.Add({ name: '寿元丹', type: CWType.DY, num: 1, isPile: true });
+      toastMsg += '，获得寿元丹！';
+    }
+
+    JXToast().show(toastMsg);
   }, [get, isSigned, set]);
 
   return (
@@ -74,12 +105,12 @@ function QianDao() {
         </JXSpace>
       </JXSpace>
       <JXSpace direction='vertical'>
-        <Text>签到奖励相关：</Text>
-        <Text>普通奖励：灵石，仙露</Text>
-        <Text>
-          特殊奖励：累计签到次数，可获得，包括筑基丹，结金丹，结婴丹，元神丹，阴阳丹，渡劫丹，大小五行寿元丹等等逆天丹药
-        </Text>
-        <Text>（相关爆率请查看攻略 =_= ）</Text>
+        <Text>签到奖励规则：</Text>
+        <Text>每日签到：灵石（基础10-50 + 连击×20）</Text>
+        <Text>累计7天：筑基丹 | 30天：结金丹 | 60天：元婴丹</Text>
+        <Text>累计100天：化神丹 | 150天：返虚丹</Text>
+        <Text>累计200天：合体丹 | 300天：大乘丹</Text>
+        <Text>连续签到满10的倍数额外获得寿元丹</Text>
       </JXSpace>
     </Container>
   );

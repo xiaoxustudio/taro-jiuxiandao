@@ -147,8 +147,8 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     danyun: number; // 丹韵
     exp: number; // 炼丹经验
     max_exp: number; // 炼丹经验上限
-    danlu: { name: number; lv: number } | null; // 丹炉
-    danyao: { id: number; num: number } | null; // 当前炼制丹药
+    danlu: { name: string; lv: number } | null; // 丹炉
+    danyao: { id: string; num: number } | null; // 当前炼制丹药
   }; // 炼丹
   danfang: { id: string; exp: number }[]; // 已学习丹方列表
   gongfa: {

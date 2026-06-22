@@ -30,6 +30,7 @@ const functions = {
 };
 
 export default () => {
+  if (typeof window === 'undefined') return;
   Object.defineProperty(window, 'H5Api', {
     value: functions,
     configurable: false,
