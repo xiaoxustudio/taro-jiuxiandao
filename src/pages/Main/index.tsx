@@ -300,9 +300,9 @@ function Main() {
                   linggen,
                   zhongzu,
                   lunhuiCount: newLunhuiCount,
-                  chengjiu: undefined,
-                  battleCount: undefined,
-                  winStreak: undefined
+                  chengjiu: get('chengjiu') || undefined,
+                  battleCount: get('battleCount') || 0,
+                  winStreak: get('winStreak') || 0
                 };
                 useActorStore.getState().set(daohao, nextActor as any);
                 useStore.getState().set(daohao);
@@ -322,7 +322,7 @@ function Main() {
             num: v.num,
             isPile: true
           }));
-          const hasPill = need.length > 0 && chuwu.HasArr(need);
+          const hasPill = need.length === 0 || chuwu.HasArr(need);
           if (hasPill) {
             chuwu.RemoveArr(need);
             const jj = JingJieTransform(get('jingjie'));
@@ -618,13 +618,21 @@ function Main() {
     const needAddXiuWeiJJ = getLingQiForJingJie();
 
     const zhongzuRates: Record<string, number> = {
-      人: 0.1,
-      魔: 0.15,
-      妖: 0.05,
-      鬼: 0.08,
-      灵: 0.2
+      人: 0.3,
+      魔: 0.5,
+      妖: 0.15,
+      鬼: 0.25,
+      灵: 0.6
     };
     const zhongzuRate = zhongzuRates[get('zhongzu') as string] ?? 0;
+    const linggenRates: Record<string, number> = {
+      金: 0.15,
+      木: 0.2,
+      水: 0.12,
+      火: 0.18,
+      土: 0.1
+    };
+    const linggenRate = linggenRates[get('linggen') as string] ?? 0;
 
     const rateOfLing = getLingQiForRate();
 
@@ -647,7 +655,8 @@ function Main() {
     const realmEff = Math.sqrt(needAddXiuWeiJJ * rateOfLing * 0.5) * 50;
     const shouldGetXiu = realmEff * lvRate * jjRate * xlBeilv;
 
-    const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate);
+    const zhotianByzhoutian =
+      Math.round(shouldGetXiu) * (0.5 + zhongzuRate + linggenRate);
 
     const baseXiu = round(zhotianByzhoutian * zhoutian * (1 + gongfaRate), 2);
     const lingchiPerZhouTian = 1;

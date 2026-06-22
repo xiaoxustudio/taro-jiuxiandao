@@ -235,7 +235,7 @@ function Index() {
     baoji: 2, // 暴击
     sudu: 20, // 速度
     fashu: 0, // 法术
-    shouyuan: 13, // 寿元
+    shouyuan: 60, // 寿元
     max_shouyuan: 100,
     shenshi: 100, // 神识
     max_shenshi: 100,

@@ -244,7 +244,8 @@ export const caiLiaoBaseList = [
   { name: '千叶草', desc: '材料，用于炼制丹药', itype: '一品', ls: 10 },
   { name: '玫瑰花', desc: '材料，用于炼制丹药', itype: '一品', ls: 25 },
   { name: '妖丹', desc: '材料，用于炼制丹药', itype: '一品', ls: 80 },
-  { name: '万灵草', desc: '材料，用于炼制丹药', itype: '三品', ls: 800 }
+  { name: '万灵草', desc: '材料，用于炼制丹药', itype: '三品', ls: 800 },
+  { name: '升灵石', desc: '稀有的洞府升阶材料', itype: '四品', ls: 5000 }
 ];
 
 export const clNameParts = [
@@ -322,6 +323,7 @@ export const MATERIAL_BASE_LIST: MaterialRegistryItem[] = [
   { name: '玫瑰花', itype: '一品' },
   { name: '妖丹', itype: '一品' },
   { name: '万灵草', itype: '三品' },
+  { name: '升灵石', itype: '四品' },
   { name: '草灵', itype: '一品' },
   { name: '百灵血竹', itype: '二品' },
   { name: '彳果', itype: '二品' },

@@ -471,6 +471,23 @@ export default function Shilian() {
           isPile: true,
           num: lingShiDrop
         });
+        const shengLingShiChance =
+          0.03 + (TIER_MAP[YaoShouInstance.jingjie] || 1) * 0.01;
+        if (Math.random() < shengLingShiChance) {
+          const shengLsNum = random(
+            1,
+            Math.min(
+              3,
+              Math.floor((TIER_MAP[YaoShouInstance.jingjie] || 1) / 2) + 1
+            )
+          );
+          chuwu.Add({
+            name: '升灵石',
+            type: CWType.QT,
+            isPile: true,
+            num: shengLsNum
+          });
+        }
         if (seedDrop) {
           const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
           if (currentYaoyuan) {
@@ -906,7 +923,9 @@ export default function Shilian() {
       guajiLockRef.current = true;
       endRef.current = false;
       handleSearchYaoShouRef.current();
-      guajiLockRef.current = false;
+      setTimeout(() => {
+        guajiLockRef.current = false;
+      }, 300);
     };
     run();
     guajiTimer.current = setInterval(run, 1500);

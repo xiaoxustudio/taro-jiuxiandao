@@ -196,11 +196,9 @@ function UsePill(name: string): boolean {
   const attr = entry.attr as Record<string, number>;
   Object.entries(attr).forEach(([key, val]) => {
     if (key === 'shouyuan') {
-      updated.max_shouyuan = (updated.max_shouyuan || 100) + val;
-      updated.shouyuan = Math.min(
-        (updated.shouyuan || 0) + val,
-        updated.max_shouyuan
-      );
+      const oldMax = updated.max_shouyuan || 100;
+      updated.max_shouyuan = oldMax + val;
+      updated.shouyuan = Math.min(updated.shouyuan || 0, updated.max_shouyuan);
     } else if (key === 'shenshi') {
       const maxShenshi = updated.max_shenshi || 100;
       updated.shenshi = Math.min((updated.shenshi || 0) + val, maxShenshi);

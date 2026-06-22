@@ -12,8 +12,8 @@ const MAJOR_REALMS = [
   '合体',
   '大乘'
 ] as const;
-const BASE_XIUWEI_BY_REALM = [800, 1200, 1600, 2000, 2500, 3600, 5000, 7000];
-const RATE_OF_LING_BY_REALM = [600, 800, 1200, 1500, 1800, 2200, 2800, 3500];
+const BASE_XIUWEI_BY_REALM = [800, 1500, 2800, 5000, 9000, 16000, 28000, 50000];
+const RATE_OF_LING_BY_REALM = [600, 900, 1500, 2400, 3800, 6000, 9500, 15000];
 const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
 
 // 轮回印记增益配置（每层）
@@ -140,8 +140,8 @@ export function TransformToJingJie1(
 function JingJie2Transform(s: string) {
   const arr = ['初期', '中期', '后期', '圆满', '大圆满'];
   const f = arr.findIndex((v) => v === s);
-  // eslint-disable-next-line no-bitwise
-  return arr[~f ? f + 1 : 0] || arr[0];
+  if (f === -1 || f >= arr.length - 1) return arr[0];
+  return arr[f + 1];
 }
 
 /**

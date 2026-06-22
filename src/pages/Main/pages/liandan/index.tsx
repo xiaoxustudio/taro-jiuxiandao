@@ -16,6 +16,7 @@ import danfangData from '@/assets/danfang.json';
 import chuwu from '@/utils/chuwu';
 import { CWType } from '@/types';
 import { currentTime, TimeArray } from '@/utils';
+import { dfGrades } from '@/assets/const';
 import './index.less';
 
 export default function Liandan() {
@@ -137,7 +138,36 @@ export default function Liandan() {
                   num: dNum,
                   isPile: true
                 });
-                JXToast().show(`获得丹药：${base.name} X ${dNum}`);
+                const gradeExp =
+                  (base.itype ? dfGrades.indexOf(base.itype) + 1 : 1) * 10;
+                const gainExp = Math.round(gradeExp * dNum);
+                let exp = get('liandan.exp') || 0;
+                const maxExp = get('liandan.max_exp') || 100;
+                let newTitle = get('liandan.chenghao') || '丹徒';
+                let newDanyun = get('liandan.danyun') || 0;
+                exp += gainExp;
+                while (exp >= maxExp && maxExp > 0) {
+                  exp -= maxExp;
+                  newDanyun += 1;
+                  const titles = [
+                    '丹徒',
+                    '丹士',
+                    '丹师',
+                    '丹宗',
+                    '丹王',
+                    '丹皇',
+                    '丹圣',
+                    '丹帝'
+                  ];
+                  const titleIdx = Math.min(newDanyun, titles.length - 1);
+                  newTitle = titles[titleIdx];
+                }
+                set('liandan.exp', exp);
+                set('liandan.danyun', newDanyun);
+                set('liandan.chenghao', newTitle);
+                JXToast().show(
+                  `获得丹药：${base.name} X ${dNum}（炼丹经验+${gainExp}）`
+                );
                 reset();
               } else {
                 JXToast().show('未在炼制丹药');
@@ -196,9 +226,12 @@ export default function Liandan() {
             set('liandan.danyao.id', data.id);
             set('liandan.danyao.num', num);
             const totalMs = new TimeArray(data.time).milliseconds;
-            set('liandan.completeTime', currentTime() + totalMs);
+            set(
+              'liandan.completeTime',
+              currentTime() + Math.round(totalMs * num)
+            );
             set('liandan.time', currentTime());
-            JXToast().show(`开始炼制丹药：${data.name}`);
+            JXToast().show(`开始炼制丹药：${data.name} X ${num}`);
           } else {
             JXToast().show('丹药材料缺少！');
           }

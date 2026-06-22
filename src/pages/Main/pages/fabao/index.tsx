@@ -67,7 +67,7 @@ export default function Fabao() {
       JXToast('已达最高品阶，无法继续升阶').show();
       return;
     }
-    const costLs = (curIdx + 2) * 10000;
+    const costLs = (curIdx + 1) * 3000;
     const currentLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
     if (currentLs < costLs) {
       JXToast(`灵石不足，需要${costLs}灵石`).show();
@@ -83,7 +83,10 @@ export default function Fabao() {
     Object.keys(updatedFB.attr).forEach((k) => {
       const key = k as keyof typeof updatedFB.attr;
       if (typeof updatedFB.attr[key] === 'number') {
-        updatedFB.attr[key] = Math.round(updatedFB.attr[key] * 1.3) as any;
+        const val = updatedFB.attr[key];
+        updatedFB.attr[key] = Math.round(
+          val >= 0 ? val * 1.3 : val / 1.3
+        ) as any;
       }
     });
     TakeOffFaBao(type);
