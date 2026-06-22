@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Container, JXButton, JXSpace, JXToast, Text } from '@/components';
 import { FabaoType, FBItemType, CWType } from '@/types';
-import { FaBaoTypeTransform, getFaBao, TakeOffFaBao } from '@/utils/fabao';
+import { getFaBao, TakeOffFaBao } from '@/utils/fabao';
 import useActorController from '@/hooks/useActorController';
 import chuwu from '@/utils/chuwu';
 import './index.less';
@@ -32,10 +32,7 @@ export default function Fabao() {
     if (Math.random() < successRate) {
       chuwu.Remove({ name: '灵石', type: CWType.QT, num: costLs });
       const updatedFB: FBItemType = { ...targetFB, lv: targetFB.lv + 1 };
-      const slotName =
-        typeof targetFB.itype === 'number'
-          ? FaBaoTypeTransform(targetFB.itype)
-          : targetFB.itype;
+      const slotName = targetFB.itype;
       const currentFabao = get('fabao');
       set('fabao', { ...currentFabao, [slotName]: updatedFB });
       JXToast(`强化成功！${targetFB.name} 提升至 +${updatedFB.lv}`).show();

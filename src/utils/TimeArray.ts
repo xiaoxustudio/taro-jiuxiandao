@@ -137,10 +137,10 @@ class TimeArray {
   }
 
   /**
-   * 获取实际过了多少天
+   * 将毫秒持续时长转换为天数
    */
   getRealDays() {
-    return Math.floor(Date.now() - this.milliseconds) / 1000 / 60 / 60 / 24;
+    return this.milliseconds / TimeArray.Map.day;
   }
 }
 export default TimeArray;

@@ -20,13 +20,16 @@ import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import useStorageStore from '@/services/storage';
 import {
+  chineseToNumber,
   getGradeColor,
   navigateTo,
+  numberToChinese,
   TimeArray,
   ZhouTian,
   formatXiuxianCalendar
 } from '@/utils';
 import {
+  getJingJieMaxDep,
   getLingQiForJingJie,
   getLingQiForRate,
   getLingQiToNumber,
@@ -76,7 +79,7 @@ function Main() {
     const maxShenshi = get('max_shenshi') || 0;
     const currentShenshi = get('shenshi') || 0;
     const shenshiRecover = Math.round(
-      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 12)
+      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 4)
     );
     if (shenshiRecover > 0) {
       set('shenshi', currentShenshi + shenshiRecover);
@@ -158,7 +161,16 @@ function Main() {
           const calcSudu = get('sudu') + 3 * lv1;
           set('sudu', calcSudu);
         }
-        set('jingjie2', JingJie2Transform(get('jingjie2')));
+        const nextJingjie2 = JingJie2Transform(get('jingjie2'));
+        set('jingjie2', nextJingjie2);
+        if (nextJingjie2 === '大圆满') {
+          const currentJ1Num = chineseToNumber(
+            (get('jingjie1') as string).replace('阶', '')
+          );
+          const maxDep = getJingJieMaxDep();
+          const nextJ1 = Math.min(maxDep, Math.max(1, currentJ1Num + 1));
+          set('jingjie1', `${numberToChinese(nextJ1)}阶`);
+        }
         const calcGongji = get('gongji') + 10 * lv1;
         const calcQixue = get('qixue') + 100 * lv1;
         const calcFashu = get('fashu') + 1 * lv1;
@@ -618,7 +630,9 @@ function Main() {
       木: 0.2,
       水: 0.12,
       火: 0.18,
-      土: 0.1
+      土: 0.1,
+      风: 0.22,
+      雷: 0.25
     };
     const linggenRate = linggenRates[get('linggen') as string] ?? 0;
 
@@ -719,7 +733,7 @@ function Main() {
       const maxShenShi = freshGet('max_shenshi') || 0;
       const currentShenshi = freshGet('shenshi') || 0;
       if (currentShenshi < maxShenShi) {
-        const passiveRecovery = Math.max(1, Math.round(maxShenShi / 180));
+        const passiveRecovery = Math.max(1, Math.round(maxShenShi / 360));
         const newShenshi = Math.min(
           maxShenShi,
           currentShenshi + passiveRecovery

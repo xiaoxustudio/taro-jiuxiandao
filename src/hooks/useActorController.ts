@@ -132,7 +132,7 @@ function useActorController() {
         if (!cancelled && loaded) patch.seedRegistry = loaded;
       }
 
-      if (!actor.xiulianbeilv) {
+      if (actor.xiulianbeilv === undefined || actor.xiulianbeilv === null) {
         patch.xiulianbeilv = 10;
       }
 

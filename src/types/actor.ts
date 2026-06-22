@@ -67,7 +67,7 @@ export type YaoyuanData = {
   seeds: YaoyuanSeed[];
 };
 export type ActorDataConfigForFaBao = {
-  [K in keyof typeof FabaoType]: null | undefined | FBItemType;
+  -readonly [K in keyof typeof FabaoType]: null | undefined | FBItemType;
 };
 
 // 重生保留配置

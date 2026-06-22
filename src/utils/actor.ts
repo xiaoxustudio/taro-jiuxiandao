@@ -125,6 +125,8 @@ export function TransformToJingJie1(
     ) {
       return s;
     }
+  } else {
+    current = s;
   }
 
   let next = current + addNum;
