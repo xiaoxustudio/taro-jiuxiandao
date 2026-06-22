@@ -83,7 +83,7 @@ export type RebirthKeepConfig = {
 
 // 重生奖励
 export type RebirthReward = {
-  type: 'xuanyuan' | 'shenshi';
+  type: 'xianyuan' | 'shenshi';
   value: number;
 };
 
@@ -106,7 +106,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   max_shouyuan: number; // 寿元上限
   zhongzu: string; // 种族
   lv: number; // 等级
-  xuanyuan: number; // 仙缘
+  xianyuan: number; // 仙缘
   xiulianbeilv: number; // 修炼倍率
   cw: CuWuType; // 储物
   time1: number; // 时间1

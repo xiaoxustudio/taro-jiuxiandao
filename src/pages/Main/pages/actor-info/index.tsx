@@ -47,7 +47,7 @@ export default function ActorInfo() {
           攻速：{get('sudu') + get('addAttr.sudu')}
         </Text>
         <Text className='item' size={16} bold>
-          仙缘：{get('xuanyuan')}
+          仙缘：{get('xianyuan')}
         </Text>
         <Text className='item' size={16} bold>
           暴击：{get('baoji') + get('addAttr.baoji')}

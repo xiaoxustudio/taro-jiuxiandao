@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Container, JXButton, JXSpace, Text } from '@/components';
-import { FabaoType, FBItemType } from '@/types';
+import { Container, JXButton, JXSpace, JXToast, Text } from '@/components';
+import { FabaoType, FBItemType, CWType } from '@/types';
 import { getFaBao, TakeOffFaBao } from '@/utils/fabao';
+import useActorController from '@/hooks/useActorController';
+import chuwu from '@/utils/chuwu';
 import './index.less';
 
 export default function Fabao() {
+  const { get } = useActorController();
   const [type, setType] = useState(FabaoType.头戴战盔);
   const [targetFB, setTargetFB] = useState<FBItemType | null>(null);
 
@@ -16,6 +19,86 @@ export default function Fabao() {
     TakeOffFaBao(type);
     updateInfo();
   }, [type, updateInfo]);
+
+  const handleStrengthen = useCallback(() => {
+    if (!targetFB) return;
+    const costLs = (targetFB.lv + 1) * 500 + 500;
+    const currentLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
+    if (currentLs < costLs) {
+      JXToast(`灵石不足，需要${costLs}灵石`).show();
+      return;
+    }
+    const successRate = Math.max(0.05, 1 - targetFB.lv * 0.05);
+    if (Math.random() < successRate) {
+      chuwu.Remove({ name: '灵石', type: CWType.QT, num: costLs });
+      const updatedFB: FBItemType = { ...targetFB, lv: targetFB.lv + 1 };
+      const idx = get('cw.fb').findIndex(
+        (v: any) => v.name === targetFB.name && v.type === CWType.FB
+      );
+      if (idx !== -1) {
+        chuwu.Remove({ name: targetFB.name, type: CWType.FB });
+      }
+      chuwu.Add({ ...updatedFB, type: CWType.FB });
+      TakeOffFaBao(type);
+      JXToast(`强化成功！${targetFB.name} 提升至 +${updatedFB.lv}`).show();
+    } else {
+      chuwu.Remove({
+        name: '灵石',
+        type: CWType.QT,
+        num: Math.floor(costLs * 0.5)
+      });
+      JXToast(`强化失败，消耗${Math.floor(costLs * 0.5)}灵石`).show();
+    }
+    updateInfo();
+  }, [targetFB, updateInfo, get, type]);
+
+  const handleUpgrade = useCallback(() => {
+    if (!targetFB) return;
+    const tierOrder = [
+      '法器',
+      '灵器',
+      '法宝',
+      '古宝',
+      '灵宝',
+      '后天灵宝',
+      '先天灵宝',
+      '通天灵宝'
+    ];
+    const curIdx = tierOrder.indexOf(targetFB.pj);
+    if (curIdx < 0 || curIdx >= tierOrder.length - 1) {
+      JXToast('已达最高品阶，无法继续升阶').show();
+      return;
+    }
+    const costLs = (curIdx + 2) * 10000;
+    const currentLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
+    if (currentLs < costLs) {
+      JXToast(`灵石不足，需要${costLs}灵石`).show();
+      return;
+    }
+    chuwu.Remove({ name: '灵石', type: CWType.QT, num: costLs });
+    const nextPj = tierOrder[curIdx + 1];
+    const updatedFB: FBItemType = {
+      ...targetFB,
+      pj: nextPj,
+      attr: { ...targetFB.attr }
+    };
+    Object.keys(updatedFB.attr).forEach((k) => {
+      const key = k as keyof typeof updatedFB.attr;
+      if (typeof updatedFB.attr[key] === 'number') {
+        updatedFB.attr[key] = Math.round(updatedFB.attr[key] * 1.3) as any;
+      }
+    });
+    const idx = get('cw.fb').findIndex(
+      (v: any) => v.name === targetFB.name && v.type === CWType.FB
+    );
+    if (idx !== -1) {
+      chuwu.Remove({ name: targetFB.name, type: CWType.FB });
+    }
+    chuwu.Add({ ...updatedFB, type: CWType.FB });
+    TakeOffFaBao(type);
+    JXToast(`升阶成功！${targetFB.name} 晋升为${nextPj}`).show();
+    updateInfo();
+  }, [targetFB, get, updateInfo, type]);
 
   useEffect(() => {
     updateInfo();
@@ -86,10 +169,10 @@ export default function Fabao() {
         </Text>
       </JXSpace>
       <JXSpace flexOne>
-        <JXButton disabled={!targetFB} width='100%'>
+        <JXButton disabled={!targetFB} width='100%' onClick={handleStrengthen}>
           强化
         </JXButton>
-        <JXButton disabled={!targetFB} width='100%'>
+        <JXButton disabled={!targetFB} width='100%' onClick={handleUpgrade}>
           升阶
         </JXButton>
         <JXButton

@@ -40,7 +40,7 @@ export default function Dongfu() {
     // 使其强制刷新
   );
 
-  const needUpLingshi = useMemo(() => lv * 2000, [lv]);
+  const needUpLingshi = useMemo(() => Math.ceil(lv ** 1.5 * 200), [lv]);
 
   const daolv = useMemo(() => get('dongfu').daolv, [get]);
 
@@ -105,31 +105,45 @@ export default function Dongfu() {
         case '一品':
           return { gongji: Math.max(1, Math.round(total.gongji * 0.06)) };
         case '二品':
-          return { qixue: Math.max(10, Math.round(total.qixue * 0.05)) };
+          return {
+            qixue: Math.max(10, Math.round(total.qixue * 0.05)),
+            fangyu: Math.max(1, Math.round(total.fangyu * 0.08))
+          };
         case '三品':
-          return { fangyu: Math.max(1, Math.round(total.fangyu * 0.25)) };
+          return {
+            fangyu: Math.max(1, Math.round(total.fangyu * 0.15)),
+            gongji: Math.max(1, Math.round(total.gongji * 0.08))
+          };
         case '四品':
-          return { sudu: Math.max(1, Math.round(total.sudu * 0.15)) };
+          return {
+            sudu: Math.max(1, Math.round(total.sudu * 0.12)),
+            qixue: Math.max(10, Math.round(total.qixue * 0.07))
+          };
         case '五品':
-          return { baoji: 2 };
+          return {
+            baoji: Math.max(1, Math.round(total.baoji * 0.03 + 2)),
+            gongji: Math.max(1, Math.round(total.gongji * 0.1))
+          };
         case '六品':
           return {
             gongji: Math.max(1, Math.round(total.gongji * 0.12)),
-            fangyu: Math.max(1, Math.round(total.fangyu * 0.35))
+            fangyu: Math.max(1, Math.round(total.fangyu * 0.2)),
+            qixue: Math.max(10, Math.round(total.qixue * 0.08))
           };
         case '七品':
           return {
             qixue: Math.max(10, Math.round(total.qixue * 0.12)),
-            sudu: Math.max(1, Math.round(total.sudu * 0.3)),
-            baoji: 3
+            sudu: Math.max(1, Math.round(total.sudu * 0.2)),
+            gongji: Math.max(1, Math.round(total.gongji * 0.15)),
+            baoji: Math.max(1, Math.round(total.baoji * 0.05 + 3))
           };
         case '八品':
           return {
-            gongji: Math.max(1, Math.round(total.gongji * 0.25)),
-            fangyu: Math.max(1, Math.round(total.fangyu * 0.7)),
-            qixue: Math.max(10, Math.round(total.qixue * 0.18)),
-            sudu: Math.max(1, Math.round(total.sudu * 0.35)),
-            baoji: 5
+            gongji: Math.max(1, Math.round(total.gongji * 0.2)),
+            fangyu: Math.max(1, Math.round(total.fangyu * 0.3)),
+            qixue: Math.max(10, Math.round(total.qixue * 0.15)),
+            sudu: Math.max(1, Math.round(total.sudu * 0.25)),
+            baoji: Math.max(1, Math.round(total.baoji * 0.08 + 5))
           };
         default:
           return {};
@@ -407,7 +421,7 @@ export default function Dongfu() {
   }, [get, lv, set]);
 
   /* 补灵 */
-  const getTransformRate = useMemo(() => lv * 0.005, [lv]); // 每升1级，补灵的转化率增加0.5%
+  const getTransformRate = useMemo(() => lv ** 0.6 * 0.003, [lv]);
   const getTransformRateMemo = useMemo(
     () => `${getTransformRate * 100}%`,
     [getTransformRate]

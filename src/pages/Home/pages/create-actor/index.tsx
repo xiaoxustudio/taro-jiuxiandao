@@ -224,7 +224,7 @@ function Index() {
     lv: 1,
     xiuwei: 0, // 修为
     max_xiuwei: 500,
-    xuanyuan: 10, // 仙缘
+    xianyuan: 10, // 仙缘
     jingjie: '练气',
     jingjie1: '一阶',
     jingjie2: '初期',
@@ -235,7 +235,6 @@ function Index() {
     baoji: 2, // 暴击
     sudu: 20, // 速度
     fashu: 0, // 法术
-    xianyuan: 0,
     shouyuan: 13, // 寿元
     max_shouyuan: 100,
     shenshi: 100, // 神识

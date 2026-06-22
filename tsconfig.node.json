@@ -4,7 +4,7 @@
     "module": "esnext",
     "removeComments": false,
     "preserveConstEnums": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "experimentalDecorators": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
@@ -14,16 +14,12 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "rootDir": ".",
-    "jsx": "react-jsx",
     "allowJs": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "typeRoots": ["node_modules/@types"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "typeRoots": ["node_modules/@types"]
   },
-  "include": ["./src", "./types"],
+  "include": [ "./config"],
   "exclude": ["node_modules"],
   "compileOnSave": false
 }

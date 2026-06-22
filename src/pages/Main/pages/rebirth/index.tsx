@@ -27,7 +27,7 @@ const defaultRebirthKeep: RebirthKeepConfig = {
 };
 
 const rebirthRewardOptions: RebirthReward[] = [
-  { type: 'xuanyuan', value: 60 },
+  { type: 'xianyuan', value: 60 },
   { type: 'shenshi', value: 50 }
 ];
 
@@ -121,7 +121,6 @@ function RebirthPage() {
       baoji: 2,
       sudu: 20,
       fashu: 0,
-      xianyuan: 0,
       xiulianbeilv: 10,
       addAttr: {
         qixue: 0,
@@ -178,7 +177,7 @@ function RebirthPage() {
         })),
         seeds: []
       },
-      xuanyuan: (actor?.xuanyuan || 0) + (rewards.xuanyuan || 0),
+      xianyuan: (actor?.xianyuan || 0) + (rewards.xianyuan || 0),
       ...(linggen && { linggen }),
       ...(zhongzu && { zhongzu }),
       chengjiu: undefined,
@@ -225,7 +224,7 @@ function RebirthPage() {
 
   const formatRewardLabel = (reward: RebirthReward) => {
     switch (reward.type) {
-      case 'xuanyuan':
+      case 'xianyuan':
         return `仙缘 +${reward.value}`;
       case 'shenshi':
         return `神识上限 +${reward.value}`;

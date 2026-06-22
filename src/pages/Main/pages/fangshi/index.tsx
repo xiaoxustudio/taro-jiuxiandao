@@ -216,7 +216,8 @@ export default function Fangshi() {
   }, [currentCategory, currentList, get, set]);
   const lsMemo = useMemo(
     () => chuwu.Get({ name: '灵石', type: CWType.QT }),
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [get, set] // 手动触发更新
   );
   const refreshLeftText = useMemo(() => {
     const total = Math.max(0, Math.ceil(refreshLeft / 1000));

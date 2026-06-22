@@ -2,6 +2,7 @@
   "name": "taro-jiuxiandao",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "九仙道重构版",
   "templateInfo": {
     "name": "default",
@@ -24,6 +25,7 @@
     "build:harmony-hybrid": "taro build --type harmony-hybrid",
     "dev": "pnpm dev:h5",
     "build": "pnpm build:h5",
+    "typecheck": "tsc --noEmit",
     "format": "prettier \"./src/**/*.{js,jsx,ts,tsx,vue}\" --write",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "dev:weapp": "pnpm run build:weapp --watch",

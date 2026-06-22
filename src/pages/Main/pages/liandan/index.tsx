@@ -69,7 +69,10 @@ export default function Liandan() {
 
     const last = new TimeArray(remainingMs);
 
-    return { done: false, text: `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）` };
+    return {
+      done: false,
+      text: `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）`
+    };
   }, [get, customDanfang]);
 
   const getNum = (item: [string, number]) => {
@@ -181,12 +184,17 @@ export default function Liandan() {
         }
         onOk={() => {
           const dy = get('liandan.danyao');
-          const hasCl = chuwu.HasArr(
-            data.cl.map((v) => ({ name: v[0], num: v[1] * num, isPile: true }))
-          );
+          const needItems = data.cl.map((v) => ({
+            name: v[0],
+            num: v[1] * num,
+            type: CWType.QT,
+            isPile: true
+          }));
+          const hasCl = chuwu.HasArr(needItems);
           if (dy) {
             JXToast().show('正则炼制丹药，不可重复炼制！');
           } else if (hasCl) {
+            chuwu.RemoveArr(needItems);
             set('liandan.danyao.id', data.id);
             set('liandan.danyao.num', num);
             set('liandan.time', currentTime());

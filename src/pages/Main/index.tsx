@@ -116,7 +116,7 @@ function Main() {
     },
     {
       name: '炼器',
-      disabeld: true,
+      disabled: true,
       click() {}
     },
     {
@@ -142,20 +142,18 @@ function Main() {
             (jjIdx + 1) *
               Math.max(jjBase * 0.5, get('max_xiuwei') * 0.4 * logFactor)
         );
+        // 阶段境界
+        if (get('jingjie2') === '大圆满') {
+          JXToast(`目前已达到大圆满，请寻找机缘突破！`).show();
+          return;
+        }
         set('lv', get('lv') + 1);
         set('xiuwei', Math.ceil(get('xiuwei') - get('max_xiuwei')));
         set('max_xiuwei', calc);
         const lv1 = get('lv') / 20 + 1;
-        // 速度
         if (get('jingjie') !== '练气') {
           const calcSudu = get('sudu') + 3 * lv1;
           set('sudu', calcSudu);
-        }
-        // 气血和物理
-        // 阶段境界
-        if (get('jingjie2') === '大圆满') {
-          JXToast().show(`目前已达到大圆满，请寻找机缘突破！`);
-          return;
         }
         set('jingjie2', JingJie2Transform(get('jingjie2')));
         const calcGongji = get('gongji') + 10 * lv1;
@@ -175,60 +173,45 @@ function Main() {
       name: '突破',
       click() {
         const tpdata = TpData[get('jingjie')];
-        const dfIdMap: Record<string, string> = {
-          练气: '20001',
-          筑基: '20002',
-          结丹: '20003',
-          元婴: '20004',
-          化神: '20005',
-          返虚: '20006',
-          合体: '20007'
-        };
-        // 大阶段境界
         if (get('jingjie2') === '大圆满') {
           if (!tpdata) {
-            JXToast().show(`天道压制，无法突破更高境界！`);
+            JXToast(`天道压制，无法突破更高境界！`).show();
             return;
           }
-          const cur = get('jingjie');
-          const dfId = dfIdMap[cur];
-          const df = dfId ? (danfangData as any)[dfId] : null;
-          const need = df
-            ? (df.cl as [string, number][]).map((v) => ({
-                name: v[0],
-                type: CWType.QT,
-                num: v[1],
-                isPile: true
-              }))
-            : [];
-          const isCl = need.length > 0 && chuwu.HasArr(need);
-          if (isCl) {
+          const need = tpdata.cl.map((v: any) => ({
+            name: v.name,
+            type: CWType.DY,
+            num: v.num,
+            isPile: true
+          }));
+          const hasPill = need.length > 0 && chuwu.HasArr(need);
+          if (hasPill) {
+            chuwu.RemoveArr(need);
             const jj = JingJieTransform(get('jingjie'));
             set('jingjie1', '一阶');
-            set('jingjie', jj); // 大境界转换
+            set('jingjie', jj);
             const lv1 = get('lv') / 20 + 1;
             const calcGongji =
               get('gongji') + 10 * lv1 + tpdata.add.gongji * 0.5;
             const calcQixue = get('qixue') + 100 * lv1 + tpdata.add.qixue * 0.5;
             set('gongji', calcGongji);
             set('qixue', calcQixue);
-            chuwu.RemoveArr(need);
             const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
             set('max_shouyuan', addShouyuan);
-            JXToast().show(
+            JXToast(
               `突破至：${jj}，寿元：${addShouyuan}\n目前气血：${calcQixue}，攻击：${calcGongji}`
-            );
+            ).show();
           } else {
-            JXToast().show(`材料不足，无法突破！`);
+            JXToast(`缺少突破丹药，请先炼制对应丹药！`).show();
           }
         } else {
-          JXToast().show(`未达到大圆满，请先提升小境界！`);
+          JXToast(`未达到大圆满，请先提升小境界！`).show();
         }
       }
     },
     {
       name: '法术',
-      disabeld: true,
+      disabled: true,
       click() {}
     }
   ];
@@ -247,7 +230,7 @@ function Main() {
     },
     {
       name: '灵兽',
-      disabeld: true,
+      disabled: true,
       click() {}
     },
 
@@ -451,17 +434,24 @@ function Main() {
         ? gongfaCurrent.xl
         : Number((gongfaCurrent?.xl || '').toString().replace('%', '')) || 0;
     const gongfaRate = Math.max(0, gongfaXL) / 100;
+    const xlBeilv = ((get('xiulianbeilv') as number) || 0) / 10;
 
     const dfLingchi = get('dongfu') ? get('dongfu').lingchi : 0;
 
     const zhoutian = ZhouTian(xiulian.time);
 
-    const shouldGetXiu = needAddXiuWeiJJ * 0.05 * rateOfLing * lvRate * jjRate;
+    const shouldGetXiu =
+      needAddXiuWeiJJ * 0.05 * rateOfLing * lvRate * jjRate * xlBeilv;
 
-    const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate); // 每小周天能获取修为
+    const zhotianByzhoutian = Math.round(shouldGetXiu) * (0.5 + zhongzuRate);
 
     const baseXiu = round(zhotianByzhoutian * zhoutian * (1 + gongfaRate), 2);
-    const calcXiu = round(baseXiu + dfLingchi, 2);
+    const lingchiPerZhouTian = 1;
+    const consumedLingchi = Math.min(
+      dfLingchi,
+      Math.floor(zhoutian * lingchiPerZhouTian)
+    );
+    const calcXiu = round(baseXiu + consumedLingchi, 2);
 
     const content = (
       <>
@@ -469,9 +459,11 @@ function Main() {
         <br />
         境界增益系数：{jjRate}
         <br />
+        修炼倍率：{xlBeilv.toFixed(2)}x
+        <br />
         功法修炼增益：{(gongfaRate * 100).toFixed(2)}%
         <br />
-        洞府增益：{dfLingchi}
+        洞府增益：{consumedLingchi}/{dfLingchi}
         <br />
         已修炼小周天：{ZhouTian(xiulian.time).toFixed(2)}
         <br />
@@ -486,7 +478,7 @@ function Main() {
       onOk() {
         c.close();
         set('xiuwei', round(get('xiuwei') + calcXiu, 2));
-        set('dongfu.lingchi', Math.max(0, dfLingchi - dfLingchi));
+        set('dongfu.lingchi', Math.max(0, dfLingchi - consumedLingchi));
         set('xiulian', null);
       }
     });
@@ -636,7 +628,7 @@ function Main() {
           {operaterOptions.map((v) => (
             <JXGrid.Item key={v.name} align='center'>
               <JXButton
-                disabled={v.disabeld}
+                disabled={v.disabled}
                 size='mini'
                 transparent
                 onClick={v.click}
@@ -673,7 +665,7 @@ function Main() {
           {operaterOptions2.map((v, index) => (
             <JXGrid.Item key={v.name + index} align='center'>
               <JXButton
-                disabled={v.disabeld}
+                disabled={v.disabled}
                 size='mini'
                 transparent
                 onClick={v.click}

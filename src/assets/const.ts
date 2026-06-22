@@ -154,6 +154,26 @@ export const faBaoTypeConfig = [
     ],
     mainAttr: 'sudu',
     extraAttrs: ['fangyu']
+  },
+  {
+    itype: '魂器镇魂',
+    parts: [
+      ['镇', '锁', '缚', '封', '摄', '定'],
+      ['魂', '灵', '魄', '神', '念', '识'],
+      ['印', '塔', '珠', '镜', '钟', '环']
+    ],
+    mainAttr: 'fangyu',
+    extraAttrs: ['xianyuan', 'baoji']
+  },
+  {
+    itype: '本名法宝',
+    parts: [
+      ['本命', '道', '玄', '元', '真', '天'],
+      ['灵', '神', '元', '道', '法', '心'],
+      ['剑', '鼎', '印', '镜', '珠', '塔']
+    ],
+    mainAttr: 'gongji',
+    extraAttrs: ['qixue', 'sudu', 'baoji']
   }
 ];
 
