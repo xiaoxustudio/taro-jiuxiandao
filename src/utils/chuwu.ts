@@ -170,32 +170,40 @@ function AddDanFang(id: string) {
 }
 
 /**
- * @description: 灵石是否大于等于
- * @param {number} num
- * @return {*}
+ * @description: 使用丹药
+ * @param {string} name
+ * @return {boolean}
  */
-function LingShiThan(num: number = 0) {
-  const lsStruct = { name: '灵石', type: CWType.QT };
-  const lsData = Get(lsStruct);
-  if (!lsData) {
-    return num <= 0;
-  }
-  const _num = lsData.num ?? 0;
-  return _num >= num;
-}
-
 function UsePill(name: string): boolean {
+  // 统一丹药效果查找链：danfang.json → danfangData缓存 → 储物attr
   const entry = Object.values(danfangData as Record<string, any>).find(
     (v: any) => v.name === name && v.attr
   );
-  let attr: Record<string, number>;
-  if (entry) {
+  let attr: Record<string, number> | undefined;
+  if (entry?.attr) {
     attr = entry.attr as Record<string, number>;
-  } else {
-    const item = Get({ name, type: CWType.DY });
-    if (!item || !(item as any).attr) return false;
-    attr = (item as any).attr as Record<string, number>;
   }
+  // 如果静态数据没找到，尝试从角色的丹方缓存中查找
+  if (!attr) {
+    const acData = getActor();
+    const danfangDataCache = (acData as Record<string, any>).danfangData;
+    if (danfangDataCache) {
+      const cachedEntry = Object.values(
+        danfangDataCache as Record<string, any>
+      ).find((v: any) => v.name === name && v.attr);
+      if (cachedEntry?.attr) {
+        attr = cachedEntry.attr as Record<string, number>;
+      }
+    }
+  }
+  // 最后从储物中的丹药本身查找
+  if (!attr) {
+    const item = Get({ name, type: CWType.DY });
+    if (item && (item as any).attr) {
+      attr = (item as any).attr as Record<string, number>;
+    }
+  }
+  if (!attr) return false;
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();
@@ -243,6 +251,5 @@ export default {
   RemoveArr,
   UsePill,
   getActor,
-  TR,
-  LingShiThan
+  TR
 };

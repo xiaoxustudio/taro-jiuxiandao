@@ -21,8 +21,8 @@ export function generateRandomName() {
   return name;
 }
 
-export function getRandomElement<T>(array: T[]): T {
-  if (array.length === 0) return array?.[0];
+export function getRandomElement<T>(array: T[]): T | undefined {
+  if (array.length === 0) return undefined;
   const randomIndex = Math.floor(Math.random() * array.length);
   return array[randomIndex];
 }

@@ -68,11 +68,8 @@ function add(gf: GongFaType, replace = false, checkAchievement = true) {
     }
     return;
   }
-  if (replace) {
-    acData.gongfa.ls = acData.gongfa.ls.map((v) => (v.id === gf.id ? gf : v));
-  } else {
-    acData.gongfa.ls.push(gf);
-  }
+  // 不存在时直接添加（replace 参数在此场景无意义，简化逻辑）
+  acData.gongfa.ls.push(gf);
   set(current, acData);
   // 检查收集成就
   if (checkAchievement) {

@@ -14,6 +14,8 @@ const LINGSHOU_GROWTH = {
 
 const LINGSHOU_EXP_CURVE = [100, 250, 500, 900, 1500, 2500, 4000, 6500, 10000];
 
+export const LINGSHOU_BONUS_RATE = 0.5;
+
 function expForLevel(lv: number): number {
   if (lv <= 0) return LINGSHOU_EXP_CURVE[0];
   if (lv > LINGSHOU_EXP_CURVE.length) {
@@ -60,8 +62,8 @@ export function getLingShouBonus(ls: LingShouData): {
 } {
   if (!ls.active) return { gongji: 0, fangyu: 0, qixue: 0 };
   return {
-    gongji: Math.round(ls.gongji * 0.3),
-    fangyu: Math.round(ls.fangyu * 0.3),
-    qixue: Math.round(ls.qixue * 0.3)
+    gongji: Math.round(ls.gongji * LINGSHOU_BONUS_RATE),
+    fangyu: Math.round(ls.fangyu * LINGSHOU_BONUS_RATE),
+    qixue: Math.round(ls.qixue * LINGSHOU_BONUS_RATE)
   };
 }

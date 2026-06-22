@@ -43,7 +43,7 @@ import { ActorDataConfig, CWType } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 import { dfGrades, dyGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
-import { createDefaultLingShou } from '@/utils/lingshou';
+import { createDefaultLingShou, LINGSHOU_BONUS_RATE } from '@/utils/lingshou';
 import { checkAchievements } from '@/utils/chengjiuHelper';
 import styles from './index.module.less';
 
@@ -523,11 +523,11 @@ function Main() {
               <Text>防御：{ls.fangyu}</Text>
               <Box style={{ height: 4 }} />
               <Text size={14} bold>
-                战斗加成（30%）
+                战斗加成（{Math.round(LINGSHOU_BONUS_RATE * 100)}%）
               </Text>
-              <Text>气血 +{Math.round(ls.qixue * 0.3)}</Text>
-              <Text>攻击 +{Math.round(ls.gongji * 0.3)}</Text>
-              <Text>防御 +{Math.round(ls.fangyu * 0.3)}</Text>
+              <Text>气血 +{Math.round(ls.qixue * LINGSHOU_BONUS_RATE)}</Text>
+              <Text>攻击 +{Math.round(ls.gongji * LINGSHOU_BONUS_RATE)}</Text>
+              <Text>防御 +{Math.round(ls.fangyu * LINGSHOU_BONUS_RATE)}</Text>
             </JXSpace>
           ),
           confirmText: '知道了'

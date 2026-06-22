@@ -119,7 +119,7 @@ const gongfaNameParts = [
   ['元', '真', '阳', '阴', '雷', '火', '风', '冰', '星', '月'],
   ['诀', '功', '经', '法', '录', '典', '术']
 ] as const;
-const gongfaAttrKeys = ['gongji', 'fangyu', 'qixue', 'sudu'] as const;
+const gongfaAttrKeys = ['gongji', 'fangyu', 'qixue', 'sudu', 'fashu'] as const;
 
 const options = [
   {
@@ -161,6 +161,22 @@ const options = [
       </Text>
     ),
     value: '土'
+  },
+  {
+    label: (
+      <Text className={styles.LingGenItem} space={10} center verticalText>
+        风灵根
+      </Text>
+    ),
+    value: '风'
+  },
+  {
+    label: (
+      <Text className={styles.LingGenItem} space={10} center verticalText>
+        雷灵根
+      </Text>
+    ),
+    value: '雷'
   }
 ];
 

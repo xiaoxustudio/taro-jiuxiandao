@@ -53,6 +53,12 @@ function WearFaBao(index: number) {
     }
   }
   updated.fabao[slotName] = fbObj;
+  if (oldFB) {
+    updated.cw.fb.push({
+      ...oldFB,
+      num: 1
+    });
+  }
   const keys = Object.keys(fbObj.attr || {}).filter(
     (k) => k !== 'xianyuan'
   ) as (keyof ActorDataConfigForZhanDou)[];

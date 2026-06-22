@@ -29,20 +29,30 @@ function QianDao() {
     const lastDate = get('qiandao.last');
     let streak = get('qiandao.streak') || 0;
 
-    // 计算连续签到天数
+    // 计算连续签到天数（使用 Date.UTC 避免时区和跨年边界问题）
     if (lastDate) {
-      // 计算日期差
-      const lastDateObj = new Date(lastDate);
-      const currentDateObj = new Date(currentDate);
-      const diffTime = currentDateObj.getTime() - lastDateObj.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 1) {
-        // 连续签到，增加连续天数
-        streak += 1;
-      } else if (diffDays > 1) {
-        // 中断签到，重置连续天数
-        streak = 1;
+      const parseDateUtc = (dateStr: string): number | null => {
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+        return Date.UTC(
+          Number(parts[0]),
+          Number(parts[1]) - 1,
+          Number(parts[2])
+        );
+      };
+      const lastDateMs = parseDateUtc(lastDate);
+      const currentDateMs = parseDateUtc(currentDate);
+      if (lastDateMs !== null && currentDateMs !== null) {
+        const diffDays = Math.round(
+          (currentDateMs - lastDateMs) / (1000 * 60 * 60 * 24)
+        );
+        if (diffDays === 1) {
+          // 连续签到，增加连续天数
+          streak += 1;
+        } else if (diffDays > 1) {
+          // 中断签到，重置连续天数
+          streak = 1;
+        }
       }
     } else {
       // 第一次签到
