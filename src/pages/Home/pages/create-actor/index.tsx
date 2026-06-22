@@ -786,7 +786,7 @@ function Index() {
       await fillGongfaGrade(0);
 
       const gongfaKeyEntries = Object.keys(gongfaPoolByGrade).map((grade) => ({
-        grade,
+        grade: grade as keyof typeof gongfaPoolByGrade,
         storageKey: `actor:${seed}:gongfaPoolByGrade:${grade}`
       }));
       try {

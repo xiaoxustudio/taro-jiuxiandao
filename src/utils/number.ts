@@ -73,9 +73,9 @@ export const AutoMapObject = <T extends object>(mapType: T) =>
   Object.values(mapType).reduce(
     (acc, key) => {
       if (typeof key === 'string') {
-        acc[mapType[key]] = key;
+        (acc as any)[(mapType as any)[key]] = key;
       }
       return acc;
     },
-    {} as Record<keyof typeof mapType, string>
-  ) as Record<keyof typeof mapType, string>;
+    {} as Record<string, string>
+  ) as Record<keyof T, string>;

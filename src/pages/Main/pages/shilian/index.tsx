@@ -224,6 +224,7 @@ export default function Shilian() {
   const guajiLockRef = useRef(false);
   const autoBattleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
+  useEffect(() => () => setSessionLoot({}), []);
   const fightSeqRef = useRef(0);
   const [yaoshouMaxQixue, setYaoshouMaxQixue] = useState(0);
   const [actorDamage, setActorDamage] = useState<{
@@ -420,10 +421,18 @@ export default function Shilian() {
           Math.max(1, Math.round(YaoShouInstance.xw * 0.7)),
           Math.max(1, Math.round(YaoShouInstance.xw * 1.2))
         );
+        const tier = TIER_MAP[YaoShouInstance.jingjie] || 1;
         const lingShiDrop = random(
-          Math.max(1, (TIER_MAP[YaoShouInstance.jingjie] || 1) * 10),
-          Math.max(2, (TIER_MAP[YaoShouInstance.jingjie] || 1) * 25)
+          Math.max(1, tier * 15),
+          Math.max(2, tier * tier * 20)
         );
+        const cw = get('cw');
+        const slotCount =
+          (cw?.fb?.length || 0) + (cw?.dy?.length || 0) + (cw?.qt?.length || 0);
+        const cwMax = cw?.max || 30;
+        if (slotCount >= cwMax) {
+          JXToast('储物空间已满，战利品将丢失！').show();
+        }
         setHuiheState((v) => ({
           ...v,
           logs: [
@@ -507,7 +516,7 @@ export default function Shilian() {
           }
         }
         set('xiuwei', Math.min(get('max_xiuwei'), get('xiuwei') + reward));
-        const currentLingShou = get('lingShou') as any;
+        const currentLingShou = get('lingShou');
         if (currentLingShou) {
           set(
             'lingShou',
@@ -610,7 +619,7 @@ export default function Shilian() {
     fightSeqRef.current += 1;
     setYaoShouInstance(newYaoShou);
     setYaoshouMaxQixue(newYaoShou.qixue);
-    const ls = get('lingShou') as any;
+    const ls = get('lingShou');
     const lsBonus = ls
       ? getLingShouBonus(ls)
       : { gongji: 0, fangyu: 0, qixue: 0 };
@@ -620,7 +629,7 @@ export default function Shilian() {
       gongji: get('gongji') + get('addAttr.gongji') + lsBonus.gongji,
       fangyu: get('fangyu') + get('addAttr.fangyu') + lsBonus.fangyu,
       sudu: get('sudu') + get('addAttr.sudu'),
-      baoji: get('baoji') + get('addAttr.baoji'),
+      baoji: Math.min(90, get('baoji') + get('addAttr.baoji')),
       fashu: get('fashu') + get('addAttr.fashu')
     });
 

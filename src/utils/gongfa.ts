@@ -1,6 +1,11 @@
 import omit from 'lodash-es/omit';
 import cloneDeep from 'lodash-es/cloneDeep';
 import { GongFaType } from '@/types/gongfa';
+import type {
+  ActorDataConfig,
+  AddAttrType,
+  ActorDataConfigForZhanDou
+} from '@/types/actor';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { getActor } from './actor';
@@ -36,7 +41,7 @@ function get(id: string): GongFaType | undefined {
 function remove({ name, id }: { name?: string; id?: string }) {
   const { set } = useActorStore.getState();
   const { current } = useStore.getState();
-  const acData = getActor();
+  const acData = cloneDeep(getActor());
   if (name) {
     acData.gongfa.ls = acData.gongfa.ls.filter((v) => v.name !== name);
   } else if (id) {
@@ -54,7 +59,7 @@ function remove({ name, id }: { name?: string; id?: string }) {
 function add(gf: GongFaType, replace = false, checkAchievement = true) {
   const { set } = useActorStore.getState();
   const { current } = useStore.getState();
-  const acData = getActor();
+  const acData = cloneDeep(getActor());
   const existingIndex = acData.gongfa.ls.findIndex((v) => v.id === gf.id);
   if (existingIndex !== -1) {
     if (replace) {
@@ -71,13 +76,15 @@ function add(gf: GongFaType, replace = false, checkAchievement = true) {
   set(current, acData);
   // 检查收集成就
   if (checkAchievement) {
+    const deepCopy = cloneDeep(acData);
     checkCollectionAchievements(
-      (key: string) => acData[key],
+      (key: keyof ActorDataConfig) => deepCopy[key],
       (key: string, value: any) => {
-        acData[key] = value;
-        set(current, acData);
+        const updated = cloneDeep(deepCopy);
+        (updated as any)[key] = value;
+        set(current, updated);
       },
-      acData
+      deepCopy
     );
   }
 }
@@ -126,11 +133,12 @@ function setCurrentGongFa(id: string): void {
     currentGongFa.time = Date.now();
     const currentAdds = currentGongFa.attr;
     if (currentAdds) {
-      Object.keys(currentAdds)
+      (Object.keys(currentAdds) as (keyof ActorDataConfigForZhanDou)[])
         .filter((k) => k !== 'xianyuan')
         .forEach((key) => {
-          updated.addAttr[key] =
-            (updated.addAttr[key] || 0) - (currentAdds[key] || 0);
+          const k = key as keyof AddAttrType;
+          updated.addAttr[k] =
+            (updated.addAttr[k] || 0) - (currentAdds[key] || 0);
         });
     }
     const existingIndex = updated.gongfa.ls.findIndex(
@@ -149,10 +157,11 @@ function setCurrentGongFa(id: string): void {
 
   const adds = newGongfa.attr;
   if (adds) {
-    Object.keys(adds)
+    (Object.keys(adds) as (keyof ActorDataConfigForZhanDou)[])
       .filter((k) => k !== 'xianyuan')
       .forEach((key) => {
-        updated.addAttr[key] = (updated.addAttr[key] || 0) + (adds[key] || 0);
+        const k = key as keyof AddAttrType;
+        updated.addAttr[k] = (updated.addAttr[k] || 0) + (adds[key] || 0);
       });
   }
   set(current, updated);
@@ -180,10 +189,11 @@ function putCurrentGongfa(): Promise<boolean> {
     state = true;
     const adds = gf!.attr;
     if (adds) {
-      Object.keys(adds)
+      (Object.keys(adds) as (keyof ActorDataConfigForZhanDou)[])
         .filter((k) => k !== 'xianyuan')
         .forEach((key) => {
-          updated.addAttr[key] = (updated.addAttr[key] || 0) - (adds[key] || 0);
+          const k = key as keyof AddAttrType;
+          updated.addAttr[k] = (updated.addAttr[k] || 0) - (adds[key] || 0);
         });
     }
     set(current, updated);

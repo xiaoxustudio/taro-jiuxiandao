@@ -28,6 +28,11 @@ export default function Chuwu() {
   const scrollHook = useScroll();
   const [type, setType] = useState<CWType>(CWType.FB);
 
+  const cw = get('cw');
+  const totalSlots =
+    (cw?.fb?.length || 0) + (cw?.dy?.length || 0) + (cw?.qt?.length || 0);
+  const maxSlots = cw?.max || 30;
+
   const updateChuWu = useCallback(() => {
     setList([]);
     const target = get('cw');
@@ -53,31 +58,39 @@ export default function Chuwu() {
       title='储物'
       desc='储物空间，可纳世间万物，大神通者，一袖乾坤，可纳山岳….'
     >
-      <JXSpace gap={10} style={{ width: '100%' }} center flexOne>
-        <JXButton
-          width='100%'
-          onClick={() => {
-            setType(CWType.FB);
-          }}
-        >
-          法宝
-        </JXButton>
-        <JXButton
-          width='100%'
-          onClick={() => {
-            setType(CWType.DY);
-          }}
-        >
-          丹药
-        </JXButton>
-        <JXButton
-          width='100%'
-          onClick={() => {
-            setType(CWType.QT);
-          }}
-        >
-          其他
-        </JXButton>
+      <JXSpace
+        direction='vertical'
+        style={{ width: '100%', marginBottom: '6px' }}
+      >
+        <Text>
+          容量：{totalSlots}/{maxSlots}
+        </Text>
+        <JXSpace gap={10} style={{ width: '100%' }} center flexOne>
+          <JXButton
+            width='100%'
+            onClick={() => {
+              setType(CWType.FB);
+            }}
+          >
+            法宝({cw?.fb?.length || 0})
+          </JXButton>
+          <JXButton
+            width='100%'
+            onClick={() => {
+              setType(CWType.DY);
+            }}
+          >
+            丹药({cw?.dy?.length || 0})
+          </JXButton>
+          <JXButton
+            width='100%'
+            onClick={() => {
+              setType(CWType.QT);
+            }}
+          >
+            其他({cw?.qt?.length || 0})
+          </JXButton>
+        </JXSpace>
       </JXSpace>
       <Scroll Scroll={scrollHook} style={{ padding: '0 4px' }}>
         {list &&
@@ -96,13 +109,14 @@ export default function Chuwu() {
                           {ReItem.name}
                         </Text>
                         <JXSpace direction='vertical' title='属性'>
-                          {Object.keys(ReItem.attr).map((item) => (
-                            <Text key={ReItem.attr[item]}>
-                              {AttrTransformChinese(
-                                item as keyof ActorDataConfigForZhanDou
-                              )}
-                              ：
-                              {ReItem.attr[item] >= 0 ? (
+                          {(
+                            Object.keys(
+                              ReItem.attr
+                            ) as (keyof ActorDataConfigForZhanDou)[]
+                          ).map((item) => (
+                            <Text key={String(ReItem.attr[item])}>
+                              {AttrTransformChinese(item)}：
+                              {(ReItem.attr[item] ?? 0) >= 0 ? (
                                 <Text color='green' inline>
                                   {ReItem.attr[item]}
                                 </Text>

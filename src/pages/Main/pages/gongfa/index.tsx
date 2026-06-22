@@ -10,6 +10,7 @@ import {
   JXToast
 } from '@/components';
 import { GongFaType } from '@/types/gongfa';
+import { AddAttrType, ActorDataConfigForZhanDou } from '@/types/actor';
 import useActorController from '@/hooks/useActorController';
 import useValue, { IUseValueNotState } from '@/hooks/useValue';
 import { putCurrentGongfa, setCurrentGongFa } from '@/utils/gongfa';
@@ -87,19 +88,27 @@ export default function Gongfa() {
     if (updatedGongfa.exp >= updatedGongfa.max_exp) {
       updatedGongfa.exp = updatedGongfa.max_exp;
       updatedGongfa.lv += 1;
-      updatedGongfa.max_exp += 1000;
-      const keys = Object.keys(updatedGongfa.attr || {});
+      updatedGongfa.max_exp = Math.round(updatedGongfa.max_exp * 1.5);
+      const keys = Object.keys(
+        updatedGongfa.attr || {}
+      ) as (keyof ActorDataConfigForZhanDou)[];
       const oldAttr = { ...updatedGongfa.attr };
       keys.forEach((key) => {
         if (updatedGongfa.attr[key]) {
-          updatedGongfa.attr[key] += 0.1 * updatedGongfa.lv;
+          const increment =
+            Math.round(Math.max(0.1, 5 / (1 + updatedGongfa.lv * 0.1)) * 10) /
+            10;
+          updatedGongfa.attr[key]! += increment;
         }
       });
-      const currentAddAttr = get('addAttr') || {};
+      const currentAddAttr = get('addAttr') || ({} as AddAttrType);
       const nextAddAttr = { ...currentAddAttr };
       keys.forEach((key) => {
-        const delta = (updatedGongfa.attr[key] || 0) - (oldAttr[key] || 0);
-        nextAddAttr[key] = (nextAddAttr[key] || 0) + delta;
+        const delta =
+          (updatedGongfa.attr[key] || 0) -
+          ((oldAttr as typeof updatedGongfa.attr)[key] || 0);
+        const k = key as keyof AddAttrType;
+        nextAddAttr[k] = (nextAddAttr[k] || 0) + delta;
       });
       set('addAttr', nextAddAttr);
     }

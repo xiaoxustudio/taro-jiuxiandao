@@ -82,6 +82,11 @@ export default function Yaoyuan() {
   const [tujianVisible, setTujianVisible] = useState(false);
   const [tujianGrade, setTujianGrade] = useState('全部');
   const [tujianKeyword, setTujianKeyword] = useState('');
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 10000);
+    return () => clearInterval(id);
+  }, []);
 
   const yaoyuan = useMemo(
     () => (get('yaoyuan') as YaoyuanData | null) || null,

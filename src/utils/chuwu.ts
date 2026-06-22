@@ -188,12 +188,18 @@ function UsePill(name: string): boolean {
   const entry = Object.values(danfangData as Record<string, any>).find(
     (v: any) => v.name === name && v.attr
   );
-  if (!entry) return false;
+  let attr: Record<string, number>;
+  if (entry) {
+    attr = entry.attr as Record<string, number>;
+  } else {
+    const item = Get({ name, type: CWType.DY });
+    if (!item || !(item as any).attr) return false;
+    attr = (item as any).attr as Record<string, number>;
+  }
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();
   const updated = cloneDeep(acData);
-  const attr = entry.attr as Record<string, number>;
   Object.entries(attr).forEach(([key, val]) => {
     if (key === 'shouyuan') {
       const oldMax = updated.max_shouyuan || 100;

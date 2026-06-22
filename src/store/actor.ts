@@ -65,7 +65,7 @@ const useActorStore = create<ActorStore>()(
         actors: Object.fromEntries(
           Object.entries(state.actors).map(([key, actor]) => [
             key,
-            omit(actor as any, [
+            omit(actor, [
               'materialPoolByGrade',
               'danfangPoolByGrade',
               'danfangData',

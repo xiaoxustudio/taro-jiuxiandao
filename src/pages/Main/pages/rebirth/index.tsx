@@ -11,6 +11,7 @@ import {
 import useActorController from '@/hooks/useActorController';
 import { navigateTo } from '@/utils';
 import {
+  ActorDataConfig,
   ActorDataConfigForFaBao,
   RebirthKeepConfig,
   RebirthReward
@@ -242,7 +243,7 @@ function RebirthPage() {
       ),
       onConfirm() {
         const daohao = actor?.daohao || '';
-        useActorStore.getState().set(daohao, nextActor as any);
+        useActorStore.getState().set(daohao, nextActor as ActorDataConfig);
         useStore.getState().set(daohao);
         JXToast('重生成功！').show();
         setTimeout(() => {

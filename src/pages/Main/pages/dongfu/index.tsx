@@ -200,14 +200,15 @@ export default function Dongfu() {
     const today = getCurrentDate();
     const raw = get('dongfu').daolvMarket || null;
     if (!raw || raw.date !== today) {
+      const freeCandidates = genDaoLvCandidates();
       set('dongfu.daolvMarket', {
         date: today,
         refreshCount: 0,
-        candidates: []
+        candidates: freeCandidates
       });
     }
     stateDaolv.setVisiableModal(true);
-  }, [get, set, stateDaolv]);
+  }, [genDaoLvCandidates, get, set, stateDaolv]);
 
   const handleRefreshDaoLv = useCallback(() => {
     const today = getCurrentDate();
@@ -397,7 +398,7 @@ export default function Dongfu() {
   }, [calcBreakupLingshi, get, set]);
 
   const handleShuangXiu = useCallback(() => {
-    const currentDaoLv = get('dongfu').daolv as any;
+    const currentDaoLv = get('dongfu').daolv;
     if (!currentDaoLv) {
       JXToast('你还没有道侣').show();
       return;
@@ -427,7 +428,7 @@ export default function Dongfu() {
   }, [get, lv, set]);
 
   /* 补灵 */
-  const getTransformRate = useMemo(() => lv ** 0.6 * 0.003, [lv]);
+  const getTransformRate = useMemo(() => lv ** 0.6 * 0.03, [lv]);
   const getTransformRateMemo = useMemo(
     () => `${getTransformRate * 100}%`,
     [getTransformRate]

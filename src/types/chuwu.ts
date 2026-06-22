@@ -61,6 +61,7 @@ export interface FBItemType extends BaseType {
 }
 export interface DYItemType extends BaseType {
   type: CWType.DY;
+  itype?: string; // 丹药品阶（运行时生成）
 }
 export interface QTItemType extends BaseType {
   type: CWType.QT;

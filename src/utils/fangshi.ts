@@ -171,7 +171,7 @@ export const createDanYaoList = (): FangshiItem[] =>
       cl,
       time,
       type: CWType.DY,
-      ls: Math.round(base.ls * FANGSHI_CONFIG.dyPriceScale)
+      ls: Math.round(base.ls * 1.5)
     };
   });
 
@@ -228,9 +228,7 @@ const createRandomDanYaoList = (
       itype: grade,
       desc: isShen ? '恢复神识的丹药' : '增加修为的丹药',
       attr,
-      ls: Math.round(
-        priceBase * gradeMul * rarityMul * FANGSHI_CONFIG.dyPriceScale
-      )
+      ls: Math.round(priceBase * gradeMul * rarityMul * 0.2)
     });
   }
   return list;

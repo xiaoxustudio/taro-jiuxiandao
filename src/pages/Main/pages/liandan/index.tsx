@@ -30,7 +30,7 @@ export default function Liandan() {
 
   const list = useMemo(
     () =>
-      get('danfang')
+      (get('danfang') as { id: string; exp: number }[])
         .map((v) => {
           const base =
             (danfangData as Record<string, any>)[v.id] || customDanfang[v.id];
@@ -136,7 +136,8 @@ export default function Liandan() {
                   name: base.name,
                   type: CWType.DY,
                   num: dNum,
-                  isPile: true
+                  isPile: true,
+                  itype: base.itype
                 });
                 const gradeExp =
                   (base.itype ? dfGrades.indexOf(base.itype) + 1 : 1) * 10;
@@ -146,8 +147,10 @@ export default function Liandan() {
                 let newTitle = get('liandan.chenghao') || '丹徒';
                 let newDanyun = get('liandan.danyun') || 0;
                 exp += gainExp;
-                while (exp >= maxExp && maxExp > 0) {
-                  exp -= maxExp;
+                let newMaxExp = maxExp;
+                while (exp >= newMaxExp && newMaxExp > 0) {
+                  exp -= newMaxExp;
+                  newMaxExp = Math.round(newMaxExp * 1.2);
                   newDanyun += 1;
                   const titles = [
                     '丹徒',
@@ -163,6 +166,7 @@ export default function Liandan() {
                   newTitle = titles[titleIdx];
                 }
                 set('liandan.exp', exp);
+                set('liandan.max_exp', newMaxExp);
                 set('liandan.danyun', newDanyun);
                 set('liandan.chenghao', newTitle);
                 JXToast().show(
@@ -191,7 +195,7 @@ export default function Liandan() {
               <Text>品阶：{data.itype}</Text>
               <Text>描述：{data.desc}</Text>
               <JXSpace direction='vertical' title='需要材料'>
-                {data.cl.map((item) => (
+                {data.cl.map((item: [string, number]) => (
                   <Text key={item[0]}>
                     {item[0]} X &nbsp;
                     <Text
@@ -212,7 +216,7 @@ export default function Liandan() {
         }
         onOk={() => {
           const dy = get('liandan.danyao');
-          const needItems = data.cl.map((v) => ({
+          const needItems = data.cl.map((v: [string, number]) => ({
             name: v[0],
             num: v[1] * num,
             type: CWType.QT,

@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash-es';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import { CWType, FabaoType, FBItemType } from '@/types';
+import { ActorDataConfigForZhanDou, AddAttrType } from '@/types/actor';
 import { getActor } from './actor';
 import chuwu from './chuwu';
 
@@ -44,15 +45,21 @@ function WearFaBao(index: number) {
   if (oldFB) {
     const oldKeys = Object.keys(oldFB.attr || {}).filter(
       (k) => k !== 'xianyuan'
-    );
+    ) as (keyof ActorDataConfigForZhanDou)[];
     for (const k of oldKeys) {
-      updated.addAttr[k] = (updated.addAttr[k] || 0) - (oldFB.attr[k] || 0);
+      const attrKey = k as keyof AddAttrType;
+      updated.addAttr[attrKey] =
+        (updated.addAttr[attrKey] || 0) - (oldFB.attr[k] || 0);
     }
   }
   updated.fabao[slotName] = fbObj;
-  const keys = Object.keys(fbObj.attr || {}).filter((k) => k !== 'xianyuan');
+  const keys = Object.keys(fbObj.attr || {}).filter(
+    (k) => k !== 'xianyuan'
+  ) as (keyof ActorDataConfigForZhanDou)[];
   for (const k of keys) {
-    updated.addAttr[k] = (updated.addAttr[k] || 0) + (fbObj.attr[k] || 0);
+    const attrKey = k as keyof AddAttrType;
+    updated.addAttr[attrKey] =
+      (updated.addAttr[attrKey] || 0) + (fbObj.attr[k] || 0);
   }
   set(current, updated);
   chuwu.Remove({ name: fbObj.name, type: CWType.FB, num: 1 });
@@ -73,9 +80,13 @@ function TakeOffFaBao(type: FabaoType) {
   const fbObj = cloneDeep(fabaoData[slotKey]) as FBItemType;
   const updated = cloneDeep(actor);
   updated.fabao[slotKey] = null;
-  const keys = Object.keys(fbObj.attr || {}).filter((k) => k !== 'xianyuan');
+  const keys = Object.keys(fbObj.attr || {}).filter(
+    (k) => k !== 'xianyuan'
+  ) as (keyof ActorDataConfigForZhanDou)[];
   for (const k of keys) {
-    updated.addAttr[k] = (updated.addAttr[k] || 0) - (fbObj.attr[k] || 0);
+    const attrKey = k as keyof AddAttrType;
+    updated.addAttr[attrKey] =
+      (updated.addAttr[attrKey] || 0) - (fbObj.attr[k] || 0);
   }
   set(current, updated);
   chuwu.Add(fbObj);

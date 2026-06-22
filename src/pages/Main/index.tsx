@@ -31,14 +31,15 @@ import {
 import {
   getJingJieMaxDep,
   getLingQiForJingJie,
-  getLingQiForRate,
   getLingQiToNumber,
+  getLunhuiBuffs,
   JingJie2Transform,
   JingJieTransform,
   LUNHUI_BUFF_PER_COUNT
 } from '@/utils/actor';
 import TpData from '@/assets/tp.json';
-import { CWType } from '@/types';
+import danfangData from '@/assets/danfang.json';
+import { ActorDataConfig, CWType } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 import { dfGrades, dyGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
@@ -80,20 +81,14 @@ function Main() {
     const maxShenshi = get('max_shenshi') || 0;
     const currentShenshi = get('shenshi') || 0;
     const shenshiRecover = Math.round(
-      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 4)
+      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 6)
     );
 
     const xiulianData = get('xiulian') as { time: number } | null;
     const daysElapsed = Math.floor(elapsedHours / 24);
     const shouyuanCost = daysElapsed;
 
-    const xiulianZhoutian = xiulianData ? ZhouTian(xiulianData.time) : 0;
-    const xiulianOfflineZhoutian = ZhouTian(
-      Date.now() - elapsedHours * TimeArray.Map.hour
-    );
-    const totalZhoutian = xiulianData
-      ? ZhouTian(xiulianData.time) + xiulianOfflineZhoutian
-      : 0;
+    const xiulianOfflineZhoutian = xiulianData ? ZhouTian(lastTime) : 0;
 
     const contentLines = [
       <Text key='hours'>你离开了 {Math.round(elapsedHours)} 小时</Text>
@@ -110,15 +105,17 @@ function Main() {
     if (shouyuanCost > 0) {
       const curShouyuan = Math.max(0, (get('shouyuan') || 0) - shouyuanCost);
       set('shouyuan', curShouyuan);
+      const newTime1 = lastTime + daysElapsed * TimeArray.Map.hour * 24;
+      set('time1', Math.round(newTime1));
       contentLines.push(
         <Text key='shouyuan'>寿元消耗：{shouyuanCost} 天</Text>
       );
     }
 
-    if (xiulianData && totalZhoutian > xiulianZhoutian) {
+    if (xiulianData && xiulianOfflineZhoutian > 0.01) {
       contentLines.push(
         <Text key='xiulian'>
-          离线修炼：约 {(totalZhoutian - xiulianZhoutian).toFixed(1)} 小周天
+          离线修炼：约 {xiulianOfflineZhoutian.toFixed(1)} 小周天
         </Text>
       );
     }
@@ -203,9 +200,16 @@ function Main() {
           const calcGongji = Math.round(get('gongji') * (1 + 0.006 * lv1));
           const calcQixue = Math.round(get('qixue') * (1 + 0.01 * lv1));
           const calcFashu = Math.round(get('fashu') * (1 + 0.004 * lv1));
+          const calcFangyu = Math.round(get('fangyu') * (1 + 0.005 * lv1));
+          const calcBaoji = Math.min(
+            80,
+            Math.round((get('baoji') || 0) + 0.1 * lv1)
+          );
           set('gongji', calcGongji);
           set('qixue', calcQixue);
           set('fashu', calcFashu);
+          set('fangyu', calcFangyu);
+          set('baoji', calcBaoji);
           checkAchievements(get, set, actor);
           JXToast().show(
             `目前气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
@@ -223,7 +227,7 @@ function Main() {
         click() {
           const jingjie = get('jingjie');
           const jingjie2 = get('jingjie2');
-          const tpdata = TpData[jingjie];
+          const tpdata = TpData[jingjie as keyof typeof TpData];
           if (jingjie2 === '大圆满') {
             if (jingjie === '大乘') {
               const count = (get('lunhuiCount') as number) || 0;
@@ -262,14 +266,14 @@ function Main() {
                   const xianyuan = get('xianyuan') || 0;
                   const newLunhuiCount =
                     ((get('lunhuiCount') as number) || 0) + 1;
-                  const {
-                    maxShenshiBonus,
-                    shouyuanBonus,
-                    initialXiuweiBonus,
-                    xiulianbeilvBonus
-                  } = LUNHUI_BUFF_PER_COUNT;
+                  const lunhuiBuffs = getLunhuiBuffs(newLunhuiCount);
+                  const maxShenshiBonus = lunhuiBuffs?.maxShenshiBonus || 0;
+                  const shouyuanBonus = lunhuiBuffs?.shouyuanBonus || 0;
+                  const initialXiuweiBonus =
+                    lunhuiBuffs?.initialXiuweiBonus || 0;
+                  const xiulianbeilvBonus = lunhuiBuffs?.xiulianbeilvBonus || 0;
                   const nextActor = {
-                    ...(actor as any),
+                    ...actor,
                     lv: 1,
                     xiuwei: initialXiuweiBonus * newLunhuiCount,
                     max_xiuwei: 500,
@@ -331,7 +335,8 @@ function Main() {
                       danlu: null,
                       danyao: null,
                       danyun: 0,
-                      time: 0
+                      time: 0,
+                      completeTime: 0
                     },
                     danfang: [],
                     gongfa: { ls: [], current: null },
@@ -352,8 +357,8 @@ function Main() {
                     chengjiu: get('chengjiu') || undefined,
                     battleCount: get('battleCount') || 0,
                     winStreak: get('winStreak') || 0
-                  };
-                  useActorStore.getState().set(daohao, nextActor as any);
+                  } as ActorDataConfig;
+                  useActorStore.getState().set(daohao, nextActor);
                   useStore.getState().set(daohao);
                   JXToast(`轮回成功！当前第 ${newLunhuiCount} 世`).show();
                   setTimeout(
@@ -384,9 +389,19 @@ function Main() {
             const cw = get('cw');
             const dyList = (cw?.dy || []) as { name: string; itype?: string }[];
             const matchedPill = dyList.find((p) => {
-              const pIdx = (dyGrades as readonly string[]).indexOf(
-                p.itype || ''
-              );
+              let pGrade: string = p.itype || '';
+              if (
+                !pGrade ||
+                !(dyGrades as readonly string[]).includes(pGrade)
+              ) {
+                const entry = (danfangData as Record<string, any>)
+                  ? Object.values(danfangData as Record<string, any>).find(
+                      (v: any) => v.name === p.name
+                    )
+                  : null;
+                pGrade = (entry as any)?.itype || '';
+              }
+              const pIdx = (dyGrades as readonly string[]).indexOf(pGrade);
               return pIdx >= needGradeIdx;
             });
             if (!matchedPill) {
@@ -413,14 +428,29 @@ function Main() {
             const calcFashu = Math.round(
               get('fashu') * (1 + 0.08 * lv1) + (tpdata.add.fashu ?? 0) * 0.5
             );
+            const calcFangyu = Math.round(
+              get('fangyu') * (1 + 0.08 * lv1) +
+                ((tpdata as any).add.fangyu || 0) * 0.5
+            );
+            const calcBaoji = Math.min(
+              80,
+              Math.round((get('baoji') || 0) + 0.1 * lv1)
+            );
             set('gongji', calcGongji);
             set('qixue', calcQixue);
             set('fashu', calcFashu);
+            set('fangyu', calcFangyu);
+            set('baoji', calcBaoji);
             const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
             set('max_shouyuan', addShouyuan);
             const newMax = (cw?.max || 30) + 10;
             set('cw', { ...cw, max: newMax });
-            checkAchievements(get, set, actor);
+            checkAchievements(
+              get,
+              set,
+              useActorStore.getState().actors[useStore.getState().current] ||
+                actor
+            );
             JXToast(
               `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
             ).show();
@@ -605,11 +635,11 @@ function Main() {
       const map = new Map<string, { name: string; itype?: string }>();
       cw.dy.forEach((item) => {
         if (!item?.name) return;
-        const key = item.name;
+        const key = `${item.name}|${item.itype || '一品'}`;
         if (!map.has(key)) {
           map.set(key, {
             name: item.name,
-            itype: (item as any).itype || '一品'
+            itype: item.itype || '一品'
           });
         }
       });
@@ -787,8 +817,6 @@ function Main() {
     };
     const linggenRate = linggenRates[get('linggen') as string] ?? 0;
 
-    const rateOfLing = getLingQiForRate();
-
     const lvRate = round((get('lv') / 10) * 0.05, 2);
 
     const jjRate = 1 + (getLingQiToNumber() - 1) * 0.15;
@@ -805,8 +833,8 @@ function Main() {
 
     const zhoutian = ZhouTian(xiulian.time);
 
-    const realmEff = Math.sqrt(needAddXiuWeiJJ * rateOfLing * 0.5) * 80;
-    const shouldGetXiu = realmEff * lvRate * jjRate * xlBeilv;
+    const basePerHour = needAddXiuWeiJJ * 0.01;
+    const shouldGetXiu = basePerHour * jjRate * xlBeilv;
 
     const zhotianByzhoutian =
       Math.round(shouldGetXiu) * (0.5 + zhongzuRate + linggenRate);
@@ -818,6 +846,8 @@ function Main() {
       Math.floor(zhoutian * lingchiPerZhouTian)
     );
     const calcXiu = round(baseXiu + consumedLingchi, 2);
+    const lingShiPerZhouTian = getLingQiToNumber() + 1;
+    const lingShiGain = Math.floor(zhoutian * lingShiPerZhouTian);
 
     const content = (
       <>
@@ -834,6 +864,8 @@ function Main() {
         已修炼小周天：{ZhouTian(xiulian.time).toFixed(2)}
         <br />
         总获取修为合计：{calcXiu.toFixed(2)}
+        <br />
+        灵石产出：+{lingShiGain}
       </>
     );
     const c = JXModal.show({
@@ -845,6 +877,14 @@ function Main() {
         c.close();
         set('xiuwei', round(get('xiuwei') + calcXiu, 2));
         set('dongfu.lingchi', Math.max(0, dfLingchi - consumedLingchi));
+        if (lingShiGain > 0) {
+          chuwu.Add({
+            name: '灵石',
+            type: CWType.QT,
+            isPile: true,
+            num: lingShiGain
+          });
+        }
         set('xiulian', null);
       }
     });
