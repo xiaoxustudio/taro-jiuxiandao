@@ -48,21 +48,21 @@ export type TotalAttr = Pick<
 >;
 
 export function getTotalAttr(
-  get: (key: string, defaultValue?: any) => any
+  get: (key: string, defaultValue?: unknown) => unknown
 ): TotalAttr {
   return {
-    qixue: (get('qixue') || 0) + (get('addAttr.qixue') || 0),
-    gongji: (get('gongji') || 0) + (get('addAttr.gongji') || 0),
-    fangyu: (get('fangyu') || 0) + (get('addAttr.fangyu') || 0),
-    sudu: (get('sudu') || 0) + (get('addAttr.sudu') || 0),
-    baoji: (get('baoji') || 0) + (get('addAttr.baoji') || 0),
-    fashu: (get('fashu') || 0) + (get('addAttr.fashu') || 0)
+    qixue: Number(get('qixue') || 0) + Number(get('addAttr.qixue') || 0),
+    gongji: Number(get('gongji') || 0) + Number(get('addAttr.gongji') || 0),
+    fangyu: Number(get('fangyu') || 0) + Number(get('addAttr.fangyu') || 0),
+    sudu: Number(get('sudu') || 0) + Number(get('addAttr.sudu') || 0),
+    baoji: Number(get('baoji') || 0) + Number(get('addAttr.baoji') || 0),
+    fashu: Number(get('fashu') || 0) + Number(get('addAttr.fashu') || 0)
   };
 }
 
 type RealmSource =
   | { jingjie?: string; jingjie1?: string; jingjie2?: string }
-  | ((key: string) => any);
+  | ((key: string) => unknown);
 
 export function getRealmText(source: RealmSource): string {
   const jingjie =

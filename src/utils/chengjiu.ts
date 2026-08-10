@@ -1,11 +1,37 @@
 import cloneDeep from 'lodash-es/cloneDeep';
 import achievementConfig from '@/assets/chengjiu.json';
 import { REALM_ORDER } from '@/assets/const';
+import type { ActorDataConfig } from '@/types';
 import {
   AchievementItem,
   AchievementCategory,
-  AchievementData
+  AchievementData,
+  AchievementCondition,
+  AchievementReward
 } from '@/types/chengjiu';
+
+export interface AchievementProgress {
+  battleCount?: number;
+  winStreak?: number;
+  gongfaCount?: number;
+  fabaoCount?: number;
+  danfangCount?: number;
+  qiandaoStreak?: number;
+  shilianCount?: number;
+  shilianPlaceCount?: number;
+  lunhuiCount?: number;
+  lingshouLv?: number;
+  yaoyuanPlots?: number;
+  daolvCount?: number;
+  danweiTitleIndex?: number;
+  [key: string]: number | undefined;
+}
+
+export interface RewardItem {
+  type: AchievementReward['type'];
+  value: number | string;
+  desc?: string;
+}
 
 // 成就分类映射
 export const ACHIEVEMENT_CATEGORY_MAP: Record<AchievementCategory, string> = {
@@ -21,7 +47,11 @@ export const ACHIEVEMENT_CATEGORY_MAP: Record<AchievementCategory, string> = {
 export const initAchievements = (): AchievementData => {
   const achievements: Record<string, AchievementItem> = {};
 
-  Object.values(achievementConfig.achievements).forEach((config: any) => {
+  const configList = Object.values(
+    achievementConfig.achievements
+  ) as unknown as AchievementItem[];
+
+  configList.forEach((config) => {
     achievements[config.id] = {
       ...config,
       status: 'locked',
@@ -50,9 +80,9 @@ export const initAchievements = (): AchievementData => {
 
 // 检查成就条件
 export const checkCondition = (
-  condition: any,
-  actor: any,
-  progress: Record<string, any>
+  condition: AchievementCondition,
+  actor: Partial<ActorDataConfig> | null | undefined,
+  progress: AchievementProgress
 ): boolean => {
   const { type, target, field, operator = '>=' } = condition;
 
@@ -62,19 +92,20 @@ export const checkCondition = (
     case 'level':
       currentValue = actor?.lv || 0;
       break;
-    case 'realm':
-      currentValue = actor?.[field] || '';
+    case 'realm': {
+      const raw =
+        actor && field ? (actor as Record<string, unknown>)[field] : undefined;
+      currentValue = typeof raw === 'string' ? raw : '';
       if (typeof currentValue === 'string') {
         const currentIndex = REALM_ORDER.indexOf(currentValue);
         const targetIndex = REALM_ORDER.indexOf(target as string);
         return currentIndex >= targetIndex;
       }
       return false;
+    }
     case 'count':
-      currentValue = progress[field] || 0;
-      break;
     case 'continuous':
-      currentValue = progress[field] || 0;
+      currentValue = field ? progress[field] || 0 : 0;
       break;
     default:
       return false;
@@ -103,8 +134,8 @@ export const checkCondition = (
 // 更新成就进度
 export const updateAchievementProgress = (
   achievementData: AchievementData,
-  actor: any,
-  progress: Record<string, any>
+  actor: Partial<ActorDataConfig> | null | undefined,
+  progress: AchievementProgress
 ): AchievementData => {
   const updatedData = cloneDeep(achievementData);
 
@@ -123,11 +154,11 @@ export const updateAchievementProgress = (
       achievement.condition.field &&
       progress[achievement.condition.field] !== undefined
     ) {
-      achievement.progress = progress[achievement.condition.field];
+      achievement.progress = progress[achievement.condition.field] as number;
     } else if (achievement.condition.type === 'level') {
       achievement.progress = actor?.lv || 0;
     } else if (achievement.condition.type === 'realm') {
-      const currentIndex = REALM_ORDER.indexOf(actor?.jingjie);
+      const currentIndex = REALM_ORDER.indexOf(actor?.jingjie || '');
       const targetIndex = REALM_ORDER.indexOf(
         achievement.condition.target as string
       );
@@ -142,7 +173,7 @@ export const updateAchievementProgress = (
 export const claimAchievementReward = (
   achievementData: AchievementData,
   achievementId: string
-): { success: boolean; rewards?: any[]; error?: string } => {
+): { success: boolean; rewards?: RewardItem[]; error?: string } => {
   const achievement = achievementData.achievements[achievementId];
 
   if (!achievement) {
@@ -195,9 +226,9 @@ export const getUnclaimedAchievements = (
 
 // 应用成就奖励
 export const applyAchievementReward = (
-  reward: any,
-  set: any,
-  get: any
+  reward: RewardItem,
+  set: (key: string, v: unknown) => void,
+  get: (key: string) => number
 ): void => {
   const { type, value } = reward;
 

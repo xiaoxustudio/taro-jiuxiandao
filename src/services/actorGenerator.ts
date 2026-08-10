@@ -1,5 +1,5 @@
 import useStorageStore from '@/services/storage';
-import { ActorDataConfig, CWType } from '@/types';
+import { ActorDataConfig, CWType, DanfangPoolByGrade } from '@/types';
 import { GongFaPinJie, GongFaType } from '@/types/gongfa';
 import { UUID } from '@/utils';
 import {
@@ -42,7 +42,10 @@ const yieldToMain = () =>
     setTimeout(resolve, 0);
   });
 
-const storageSet = async (key: string, data: any) => {
+const getErrorMessage = (e: unknown, fallback: string) =>
+  e instanceof Error && e.message ? e.message : fallback;
+
+const storageSet = async (key: string, data: unknown) => {
   const { set } = useStorageStore.getState();
   await set(key, data);
 };
@@ -217,10 +220,10 @@ const generateMaterialPool = async (
         storageKey,
         pool[grade].map((m) => m.name)
       );
-    } catch (e: any) {
+    } catch (e: unknown) {
       await rollbackStoredKeys(storedKeys);
       throw new Error(
-        e?.message || '存档空间不足，无法保存材料数据，请清理存档后重试'
+        getErrorMessage(e, '存档空间不足，无法保存材料数据，请清理存档后重试')
       );
     }
     storedKeys.push(storageKey);
@@ -238,7 +241,7 @@ const generateMaterialPool = async (
 const generateDanfangPool = async (
   ctx: GeneratePoolCtx & { materialFlat: MaterialRegistryItem[] }
 ): Promise<{
-  pool: Record<string, any[]>;
+  pool: DanfangPoolByGrade;
   storageKeysByGrade: Record<string, string>;
 }> => {
   const { seed, rng, emit, storedKeys, materialFlat } = ctx;
@@ -247,13 +250,10 @@ const generateDanfangPool = async (
   emit(0, total, '');
   const dfNameParts = dyNameParts.slice(0, 2);
 
-  const pool: Record<string, any[]> = dfGrades.reduce(
-    (acc, grade) => {
-      acc[grade] = [];
-      return acc;
-    },
-    {} as Record<string, any[]>
-  );
+  const pool: DanfangPoolByGrade = dfGrades.reduce((acc, grade) => {
+    acc[grade] = [];
+    return acc;
+  }, {} as DanfangPoolByGrade);
   const storageKeysByGrade: Record<string, string> = {};
   const usageCounts = new Map<string, number>();
   const usedDanfangName = new Set<string>();
@@ -298,8 +298,8 @@ const generateDanfangPool = async (
 
         const isShen = rng() < 0.5;
         const scale =
-          (DY_EFFECT_SCALE as unknown as Record<string, any>)[grade] ??
-          (DY_EFFECT_SCALE as unknown as Record<string, any>)[dfGrades[0]];
+          DY_EFFECT_SCALE[grade as keyof typeof DY_EFFECT_SCALE] ??
+          DY_EFFECT_SCALE[dfGrades[0] as keyof typeof DY_EFFECT_SCALE];
         const valRange = isShen ? scale.shenshi : scale.xiuwei;
         const baseVal =
           valRange[0] === valRange[1]
@@ -341,7 +341,7 @@ const generateDanfangPool = async (
         );
 
         const picked: { name: string; itype: string }[] = [];
-        const mutablePool = [...pickSource] as any[];
+        const mutablePool = [...pickSource];
         for (let j = 0; j < pickCount && mutablePool.length; j += 1) {
           const safeMutable = mutablePool.filter(
             (v) => !!v && typeof v.name === 'string'
@@ -360,7 +360,7 @@ const generateDanfangPool = async (
           const pickedItem = targetPool[idx];
           if (pickedItem) {
             const removeIndex = mutablePool.findIndex(
-              (x: any) => x?.name === pickedItem.name
+              (x) => x.name === pickedItem.name
             );
             if (removeIndex >= 0) mutablePool.splice(removeIndex, 1);
             picked.push(pickedItem);
@@ -384,7 +384,7 @@ const generateDanfangPool = async (
           return [m.name, Math.max(1, Math.round(baseNum * numScale))];
         });
 
-        const time = [
+        const time: [number, number, number] = [
           Math.max(0, Math.floor(dfGradeIndex / 3)),
           Math.min(12, dfGradeIndex * 2),
           Math.floor(rng() * (11 + dfGradeIndex * 3)) + 5
@@ -420,10 +420,10 @@ const generateDanfangPool = async (
     const storageKey = `actor:${seed}:danfangPoolByGrade:${grade}`;
     try {
       await storageSet(storageKey, pool[grade]);
-    } catch (e: any) {
+    } catch (e: unknown) {
       await rollbackStoredKeys(storedKeys);
       throw new Error(
-        e?.message || '存档空间不足，无法保存丹方数据，请清理存档后重试'
+        getErrorMessage(e, '存档空间不足，无法保存丹方数据，请清理存档后重试')
       );
     }
     storedKeys.push(storageKey);
@@ -558,13 +558,13 @@ const generateGongfaPool = async (
         storageSet(storageKey, pool[grade])
       )
     );
-  } catch (e: any) {
+  } catch (e: unknown) {
     await rollbackStoredKeys([
       ...storedKeys,
       ...keyEntries.map((item) => item.storageKey)
     ]);
     throw new Error(
-      e?.message || '存档空间不足，无法保存功法数据，请清理存档后重试'
+      getErrorMessage(e, '存档空间不足，无法保存功法数据，请清理存档后重试')
     );
   }
   keyEntries.forEach(({ grade, storageKey }) => {
@@ -650,10 +650,10 @@ export async function generateActorData(
     const seedRegistryStorageKey = `actor:${seed}:seedRegistry`;
     try {
       await storageSet(seedRegistryStorageKey, seedRegistry);
-    } catch (e: any) {
+    } catch (e: unknown) {
       await rollbackStoredKeys(storedKeys);
       throw new Error(
-        e?.message || '存档空间不足，无法保存种子数据，请清理存档后重试'
+        getErrorMessage(e, '存档空间不足，无法保存种子数据，请清理存档后重试')
       );
     }
     storedKeys.push(seedRegistryStorageKey);
@@ -689,7 +689,7 @@ export async function generateActorData(
     };
 
     return { ok: true, actor: nextActor, keys: storedKeys };
-  } catch (e: any) {
-    return { ok: false, message: e?.message || '创建角色失败' };
+  } catch (e: unknown) {
+    return { ok: false, message: getErrorMessage(e, '创建角色失败') };
   }
 }

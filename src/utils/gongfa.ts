@@ -49,9 +49,9 @@ function add(gf: GongFaType, replace = false, checkAchievement = true) {
     const deepCopy = cloneDeep(acData);
     checkCollectionAchievements(
       (key: keyof ActorDataConfig) => deepCopy[key],
-      (key: string, value: any) => {
+      (key: string, value: unknown) => {
         const updated = cloneDeep(deepCopy);
-        (updated as any)[key] = value;
+        (updated as unknown as Record<string, unknown>)[key] = value;
         set(current, updated);
       },
       deepCopy

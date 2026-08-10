@@ -4,8 +4,11 @@ import { useShallow } from 'zustand/react/shallow';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import useStorageStore from '@/services/storage';
-import { ActorDataConfig } from '@/types';
+import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
+import { ActorDataConfig, DanfangPoolByGrade } from '@/types';
 import { GongFaType } from '@/types/gongfa';
+
+type UnknownRecord = Record<string, unknown>;
 
 /**
  * @description: 当前角色控制器
@@ -46,7 +49,8 @@ function useActorController() {
 
       if (!actor.materialPoolByGrade && actor.materialPoolStorageKey) {
         const loaded = await load(actor.materialPoolStorageKey);
-        if (!cancelled && loaded) patch.materialPoolByGrade = loaded;
+        if (!cancelled && loaded)
+          patch.materialPoolByGrade = loaded as MaterialPoolByGrade;
       }
       if (
         !actor.materialPoolByGrade &&
@@ -66,32 +70,33 @@ function useActorController() {
                   itype: grade
                 }));
               } else {
-                next[grade] = loaded as any;
+                next[grade] = loaded;
               }
             }
           )
         );
         if (!cancelled && Object.keys(next).length) {
-          patch.materialPoolByGrade = next as any;
+          patch.materialPoolByGrade = next as MaterialPoolByGrade;
         }
       }
       if (!actor.danfangPoolByGrade && actor.danfangPoolStorageKey) {
         const loaded = await load(actor.danfangPoolStorageKey);
-        if (!cancelled && loaded) patch.danfangPoolByGrade = loaded;
+        if (!cancelled && loaded)
+          patch.danfangPoolByGrade = loaded as DanfangPoolByGrade;
       }
       if (
         !actor.danfangPoolByGrade &&
         actor.danfangPoolStorageKeysByGrade &&
         Object.keys(actor.danfangPoolStorageKeysByGrade).length
       ) {
-        const next: Record<string, any[]> = {};
+        const next: DanfangPoolByGrade = {};
         await Promise.all(
           Object.entries(actor.danfangPoolStorageKeysByGrade).map(
             async ([grade, key]) => {
               if (cancelled) return;
               const loaded = await load(key);
               if (!Array.isArray(loaded)) return;
-              next[grade] = loaded as any[];
+              next[grade] = loaded;
             }
           )
         );
@@ -121,11 +126,13 @@ function useActorController() {
       }
       if (!actor.danfangData && actor.danfangDataStorageKey) {
         const loaded = await load(actor.danfangDataStorageKey);
-        if (!cancelled && loaded) patch.danfangData = loaded;
+        if (!cancelled && loaded)
+          patch.danfangData = loaded as Record<string, unknown>;
       }
       if (!actor.seedRegistry && actor.seedRegistryStorageKey) {
         const loaded = await load(actor.seedRegistryStorageKey);
-        if (!cancelled && loaded) patch.seedRegistry = loaded;
+        if (!cancelled && loaded)
+          patch.seedRegistry = loaded as SeedRegistryItem[];
       }
 
       if (actor.xiulianbeilv === undefined || actor.xiulianbeilv === null) {
@@ -163,45 +170,48 @@ function useActorController() {
     actorRef.current = safeActor;
   }, [safeActor]);
 
-  const get = useCallback((key: string, defaultValue: any = null) => {
+  const get = useCallback(<T = any>(key: string, defaultValue?: T): T => {
     // 合法性校验
     if (/\s/.test(key)) {
       throw new Error('Key 包含非法空格');
     }
 
     const pathParts = key.split('.');
-    let currentValue: any = actorRef.current;
+    let currentValue: unknown = actorRef.current;
 
     // eslint-disable-next-line no-restricted-syntax
     for (const part of pathParts) {
       if (currentValue === null || currentValue === undefined) {
-        return defaultValue;
+        return defaultValue as T;
       }
-      currentValue = currentValue[part];
+      currentValue = (currentValue as UnknownRecord)[part];
     }
 
-    return currentValue ?? defaultValue;
+    return (currentValue ?? defaultValue) as T;
   }, []);
 
-  const persistStorage = useCallback((key: string, val: any, uuid: string) => {
-    const storageKeyMap: Record<string, string> = {
-      danfangData: `actor:${uuid}:danfangData`,
-      seedRegistry: `actor:${uuid}:seedRegistry`
-    };
-    const storageKey = storageKeyMap[key];
-    if (!storageKey) return undefined;
-    const { set: setStorage } = useStorageStore.getState();
-    setStorage(storageKey, val).catch((e: any) =>
-      console.error(`Failed to save ${key}:`, e)
-    );
-    return storageKey;
-  }, []);
+  const persistStorage = useCallback(
+    (key: string, val: unknown, uuid: string) => {
+      const storageKeyMap: Record<string, string> = {
+        danfangData: `actor:${uuid}:danfangData`,
+        seedRegistry: `actor:${uuid}:seedRegistry`
+      };
+      const storageKey = storageKeyMap[key];
+      if (!storageKey) return undefined;
+      const { set: setStorage } = useStorageStore.getState();
+      setStorage(storageKey, val).catch((e: unknown) =>
+        console.error(`Failed to save ${key}:`, e)
+      );
+      return storageKey;
+    },
+    []
+  );
 
   /**
    * @description: 设置属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
    */
   const set = useCallback(
-    (key: string, val: any) => {
+    (key: string, val: unknown) => {
       if (/\s/.test(key)) {
         throw new Error('Key 包含非法空格');
       }
@@ -215,7 +225,8 @@ function useActorController() {
 
         const newActor = cloneDeep(currentActor) as ActorDataConfig;
         const pathParts = key.split('.');
-        let copyActorTarget: any = newActor;
+        let copyActorTarget: UnknownRecord =
+          newActor as unknown as UnknownRecord;
 
         for (let i = 0; i < pathParts.length - 1; i++) {
           const part = pathParts[i];
@@ -226,7 +237,7 @@ function useActorController() {
               `路径 ${pathParts.slice(0, i + 1).join('.')} 不是对象`
             );
           }
-          copyActorTarget = copyActorTarget[part];
+          copyActorTarget = copyActorTarget[part] as UnknownRecord;
         }
 
         const lastKey = pathParts[pathParts.length - 1];
@@ -235,8 +246,10 @@ function useActorController() {
         if (key === 'danfangData' || key === 'seedRegistry') {
           storageKeyToSave = persistStorage(key, val, newActor.uuid);
           if (storageKeyToSave) {
-            const storageField = `${key}StorageKey` as keyof ActorDataConfig;
-            (newActor as any)[storageField] = storageKeyToSave;
+            const storageField = `${key}StorageKey` as
+              | 'danfangDataStorageKey'
+              | 'seedRegistryStorageKey';
+            newActor[storageField] = storageKeyToSave;
           }
         }
 
