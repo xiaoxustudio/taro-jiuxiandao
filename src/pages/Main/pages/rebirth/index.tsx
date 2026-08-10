@@ -50,11 +50,11 @@ function RebirthPage() {
   });
   const [selectReward, setSelectReward] = useState<RebirthReward | null>(null);
 
-  const maxShouyuan = useMemo(() => get('max_shouyuan'), [get]);
-  const xiuwei = useMemo(() => get('xiuwei'), [get]);
-  const maxXiuwei = useMemo(() => get('max_xiuwei'), [get]);
+  const maxShouyuan = useMemo(() => actor?.max_shouyuan ?? 0, [actor]);
+  const xiuwei = useMemo(() => actor?.xiuwei ?? 0, [actor]);
+  const maxXiuwei = useMemo(() => actor?.max_xiuwei ?? 0, [actor]);
 
-  const canRebirth = useMemo(() => get('shouyuan') <= 0, [get]);
+  const canRebirth = useMemo(() => (actor?.shouyuan ?? 1) <= 0, [actor]);
 
   const calculateKeptItems = useCallback(() => {
     const keptShouyuan = Math.round(

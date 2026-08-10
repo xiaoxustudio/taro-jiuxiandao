@@ -22,6 +22,7 @@ import {
   SeedRegistryItem
 } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
+import { checkAchievements } from '@/utils/chengjiuHelper';
 import { getGradeColor, numberToChinese, TimeArray } from '@/utils';
 import { CWType, YaoyuanData } from '@/types';
 import './index.less';
@@ -89,14 +90,14 @@ export default function Yaoyuan() {
   }, []);
 
   const yaoyuan = useMemo(
-    () => (get('yaoyuan') as YaoyuanData | null) || null,
-    [get]
+    () => (actor?.yaoyuan as YaoyuanData | null) || null,
+    [actor]
   );
   const plots = useMemo(() => yaoyuan?.plots ?? [], [yaoyuan]);
   const seeds = useMemo(() => yaoyuan?.seeds ?? [], [yaoyuan]);
   const seedRegistry = useMemo(
-    () => (get('seedRegistry') as SeedRegistryItem[]) || [],
-    [get]
+    () => (actor?.seedRegistry as SeedRegistryItem[]) || [],
+    [actor]
   );
 
   useEffect(() => {
@@ -330,8 +331,19 @@ export default function Yaoyuan() {
     );
     updateYaoyuan({ ...yaoyuan, plots: nextPlots });
     stateUnlock.setVisiableModal(false);
+    checkAchievements(get, set, actor);
     JXToast().show(`灵田#${plot.id}已解锁`);
-  }, [lingshi, plot, stateUnlock, unlockCost, updateYaoyuan, yaoyuan]);
+  }, [
+    actor,
+    get,
+    lingshi,
+    plot,
+    set,
+    stateUnlock,
+    unlockCost,
+    updateYaoyuan,
+    yaoyuan
+  ]);
 
   const plotSeed = plot?.seed ?? null;
   const remainingMs = plotSeed ? getRemainingMs(plotSeed, Date.now()) : 0;

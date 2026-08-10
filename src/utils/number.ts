@@ -68,14 +68,3 @@ export function numberToChinese(number: number): string {
   }
   return str.replace(/^一十/, '十').replace(/零+$/, '');
 }
-
-export const AutoMapObject = <T extends object>(mapType: T) =>
-  Object.values(mapType).reduce(
-    (acc, key) => {
-      if (typeof key === 'string') {
-        (acc as any)[(mapType as any)[key]] = key;
-      }
-      return acc;
-    },
-    {} as Record<string, string>
-  ) as Record<keyof T, string>;

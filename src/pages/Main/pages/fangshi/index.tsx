@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   fangshiCategories,
   FangshiCategoryKey,
+  FangshiItem,
   FangshiSnapshot,
   FANGSHI_REFRESH_INTERVAL,
   resolveFangshiSnapshot
@@ -46,6 +47,7 @@ export default function Fangshi() {
     const updatedAt = current?.updatedAt ?? Date.now();
     return Math.max(0, FANGSHI_REFRESH_INTERVAL - (Date.now() - updatedAt));
   });
+  const [version, setVersion] = useState(0);
   const currentCategory = useMemo(
     () => fangshiCategories.find((item) => item.key === type),
     [type]
@@ -54,6 +56,43 @@ export default function Fangshi() {
     () => snapshot?.items[type] ?? [],
     [snapshot, type]
   );
+
+  const sellItem = (v: FangshiItem) => {
+    if (v.isPile) {
+      const owned = chuwu.Get({ name: v.name, type: v.type as CWType });
+      if (!owned || !owned.num) {
+        JXToast('背包中无该物品').show();
+        return;
+      }
+      const price = Math.floor(v.ls * 0.5);
+      const { num } = owned;
+      chuwu.Remove({ name: v.name, type: v.type as CWType, num });
+      chuwu.Add({
+        name: '灵石',
+        type: CWType.QT,
+        isPile: true,
+        num: price * num
+      });
+      setVersion((p) => p + 1);
+      JXToast(`出售${v.name}×${num}，获得灵石${price * num}`).show();
+      return;
+    }
+    const owned = chuwu.Get({ name: v.name, type: v.type as CWType });
+    if (!owned) {
+      JXToast('背包中无该物品').show();
+      return;
+    }
+    const price = Math.floor(v.ls * 0.5);
+    chuwu.Remove({ name: v.name, type: v.type as CWType });
+    chuwu.Add({
+      name: '灵石',
+      type: CWType.QT,
+      isPile: true,
+      num: price
+    });
+    setVersion((p) => p + 1);
+    JXToast(`出售${v.name}，获得灵石${price}`).show();
+  };
   const list = useMemo(() => {
     const targetList = currentList;
     const action = currentCategory?.action;
@@ -61,7 +100,19 @@ export default function Fangshi() {
       ...v,
       title: (
         <Box>
-          <Text>{v.name}</Text>
+          <JXSpace between>
+            <Text>{v.name}</Text>
+            <JXButton
+              size='mini'
+              transparent
+              onClick={(e) => {
+                e.stopPropagation();
+                sellItem(v);
+              }}
+            >
+              出售
+            </JXButton>
+          </JXSpace>
           <JXSpace between>
             <Text>灵石：{v.ls}</Text>
             <Text align='right' color={getGradeColor(v.itype) || undefined}>
@@ -233,7 +284,7 @@ export default function Fangshi() {
   const lsMemo = useMemo(
     () => chuwu.Get({ name: '灵石', type: CWType.QT }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [get, set] // 手动触发更新
+    [get, set, version] // 手动触发更新
   );
   const refreshLeftText = useMemo(() => {
     const total = Math.max(0, Math.ceil(refreshLeft / 1000));
@@ -317,7 +368,7 @@ export default function Fangshi() {
       </JXSpace>
       {currentCategory && (
         <Scroll calc={container.calcHeight + 50} bottomBlankSpace={30}>
-          <List list={list} noFlex />
+          <List list={list} noFlex emptyText='该分类暂无商品，稍后自动刷新' />
         </Scroll>
       )}
     </Container>

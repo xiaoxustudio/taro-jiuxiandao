@@ -322,6 +322,256 @@
           "desc": "500修为"
         }
       ]
+    },
+    "shilian_first": {
+      "id": "shilian_first",
+      "name": "初入江湖",
+      "desc": "完成任意一次试炼",
+      "category": "exploration",
+      "points": 10,
+      "condition": {
+        "type": "count",
+        "target": 1,
+        "field": "shilianCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 100,
+          "desc": "100修为"
+        }
+      ]
+    },
+    "shilian_place_5": {
+      "id": "shilian_place_5",
+      "name": "名动四方",
+      "desc": "通关5个试炼地点",
+      "category": "exploration",
+      "points": 25,
+      "condition": {
+        "type": "count",
+        "target": 5,
+        "field": "shilianPlaceCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 400,
+          "desc": "400修为"
+        }
+      ]
+    },
+    "shilian_place_10": {
+      "id": "shilian_place_10",
+      "name": "踏遍九州",
+      "desc": "通关10个试炼地点",
+      "category": "exploration",
+      "points": 50,
+      "condition": {
+        "type": "count",
+        "target": 10,
+        "field": "shilianPlaceCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 1000,
+          "desc": "1000修为"
+        },
+        {
+          "type": "shenshi",
+          "value": 30,
+          "desc": "30神识"
+        }
+      ]
+    },
+    "lunhui_1": {
+      "id": "lunhui_1",
+      "name": "轮回一世",
+      "desc": "轮回重修1次",
+      "category": "special",
+      "points": 30,
+      "condition": {
+        "type": "count",
+        "target": 1,
+        "field": "lunhuiCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 500,
+          "desc": "500修为"
+        },
+        {
+          "type": "shouyuan",
+          "value": 50,
+          "desc": "50寿元"
+        }
+      ]
+    },
+    "danshi_title": {
+      "id": "danshi_title",
+      "name": "丹师之姿",
+      "desc": "获得丹师称号",
+      "category": "special",
+      "points": 15,
+      "condition": {
+        "type": "count",
+        "target": 2,
+        "field": "danweiTitleIndex",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 200,
+          "desc": "200修为"
+        }
+      ]
+    },
+    "danwang_title": {
+      "id": "danwang_title",
+      "name": "丹王无双",
+      "desc": "获得丹王称号",
+      "category": "special",
+      "points": 40,
+      "condition": {
+        "type": "count",
+        "target": 4,
+        "field": "danweiTitleIndex",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 800,
+          "desc": "800修为"
+        },
+        {
+          "type": "shenshi",
+          "value": 20,
+          "desc": "20神识"
+        }
+      ]
+    },
+    "lingshou_5": {
+      "id": "lingshou_5",
+      "name": "灵兽初成",
+      "desc": "灵兽等级达到5级",
+      "category": "special",
+      "points": 20,
+      "condition": {
+        "type": "count",
+        "target": 5,
+        "field": "lingshouLv",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 300,
+          "desc": "300修为"
+        }
+      ]
+    },
+    "lingshou_10": {
+      "id": "lingshou_10",
+      "name": "灵兽通灵",
+      "desc": "灵兽等级达到10级",
+      "category": "special",
+      "points": 40,
+      "condition": {
+        "type": "count",
+        "target": 10,
+        "field": "lingshouLv",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 800,
+          "desc": "800修为"
+        },
+        {
+          "type": "shouyuan",
+          "value": 30,
+          "desc": "30寿元"
+        }
+      ]
+    },
+    "yaoyuan_plot_3": {
+      "id": "yaoyuan_plot_3",
+      "name": "灵田初扩",
+      "desc": "药园解锁3块灵田",
+      "category": "special",
+      "points": 15,
+      "condition": {
+        "type": "count",
+        "target": 3,
+        "field": "yaoyuanPlots",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 200,
+          "desc": "200修为"
+        }
+      ]
+    },
+    "yaoyuan_plot_5": {
+      "id": "yaoyuan_plot_5",
+      "name": "九宫灵田",
+      "desc": "药园解锁5块灵田",
+      "category": "special",
+      "points": 30,
+      "condition": {
+        "type": "count",
+        "target": 5,
+        "field": "yaoyuanPlots",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 500,
+          "desc": "500修为"
+        },
+        {
+          "type": "lingqi_rate",
+          "value": 0.5,
+          "desc": "5%修炼速度加成"
+        }
+      ]
+    },
+    "daolv_1": {
+      "id": "daolv_1",
+      "name": "伉俪情深",
+      "desc": "洞府结缘道侣",
+      "category": "special",
+      "points": 25,
+      "condition": {
+        "type": "count",
+        "target": 1,
+        "field": "daolvCount",
+        "operator": ">="
+      },
+      "reward": [
+        {
+          "type": "xiuwei",
+          "value": 300,
+          "desc": "300修为"
+        },
+        {
+          "type": "shouyuan",
+          "value": 30,
+          "desc": "30寿元"
+        }
+      ]
     }
   }
 }

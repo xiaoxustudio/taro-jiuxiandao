@@ -3,6 +3,7 @@ import {
   Box,
   Container,
   JXButton,
+  JXDivider,
   JXModal,
   JXSpace,
   JXToast,
@@ -14,23 +15,27 @@ import {
 import useActorController from '@/hooks/useActorController';
 import danfangData from '@/assets/danfang.json';
 import chuwu from '@/utils/chuwu';
+import { CHENGHAO_RULES, getDanLuLevel, getDanLuSpeed } from '@/utils/liandan';
+import { checkAchievements } from '@/utils/chengjiuHelper';
 import { CWType } from '@/types';
 import { currentTime, TimeArray } from '@/utils';
 import { dfGrades } from '@/assets/const';
 import './index.less';
 
 export default function Liandan() {
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
   const [data, setData] = useState<any>(null);
   const [num, setNum] = useState(1);
+  const [chenghaoVisible, setChenghaoVisible] = useState(false);
+  const [danluVisible, setDanluVisible] = useState(false);
   const customDanfang = useMemo(
-    () => (get('danfangData') ?? {}) as Record<string, any>,
-    [get]
+    () => (actor?.danfangData ?? {}) as Record<string, any>,
+    [actor]
   );
 
   const list = useMemo(
     () =>
-      (get('danfang') as { id: string; exp: number }[])
+      (actor?.danfang as { id: string; exp: number }[])
         .map((v) => {
           const base =
             (danfangData as Record<string, any>)[v.id] || customDanfang[v.id];
@@ -49,11 +54,11 @@ export default function Liandan() {
           } as ListItemData;
         })
         .filter(Boolean) as ListItemData[],
-    [get, customDanfang]
+    [actor, customDanfang]
   );
 
   const complateInfo = useMemo(() => {
-    const completeTime = get('liandan.completeTime') as number | undefined;
+    const completeTime = actor?.liandan?.completeTime as number | undefined;
     if (!completeTime) return { done: false, text: '无' };
 
     const remainingMs = completeTime - currentTime();
@@ -68,11 +73,43 @@ export default function Liandan() {
       done: false,
       text: `${last.toString()}（${last.toZhouTian().toFixed(2)}周天）`
     };
-  }, [get]);
+  }, [actor]);
 
   const getNum = (item: [string, number]) => {
     return chuwu.Get({ name: item[0], type: CWType.QT })?.num || 0;
   };
+
+  const danlu =
+    (get('liandan.danlu') as { name: string; lv: number } | null) ?? null;
+  const danluLv = danlu?.lv ?? 1;
+  const danluLevel = getDanLuLevel(danluLv) ?? getDanLuLevel(1)!;
+  const nextLevel = getDanLuLevel(danluLv + 1);
+
+  const upgradeDanlu = useCallback(() => {
+    if (!nextLevel) {
+      setDanluVisible(false);
+      return;
+    }
+    const curLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
+    if (curLs < nextLevel.costLs) {
+      JXToast().show(`灵石不足，升阶需要${nextLevel.costLs}灵石`);
+      return;
+    }
+    const needItems = nextLevel.costItems.map((v) => ({
+      name: v.name,
+      num: v.num,
+      type: CWType.QT
+    }));
+    if (!chuwu.HasArr(needItems)) {
+      JXToast().show('升阶材料不足');
+      return;
+    }
+    chuwu.Remove({ name: '灵石', type: CWType.QT, num: nextLevel.costLs });
+    chuwu.RemoveArr(needItems);
+    set('liandan.danlu', { name: nextLevel.name, lv: nextLevel.lv });
+    JXToast().show(`丹炉升阶成功：${nextLevel.name} Lv.${nextLevel.lv}`);
+    setDanluVisible(false);
+  }, [nextLevel, set]);
 
   const reset = useCallback(() => {
     set('liandan.danyao', null);
@@ -90,7 +127,9 @@ export default function Liandan() {
       <JXSpace className='attr' direction='vertical'>
         <Text>称号: {get('liandan.chenghao')}</Text>
         <Text>丹韵: {get('liandan.danyun')}</Text>
-        <Text>丹炉: {get('liandan.danlu.name', '无')}</Text>
+        <Text>
+          丹炉: {get('liandan.danlu.name', '无')} Lv.{danluLv}
+        </Text>
         <Text>丹名: {get('liandan.danyao.id', '无')}</Text>
         <Text>
           炼丹经验: {get('liandan.exp')}/{get('liandan.max_exp')}
@@ -116,8 +155,8 @@ export default function Liandan() {
         </Text>
       </JXSpace>
       <JXSpace style={{ margin: '.5em 0.25em' }} align='center' gap={5}>
-        <JXButton>称号</JXButton>
-        <JXButton>升阶丹炉</JXButton>
+        <JXButton onClick={() => setChenghaoVisible(true)}>称号</JXButton>
+        <JXButton onClick={() => setDanluVisible(true)}>升阶丹炉</JXButton>
         <JXButton
           onClick={() => {
             if (complateInfo.done) {
@@ -169,6 +208,7 @@ export default function Liandan() {
                 set('liandan.max_exp', newMaxExp);
                 set('liandan.danyun', newDanyun);
                 set('liandan.chenghao', newTitle);
+                checkAchievements(get, set, actor);
                 JXToast().show(
                   `获得丹药：${base.name} X ${dNum}（炼丹经验+${gainExp}）`
                 );
@@ -182,7 +222,7 @@ export default function Liandan() {
           起炉收丹
         </JXButton>
       </JXSpace>
-      <List list={list} noFlex />
+      <List list={list} noFlex emptyText='暂无已掌握丹方' />
       <JXModal
         visible={!!data}
         okText='炼制'
@@ -216,6 +256,15 @@ export default function Liandan() {
         }
         onOk={() => {
           const dy = get('liandan.danyao');
+          const gradeIdx = data.itype ? dfGrades.indexOf(data.itype) + 1 : 1;
+          if (danluLevel && gradeIdx > danluLevel.maxGradeIdx) {
+            JXToast().show(
+              `丹炉品阶不足，无法炼制${data.itype}丹药（当前最高可炼${danluLevel.maxGrade}）`
+            );
+            setData(null);
+            setNum(1);
+            return;
+          }
           const needItems = data.cl.map((v: [string, number]) => ({
             name: v[0],
             num: v[1] * num,
@@ -230,9 +279,10 @@ export default function Liandan() {
             set('liandan.danyao.id', data.id);
             set('liandan.danyao.num', num);
             const totalMs = new TimeArray(data.time).milliseconds;
+            const speed = getDanLuSpeed(danluLv);
             set(
               'liandan.completeTime',
-              currentTime() + Math.round(totalMs * num)
+              currentTime() + Math.round(totalMs * num * speed)
             );
             set('liandan.time', currentTime());
             JXToast().show(`开始炼制丹药：${data.name} X ${num}`);
@@ -246,6 +296,71 @@ export default function Liandan() {
           setNum(1);
           setData(null);
         }}
+      />
+      <JXModal
+        visible={chenghaoVisible}
+        okText='知道了'
+        disableCancle
+        content={
+          <JXSpace direction='vertical'>
+            <Text size={20} bold>
+              当前称号：{get('liandan.chenghao', '丹徒')}
+            </Text>
+            <Text>
+              炼丹经验：{get('liandan.exp', 0)}/{get('liandan.max_exp', 100)}
+            </Text>
+            <JXDivider />
+            <Text size={18} bold>
+              称号晋级规则
+            </Text>
+            <Text color='gray'>炼丹成功后按经验自动晋级：</Text>
+            {CHENGHAO_RULES.map((v) => (
+              <Text key={v.name}>
+                {v.name}：累计经验 {v.exp}
+              </Text>
+            ))}
+          </JXSpace>
+        }
+        onOk={() => setChenghaoVisible(false)}
+        onCancel={() => setChenghaoVisible(false)}
+      />
+      <JXModal
+        visible={danluVisible}
+        okText={nextLevel ? '升阶' : '关闭'}
+        disableCancle={!nextLevel}
+        content={
+          <JXSpace direction='vertical'>
+            <Text size={20} bold>
+              当前丹炉：{get('liandan.danlu.name', '无')} Lv.{danluLv}
+            </Text>
+            <Text>品级：{danluLevel.maxGrade}</Text>
+            <Text>
+              炼制时间系数：{Math.round(getDanLuSpeed(danluLv) * 100)}%
+            </Text>
+            <JXDivider />
+            {nextLevel ? (
+              <>
+                <Text size={18} bold>
+                  升阶目标：{nextLevel.name} Lv.{nextLevel.lv}
+                </Text>
+                <Text>品级：{nextLevel.maxGrade}</Text>
+                <Text>
+                  炼制时间系数：{Math.round(getDanLuSpeed(nextLevel.lv) * 100)}%
+                </Text>
+                <Text>消耗灵石：{nextLevel.costLs}</Text>
+                {nextLevel.costItems.map((v) => (
+                  <Text key={v.name}>
+                    {v.name} X {v.num}
+                  </Text>
+                ))}
+              </>
+            ) : (
+              <Text>丹炉已升至最高品阶</Text>
+            )}
+          </JXSpace>
+        }
+        onOk={upgradeDanlu}
+        onCancel={() => setDanluVisible(false)}
       />
     </Container>
   );

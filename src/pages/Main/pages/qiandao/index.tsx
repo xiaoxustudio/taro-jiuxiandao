@@ -2,17 +2,17 @@ import { random } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
 import { Container, JXButton, JXSpace, JXToast, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
-import { ActorDataConfig, CWType } from '@/types';
+import { CWType } from '@/types';
 import { getCurrentDate } from '@/utils';
 import { REALM_ORDER } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import { checkQiandaoAchievements } from '@/utils/chengjiuHelper';
 
 function QianDao() {
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
   const qiandao = useMemo(
-    () => get('qiandao') as ActorDataConfig['qiandao'],
-    [get]
+    () => actor?.qiandao ?? { count: 0, last: '', time: '', streak: 0 },
+    [actor]
   );
   const isSigned = useMemo(
     () => qiandao.time === getCurrentDate(),

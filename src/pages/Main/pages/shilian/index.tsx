@@ -48,6 +48,10 @@ import {
   SeedRegistryItem
 } from '@/assets/const';
 import { updateAchievementProgress } from '@/utils/chengjiu';
+import {
+  checkLingShouAchievements,
+  checkShilianAchievements
+} from '@/utils/chengjiuHelper';
 import { addLingShouExp, getLingShouBonus } from '@/utils/lingshou';
 import styles from './index.module.less';
 
@@ -77,15 +81,15 @@ const seedDropRates: Record<(typeof clGrades)[number], number> = {
 
 export default function Shilian() {
   const scrollHook = useScroll();
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
   const [isGuaji, setGuaji] = useState(false);
   // eslint-disable-next-line no-undef
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const guajiTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const df = useMemo(() => {
-    const target = difangData.find((v) => v.name === get('zd.df'));
+    const target = difangData.find((v) => v.name === actor?.zd?.df);
     return (target || difangData[0]) as DiFangType;
-  }, [get]);
+  }, [actor]);
   useEffect(() => {
     if (!df?.name) return;
     if (get('zd.df') !== df.name) {
@@ -574,6 +578,16 @@ export default function Shilian() {
           { battleCount, winStreak: newWinStreak }
         );
         set('chengjiu', updatedAchievementData);
+        checkShilianAchievements(
+          get,
+          set,
+          { lv: get('lv'), jingjie: get('jingjie') },
+          df.name
+        );
+        checkLingShouAchievements(get, set, {
+          lv: get('lv'),
+          jingjie: get('jingjie')
+        });
         return;
       }
       // 战斗计算
@@ -595,6 +609,7 @@ export default function Shilian() {
     ActorInstance,
     HuiheState.target,
     YaoShouInstance,
+    df.name,
     get,
     set,
     zhandouLogic

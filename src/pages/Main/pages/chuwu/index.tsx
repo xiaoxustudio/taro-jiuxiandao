@@ -19,8 +19,20 @@ import {
 import { AttrTransformChinese } from '@/utils';
 import { WearFaBao } from '@/utils/fabao';
 import chuwu from '@/utils/chuwu';
+import { clGradePrice, clGrades } from '@/assets/const';
 import useScroll from '@/hooks/useScroll';
 import './index.less';
+
+const getSellPrice = (v: BaseType) => {
+  const { ls } = v as any;
+  if (typeof ls === 'number' && ls > 0) {
+    return Math.floor(ls * 0.5);
+  }
+  const grade = (v as any).itype as (typeof clGrades)[number];
+  const range = grade ? clGradePrice[grade] : undefined;
+  const base = range ? range[0] : 1;
+  return Math.max(1, Math.floor(base * 0.5));
+};
 
 export default function Chuwu() {
   const { get } = useActorController();
@@ -167,6 +179,62 @@ export default function Chuwu() {
                       onCancel() {
                         close();
                       }
+                    });
+                  } else if (v.type === CWType.QT) {
+                    if (v.name === '灵石') {
+                      JXToast('灵石为通用货币，不可丢弃').show();
+                      return;
+                    }
+                    content = (
+                      <>
+                        <Text size={20} bold>
+                          {v.name}
+                        </Text>
+                        <Text>数量：{v.num}</Text>
+                        <Text>出售单价：{getSellPrice(v)} 灵石</Text>
+                      </>
+                    );
+                    const { close } = JXModal.show({
+                      content,
+                      okText: '丢弃',
+                      onOk() {
+                        chuwu.Remove({
+                          name: v.name,
+                          type: CWType.QT,
+                          num: v.num
+                        });
+                        JXToast(`已丢弃${v.name}`).show();
+                        updateChuWu();
+                        close();
+                      },
+                      onCancel() {
+                        close();
+                      },
+                      actions: [
+                        {
+                          key: 'sell',
+                          text: '出售换灵石',
+                          onClick() {
+                            const num = v.num ?? 1;
+                            chuwu.Remove({
+                              name: v.name,
+                              type: CWType.QT,
+                              num
+                            });
+                            chuwu.Add({
+                              name: '灵石',
+                              type: CWType.QT,
+                              isPile: true,
+                              num: getSellPrice(v) * num
+                            });
+                            JXToast(
+                              `出售${v.name}，获得灵石${getSellPrice(v) * num}`
+                            ).show();
+                            updateChuWu();
+                            close();
+                          }
+                        }
+                      ]
                     });
                   }
                 }}

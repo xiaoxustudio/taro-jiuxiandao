@@ -18,7 +18,16 @@ export const checkAchievements = (get: any, set: any, actor: any) => {
     gongfaCount: get('gongfa.ls')?.length || 0,
     fabaoCount: Object.values(get('fabao') || {}).filter(Boolean).length,
     danfangCount: get('danfang')?.length || 0,
-    qiandaoStreak: get('qiandao.streak') || 0
+    qiandaoStreak: get('qiandao.streak') || 0,
+    shilianCount: get('battleCount') || 0,
+    shilianPlaceCount: (get('shilianPlaces') as string[])?.length || 0,
+    lunhuiCount: get('lunhuiCount') || 0,
+    lingshouLv: get('lingShou')?.lv || 0,
+    yaoyuanPlots: ((get('yaoyuan')?.plots || []) as any[]).filter(
+      (p) => p.unlocked
+    ).length,
+    daolvCount: get('dongfu')?.daolv ? 1 : 0,
+    danweiTitleIndex: get('liandan')?.danyun || 0
   };
 
   const updated = updateAchievementProgress(chengjiu, actor, progress);
@@ -146,6 +155,55 @@ export const checkSocialAchievements = (get: any, set: any, actor: any) => {
 
   const progress = {
     qiandaoStreak: get('qiandao.streak') || 0
+  };
+
+  const updated = updateAchievementProgress(chengjiu, actor, progress);
+  set('chengjiu', updated);
+};
+
+export const checkShilianAchievements = (
+  get: any,
+  set: any,
+  actor: any,
+  dfName?: string
+) => {
+  const chengjiu = get('chengjiu');
+  if (!chengjiu) return;
+
+  const currentPlaces = (get('shilianPlaces') as string[]) || [];
+  let places = currentPlaces;
+  if (dfName && !currentPlaces.includes(dfName)) {
+    places = [...currentPlaces, dfName];
+    set('shilianPlaces', places);
+  }
+
+  const progress = {
+    shilianCount: get('battleCount') || 0,
+    shilianPlaceCount: places.length
+  };
+
+  const updated = updateAchievementProgress(chengjiu, actor, progress);
+  set('chengjiu', updated);
+};
+
+export const checkLunhuiAchievements = (get: any, set: any, actor: any) => {
+  const chengjiu = get('chengjiu');
+  if (!chengjiu) return;
+
+  const progress = {
+    lunhuiCount: get('lunhuiCount') || 0
+  };
+
+  const updated = updateAchievementProgress(chengjiu, actor, progress);
+  set('chengjiu', updated);
+};
+
+export const checkLingShouAchievements = (get: any, set: any, actor: any) => {
+  const chengjiu = get('chengjiu');
+  if (!chengjiu) return;
+
+  const progress = {
+    lingshouLv: get('lingShou')?.lv || 0
   };
 
   const updated = updateAchievementProgress(chengjiu, actor, progress);

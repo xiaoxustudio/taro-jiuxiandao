@@ -88,6 +88,59 @@ function add(gf: GongFaType, replace = false, checkAchievement = true) {
 
 type GongFaTypeEx = GongFaType & { update: () => void };
 
+export type LingGenMatch = 'match' | 'conflict' | 'common';
+
+function parseLingGen(lg?: string): string[] {
+  const clean = (lg || '').replace(/灵根/g, '').trim();
+  if (!clean) return [];
+  return clean.split('');
+}
+
+export function getLingGenMatch(
+  gf: Pick<GongFaType, 'lg'>,
+  linggen: string
+): LingGenMatch {
+  const ls = parseLingGen(gf.lg);
+  if (!ls.length) return 'common';
+  return ls.includes(linggen) ? 'match' : 'conflict';
+}
+
+export function getLingGenExpRate(
+  gf: Pick<GongFaType, 'lg'>,
+  linggen: string
+): number {
+  const m = getLingGenMatch(gf, linggen);
+  if (m === 'match') return 1.5;
+  if (m === 'conflict') return 0.7;
+  return 1;
+}
+
+export function getLingGenAttrRate(
+  gf: Pick<GongFaType, 'lg'>,
+  linggen: string
+): number {
+  return getLingGenMatch(gf, linggen) === 'conflict' ? 0.8 : 1;
+}
+
+export function getEffectiveAttr(
+  gf: GongFaType,
+  linggen: string
+): Partial<ActorDataConfigForZhanDou> {
+  const attrRate = getLingGenAttrRate(gf, linggen);
+  const result: Partial<ActorDataConfigForZhanDou> = {};
+  if (gf.attr) {
+    (Object.keys(gf.attr) as (keyof ActorDataConfigForZhanDou)[])
+      .filter((k) => k !== 'xianyuan')
+      .forEach((key) => {
+        const v = gf.attr[key] || 0;
+        if (v) {
+          result[key] = Math.round(v * attrRate * 10) / 10;
+        }
+      });
+  }
+  return result;
+}
+
 /**
  * @description: 获取带 update 方法的功法对象（用于就地保存更新）
  * @param {string} id
@@ -118,6 +171,7 @@ function setCurrentGongFa(id: string): void {
   if (!gf) return;
 
   const updated = cloneDeep(acData);
+  const { linggen } = updated;
 
   if (updated.gongfa.current) {
     const currentGongFa = updated.gongfa.current;
@@ -125,19 +179,18 @@ function setCurrentGongFa(id: string): void {
       ? Math.max(0, Date.now() - currentGongFa.time)
       : 0;
     const timeArr = new TimeArray(elapsedMs);
-    const addExp = timeArr.toZhouTian() * 1000;
+    const addExp =
+      timeArr.toZhouTian() * 1000 * getLingGenExpRate(currentGongFa, linggen);
     currentGongFa.exp += addExp;
     currentGongFa.time = Date.now();
-    const currentAdds = currentGongFa.attr;
-    if (currentAdds) {
-      (Object.keys(currentAdds) as (keyof ActorDataConfigForZhanDou)[])
-        .filter((k) => k !== 'xianyuan')
-        .forEach((key) => {
-          const k = key as keyof AddAttrType;
-          updated.addAttr[k] =
-            (updated.addAttr[k] || 0) - (currentAdds[key] || 0);
-        });
-    }
+    const currentAdds = getEffectiveAttr(currentGongFa, linggen);
+    (Object.keys(currentAdds) as (keyof ActorDataConfigForZhanDou)[]).forEach(
+      (key) => {
+        const k = key as keyof AddAttrType;
+        updated.addAttr[k] =
+          (updated.addAttr[k] || 0) - (currentAdds[key] || 0);
+      }
+    );
     const existingIndex = updated.gongfa.ls.findIndex(
       (v) => v.id === currentGongFa.id
     );
@@ -152,15 +205,11 @@ function setCurrentGongFa(id: string): void {
   const newGongfa = { ...gf, time: Date.now() };
   updated.gongfa.current = newGongfa;
 
-  const adds = newGongfa.attr;
-  if (adds) {
-    (Object.keys(adds) as (keyof ActorDataConfigForZhanDou)[])
-      .filter((k) => k !== 'xianyuan')
-      .forEach((key) => {
-        const k = key as keyof AddAttrType;
-        updated.addAttr[k] = (updated.addAttr[k] || 0) + (adds[key] || 0);
-      });
-  }
+  const adds = getEffectiveAttr(newGongfa, linggen);
+  (Object.keys(adds) as (keyof ActorDataConfigForZhanDou)[]).forEach((key) => {
+    const k = key as keyof AddAttrType;
+    updated.addAttr[k] = (updated.addAttr[k] || 0) + (adds[key] || 0);
+  });
   set(current, updated);
 }
 
@@ -177,9 +226,11 @@ function putCurrentGongfa(): Promise<boolean> {
   if (currentGongFa) {
     const updated = cloneDeep(acData);
     const gf = updated.gongfa.current;
+    const { linggen } = updated;
     const elapsedMs = gf?.time ? Math.max(0, Date.now() - gf.time) : 0;
     const timeArr = new TimeArray(elapsedMs);
-    const addExp = timeArr.toZhouTian() * 1000;
+    const addExp =
+      timeArr.toZhouTian() * 1000 * getLingGenExpRate(gf!, linggen);
     gf!.exp += addExp;
     const existingIndex = updated.gongfa.ls.findIndex((v) => v.id === gf!.id);
     if (existingIndex === -1) {
@@ -189,15 +240,13 @@ function putCurrentGongfa(): Promise<boolean> {
     }
     updated.gongfa.current = null;
     state = true;
-    const adds = gf!.attr;
-    if (adds) {
-      (Object.keys(adds) as (keyof ActorDataConfigForZhanDou)[])
-        .filter((k) => k !== 'xianyuan')
-        .forEach((key) => {
-          const k = key as keyof AddAttrType;
-          updated.addAttr[k] = (updated.addAttr[k] || 0) - (adds[key] || 0);
-        });
-    }
+    const adds = getEffectiveAttr(gf!, linggen);
+    (Object.keys(adds) as (keyof ActorDataConfigForZhanDou)[]).forEach(
+      (key) => {
+        const k = key as keyof AddAttrType;
+        updated.addAttr[k] = (updated.addAttr[k] || 0) - (adds[key] || 0);
+      }
+    );
     set(current, updated);
   } else {
     set(current, acData);

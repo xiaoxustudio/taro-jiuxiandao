@@ -177,6 +177,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   chengjiu?: AchievementData; // 成就数据
   battleCount?: number; // 战斗次数
   winStreak?: number; // 连胜次数
+  shilianPlaces?: string[]; // 已通关试炼地点
   rebirthReward?: RebirthReward[]; // 重生奖励
   rebirthKeepConfig?: RebirthKeepConfig; // 重生保留配置
   lunhuiCount?: number; // 轮回次数

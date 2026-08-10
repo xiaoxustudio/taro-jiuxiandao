@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash-es/cloneDeep';
 import achievementConfig from '@/assets/chengjiu.json';
+import { REALM_ORDER } from '@/assets/const';
 import {
   AchievementItem,
   AchievementCategory,
@@ -64,18 +65,8 @@ export const checkCondition = (
     case 'realm':
       currentValue = actor?.[field] || '';
       if (typeof currentValue === 'string') {
-        const realmOrder = [
-          '练气',
-          '筑基',
-          '结丹',
-          '元婴',
-          '化神',
-          '返虚',
-          '合体',
-          '大乘'
-        ];
-        const currentIndex = realmOrder.indexOf(currentValue);
-        const targetIndex = realmOrder.indexOf(target);
+        const currentIndex = REALM_ORDER.indexOf(currentValue);
+        const targetIndex = REALM_ORDER.indexOf(target as string);
         return currentIndex >= targetIndex;
       }
       return false;
@@ -135,6 +126,13 @@ export const updateAchievementProgress = (
       achievement.progress = progress[achievement.condition.field];
     } else if (achievement.condition.type === 'level') {
       achievement.progress = actor?.lv || 0;
+    } else if (achievement.condition.type === 'realm') {
+      const currentIndex = REALM_ORDER.indexOf(actor?.jingjie);
+      const targetIndex = REALM_ORDER.indexOf(
+        achievement.condition.target as string
+      );
+      achievement.progress =
+        currentIndex >= 0 && currentIndex >= targetIndex ? 1 : 0;
     }
   });
   return updatedData;

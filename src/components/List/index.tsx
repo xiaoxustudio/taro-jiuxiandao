@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 import JXSpace, { JXSpaceProps } from '../Space';
+import Text from '../Text';
 import styles from './index.module.less';
 import ListItem from './list-item';
 
@@ -15,22 +16,27 @@ export interface ListItemData {
 interface ListProps extends JXSpaceProps {
   list: ListItemData[];
   noFlex?: boolean;
+  emptyText?: string;
 }
 
-function List({ list, noFlex }: ListProps) {
+function List({ list, noFlex, emptyText = '暂无数据' }: ListProps) {
   return (
     <JXSpace
       className={classNames(styles.List, noFlex && styles.ListNoFlex)}
       direction='vertical'
     >
-      {list.map((v, index) => (
-        <ListItem
-          key={`list-item__${v.key}-${index}`}
-          title={v.title}
-          value={v.value}
-          click={() => v.click?.(v)}
-        />
-      ))}
+      {list.length ? (
+        list.map((v, index) => (
+          <ListItem
+            key={`list-item__${v.key}-${index}`}
+            title={v.title}
+            value={v.value}
+            click={() => v.click?.(v)}
+          />
+        ))
+      ) : (
+        <Text color='#999'>{emptyText}</Text>
+      )}
     </JXSpace>
   );
 }

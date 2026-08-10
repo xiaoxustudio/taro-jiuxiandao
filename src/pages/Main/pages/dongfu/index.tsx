@@ -21,6 +21,7 @@ import {
   safeNumber
 } from '@/utils';
 import chuwu from '@/utils/chuwu';
+import { checkAchievements } from '@/utils/chengjiuHelper';
 import {
   ActorDataConfigForZhanDou,
   CWType,
@@ -31,13 +32,13 @@ import useModal from '@/hooks/useModal';
 import './index.less';
 
 export default function Dongfu() {
-  const { get, set } = useActorController();
+  const { get, set, actor } = useActorController();
 
   const [blNum, setBlNum] = useState(0); // 补灵数量
   const { state: stateBuling } = useModal(); // 补灵
   const { state: stateShengjie } = useModal(); // 升阶
   const { state: stateDaolv } = useModal(); // 道侣
-  const lv = useMemo(() => get('dongfu').lv, [get]);
+  const lv = useMemo(() => actor?.dongfu?.lv ?? 1, [actor]);
   const pjMemo = useMemo(() => `${numberToChinese(lv)}阶`, [lv]);
 
   const lingshi = useMemo(
@@ -48,11 +49,11 @@ export default function Dongfu() {
 
   const needUpLingshi = useMemo(() => Math.ceil(lv ** 1.5 * 200), [lv]);
 
-  const daolv = useMemo(() => get('dongfu').daolv, [get]);
+  const daolv = useMemo(() => actor?.dongfu?.daolv ?? null, [actor]);
 
   const daolvMarket = useMemo(() => {
     const today = getCurrentDate();
-    const raw = get('dongfu').daolvMarket || null;
+    const raw = actor?.dongfu?.daolvMarket || null;
     if (!raw || raw.date !== today) {
       return {
         date: today,
@@ -65,13 +66,13 @@ export default function Dongfu() {
       refreshCount: number;
       candidates: DaoLvCandidate[];
     };
-  }, [get]);
+  }, [actor]);
 
   const isTodayShuangXiu = useMemo(() => {
     const today = getCurrentDate();
-    const last = get('dongfu').shuangxiu?.date;
+    const last = actor?.dongfu?.shuangxiu?.date;
     return last === today;
-  }, [get]);
+  }, [actor]);
 
   const calcBreakupLingshi = useCallback(
     (oldDaoLv: Partial<DaoLvCandidate> | null | undefined) => {
@@ -265,6 +266,7 @@ export default function Dongfu() {
         applyDelta(candidate.attr, 1);
         set('addAttr', nextAddAttr);
         set('dongfu.daolv', candidate);
+        checkAchievements(get, set, actor);
         stateDaolv.setVisiableModal(false);
       };
 
@@ -328,7 +330,7 @@ export default function Dongfu() {
         }
       });
     },
-    [calcBreakupLingshi, get, set, stateDaolv]
+    [actor, calcBreakupLingshi, get, set, stateDaolv]
   );
 
   const handleDropDaoLv = useCallback(() => {

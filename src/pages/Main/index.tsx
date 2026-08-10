@@ -2,7 +2,7 @@ import { cloneDeep, round } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import title from '@/assets/logo.png';
 import {
   Box,
@@ -42,12 +42,16 @@ import { ActorDataConfig, CWType } from '@/types';
 import { GongFaType } from '@/types/gongfa';
 import { dfGrades, dyGrades, XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
-import { createDefaultLingShou, LINGSHOU_BONUS_RATE } from '@/utils/lingshou';
-import { checkAchievements } from '@/utils/chengjiuHelper';
+import { createDefaultLingShou } from '@/utils/lingshou';
+import {
+  checkAchievements,
+  checkLunhuiAchievements
+} from '@/utils/chengjiuHelper';
 import styles from './index.module.less';
 
 function Main() {
   const { get, set, actor } = useActorController();
+  const rebirthPromptedRef = useRef(false);
   const [tujianVisible, setTujianVisible] = useState(false);
   const [tujianTab, setTujianTab] = useState<'dy' | 'df' | 'gf'>('dy');
   const [tujianGrade, setTujianGrade] = useState('全部');
@@ -132,7 +136,7 @@ function Main() {
     }
   }, [get, set]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const xiulian = useMemo(() => get('xiulian') ?? 0, [get]);
+  const xiulian = useMemo(() => actor?.xiulian ?? 0, [actor]);
   const canRed = useMemo(
     () => get('xiuwei') >= get('max_xiuwei'),
     [get, actor] //eslint-disable-line
@@ -153,9 +157,9 @@ function Main() {
         }
       },
       {
-        name: '炼器',
+        name: '仙缘',
         click() {
-          JXToast('开发中，敬请期待').show();
+          navigateTo('Main/pages/xianyuan/index');
         }
       },
       {
@@ -207,35 +211,50 @@ function Main() {
             Math.round((get('baoji') || 0) + 0.1 * lv1)
           );
 
-          const updates = {
-            lv: newLv,
-            xiuwei: calcXiuwei,
-            max_xiuwei: calc,
-            sudu: calcSudu,
-            jingjie2: nextJingjie2,
-            jingjie1: nextJingjie1,
-            gongji: calcGongji,
-            qixue: calcQixue,
-            fashu: calcFashu,
-            fangyu: calcFangyu,
-            baoji: calcBaoji
-          };
-          useActorStore.setState((state) => {
-            const { current: curr } = useStore.getState();
-            const currentActor = state.actors[curr];
-            if (!currentActor) return state;
-            return {
-              ...state,
-              actors: {
-                ...state.actors,
-                [curr]: { ...currentActor, ...updates }
-              }
-            };
+          JXModal.confirm({
+            title: '升阶确认',
+            content: (
+              <JXSpace direction='vertical'>
+                <Text>修为已满，是否进行升阶？</Text>
+                <Text>升阶后等级：Lv.{newLv}</Text>
+                <Text>
+                  升阶后境界：{nextJingjie1}
+                  {nextJingjie2}
+                </Text>
+              </JXSpace>
+            ),
+            onConfirm() {
+              const updates = {
+                lv: newLv,
+                xiuwei: calcXiuwei,
+                max_xiuwei: calc,
+                sudu: calcSudu,
+                jingjie2: nextJingjie2,
+                jingjie1: nextJingjie1,
+                gongji: calcGongji,
+                qixue: calcQixue,
+                fashu: calcFashu,
+                fangyu: calcFangyu,
+                baoji: calcBaoji
+              };
+              useActorStore.setState((state) => {
+                const { current: curr } = useStore.getState();
+                const currentActor = state.actors[curr];
+                if (!currentActor) return state;
+                return {
+                  ...state,
+                  actors: {
+                    ...state.actors,
+                    [curr]: { ...currentActor, ...updates }
+                  }
+                };
+              });
+              checkAchievements(get, set, actor);
+              JXToast().show(
+                `目前气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
+              );
+            }
           });
-          checkAchievements(get, set, actor);
-          JXToast().show(
-            `目前气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
-          );
         }
       },
       {
@@ -382,6 +401,11 @@ function Main() {
                   } as ActorDataConfig;
                   useActorStore.getState().set(daohao, nextActor);
                   useStore.getState().set(daohao);
+                  checkLunhuiAchievements(
+                    get,
+                    set,
+                    nextActor as ActorDataConfig
+                  );
                   JXToast(`轮回成功！当前第 ${newLunhuiCount} 世`).show();
                   setTimeout(
                     () => navigateTo('Main/index', { all: true }),
@@ -430,52 +454,73 @@ function Main() {
               JXToast(`缺少${needGrade}以上丹药，请先炼制对应丹药！`).show();
               return;
             }
-            chuwu.Remove({ name: matchedPill.name, type: CWType.DY, num: 1 });
-            const jj = JingJieTransform(get('jingjie'));
-            const prevJingjie = get('jingjie');
-            set('jingjie1', '一阶');
-            set('jingjie2', '初期');
-            set('jingjie', jj);
-            if (jj === '筑基' && prevJingjie === '练气' && !get('lingShou')) {
-              set('lingShou', createDefaultLingShou(0));
-              JXToast('突破筑基，灵兽感应降临！').show();
-            }
-            const lv1 = get('lv') / 20 + 1;
-            const calcGongji = Math.round(
-              get('gongji') * (1 + 0.08 * lv1) + tpdata.add.gongji * 0.5
-            );
-            const calcQixue = Math.round(
-              get('qixue') * (1 + 0.08 * lv1) + tpdata.add.qixue * 0.5
-            );
-            const calcFashu = Math.round(
-              get('fashu') * (1 + 0.08 * lv1) + (tpdata.add.fashu ?? 0) * 0.5
-            );
-            const calcFangyu = Math.round(
-              get('fangyu') * (1 + 0.08 * lv1) +
-                ((tpdata as any).add.fangyu || 0) * 0.5
-            );
-            const calcBaoji = Math.min(
-              80,
-              Math.round((get('baoji') || 0) + 0.1 * lv1)
-            );
-            set('gongji', calcGongji);
-            set('qixue', calcQixue);
-            set('fashu', calcFashu);
-            set('fangyu', calcFangyu);
-            set('baoji', calcBaoji);
-            const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
-            set('max_shouyuan', addShouyuan);
-            const newMax = (cw?.max || 30) + 10;
-            set('cw', { ...cw, max: newMax });
-            checkAchievements(
-              get,
-              set,
-              useActorStore.getState().actors[useStore.getState().current] ||
-                actor
-            );
-            JXToast(
-              `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
-            ).show();
+            JXModal.confirm({
+              title: '突破确认',
+              content: (
+                <JXSpace direction='vertical'>
+                  <Text>即将突破至下一大境界，需消耗丹药：</Text>
+                  <Text>{matchedPill.name} × 1</Text>
+                </JXSpace>
+              ),
+              onConfirm() {
+                chuwu.Remove({
+                  name: matchedPill.name,
+                  type: CWType.DY,
+                  num: 1
+                });
+                const jj = JingJieTransform(get('jingjie'));
+                const prevJingjie = get('jingjie');
+                set('jingjie1', '一阶');
+                set('jingjie2', '初期');
+                set('jingjie', jj);
+                if (
+                  jj === '筑基' &&
+                  prevJingjie === '练气' &&
+                  !get('lingShou')
+                ) {
+                  set('lingShou', createDefaultLingShou(0));
+                  JXToast('突破筑基，灵兽感应降临！').show();
+                }
+                const lv1 = get('lv') / 20 + 1;
+                const calcGongji = Math.round(
+                  get('gongji') * (1 + 0.08 * lv1) + tpdata.add.gongji * 0.5
+                );
+                const calcQixue = Math.round(
+                  get('qixue') * (1 + 0.08 * lv1) + tpdata.add.qixue * 0.5
+                );
+                const calcFashu = Math.round(
+                  get('fashu') * (1 + 0.08 * lv1) +
+                    (tpdata.add.fashu ?? 0) * 0.5
+                );
+                const calcFangyu = Math.round(
+                  get('fangyu') * (1 + 0.08 * lv1) +
+                    ((tpdata as any).add.fangyu || 0) * 0.5
+                );
+                const calcBaoji = Math.min(
+                  80,
+                  Math.round((get('baoji') || 0) + 0.1 * lv1)
+                );
+                set('gongji', calcGongji);
+                set('qixue', calcQixue);
+                set('fashu', calcFashu);
+                set('fangyu', calcFangyu);
+                set('baoji', calcBaoji);
+                const addShouyuan = get('max_shouyuan') + tpdata.add.shouyuan;
+                set('max_shouyuan', addShouyuan);
+                const newMax = (cw?.max || 30) + 10;
+                set('cw', { ...cw, max: newMax });
+                checkAchievements(
+                  get,
+                  set,
+                  useActorStore.getState().actors[
+                    useStore.getState().current
+                  ] || actor
+                );
+                JXToast(
+                  `突破至：${jj}，寿元：${addShouyuan}，储物上限：${newMax}\n气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
+                ).show();
+              }
+            });
           } else {
             JXToast(`未达到大圆满，请先提升小境界！`).show();
           }
@@ -501,6 +546,12 @@ function Main() {
             confirmText: '知道了'
           });
         }
+      },
+      {
+        name: '灵兽',
+        click() {
+          navigateTo('Main/pages/lingshou/index');
+        }
       }
     ];
   const operaterOptions2: {
@@ -518,42 +569,6 @@ function Main() {
       name: '储物',
       click() {
         navigateTo('Main/pages/chuwu/index');
-      }
-    },
-    {
-      name: '灵兽',
-      click() {
-        const ls = get('lingShou') as any;
-        if (!ls) {
-          JXModal.alert({
-            title: '灵兽',
-            content: <Text>尚未获得灵兽。突破至筑基后将获得灵兽。</Text>,
-            confirmText: '知道了'
-          });
-          return;
-        }
-        JXModal.alert({
-          title: ls.name,
-          content: (
-            <JXSpace direction='vertical'>
-              <Text>等级：{ls.lv}</Text>
-              <Text>
-                经验：{ls.exp}/{ls.maxExp}
-              </Text>
-              <Text>气血：{ls.qixue}</Text>
-              <Text>攻击：{ls.gongji}</Text>
-              <Text>防御：{ls.fangyu}</Text>
-              <Box style={{ height: 4 }} />
-              <Text size={14} bold>
-                战斗加成（{Math.round(LINGSHOU_BONUS_RATE * 100)}%）
-              </Text>
-              <Text>气血 +{Math.round(ls.qixue * LINGSHOU_BONUS_RATE)}</Text>
-              <Text>攻击 +{Math.round(ls.gongji * LINGSHOU_BONUS_RATE)}</Text>
-              <Text>防御 +{Math.round(ls.fangyu * LINGSHOU_BONUS_RATE)}</Text>
-            </JXSpace>
-          ),
-          confirmText: '知道了'
-        });
       }
     },
 
@@ -634,7 +649,7 @@ function Main() {
   }, [get, set, tujianVisible]);
 
   const danfangList = useMemo(() => {
-    const pool = get('danfangPoolByGrade') as Record<string, any[]> | undefined;
+    const pool = actor?.danfangPoolByGrade as Record<string, any[]> | undefined;
     if (!pool) return [];
     const map = new Map<string, { name: string; itype?: string }>();
     Object.values(pool).forEach((items) => {
@@ -647,10 +662,10 @@ function Main() {
       });
     });
     return [...map.values()];
-  }, [get]);
+  }, [actor]);
 
   const danyaoList = useMemo(() => {
-    const cw = get('cw') as
+    const cw = actor?.cw as
       | { dy: { name: string; itype?: string }[] }
       | undefined;
     if (cw?.dy?.length) {
@@ -668,10 +683,10 @@ function Main() {
       return [...map.values()];
     }
     return [];
-  }, [get]);
+  }, [actor]);
 
   const gongfaList = useMemo(() => {
-    const pool = get('gongfaPoolByGrade') as Record<string, any[]> | undefined;
+    const pool = actor?.gongfaPoolByGrade as Record<string, any[]> | undefined;
     if (pool && Object.keys(pool).length) {
       const map = new Map<string, { name: string; itype?: string }>();
       Object.entries(pool).forEach(([grade, items]) => {
@@ -686,8 +701,8 @@ function Main() {
       });
       return [...map.values()];
     }
-    const list = (get('gongfa.ls') || []) as GongFaType[];
-    const current = get('gongfa.current') as GongFaType | null;
+    const list = (actor?.gongfa?.ls || []) as GongFaType[];
+    const current = actor?.gongfa?.current as GongFaType | null;
     const map = new Map<string, { name: string; itype?: string }>();
     const addGongfa = (gf?: GongFaType | null) => {
       if (!gf?.name) return;
@@ -698,7 +713,7 @@ function Main() {
     list.forEach(addGongfa);
     addGongfa(current);
     return [...map.values()];
-  }, [get]);
+  }, [actor]);
 
   const tujianList = useMemo(() => {
     if (tujianTab === 'dy') return danyaoList;
@@ -853,7 +868,9 @@ function Main() {
 
     const dfLingchi = get('dongfu') ? get('dongfu').lingchi : 0;
 
-    const zhoutian = new TimeArray(Date.now() - xiulian.time).toZhouTian();
+    const zhoutian = new TimeArray(
+      Date.now() - (xiulian ? xiulian.time : Date.now())
+    ).toZhouTian();
 
     const basePerHour = needAddXiuWeiJJ * 0.01;
     const shouldGetXiu = basePerHour * 24 * jjRate * xlBeilv;
@@ -968,7 +985,12 @@ function Main() {
         }
         const newShouyuan = Math.max(0, Math.min(currentShouyuan, maxShouyuan));
         rawSet('shouyuan', newShouyuan);
-        if (newShouyuan <= 0 && (freshGet('shouyuan') || 0) <= 0) {
+        if (
+          newShouyuan <= 0 &&
+          (freshGet('shouyuan') || 0) <= 0 &&
+          !rebirthPromptedRef.current
+        ) {
+          rebirthPromptedRef.current = true;
           JXModal.show({
             visible: true,
             title: '重生',
@@ -992,7 +1014,6 @@ function Main() {
 
     tick();
     const id = setInterval(tick, 60000);
-    // rawSet('xiuwei', 9999999);
     return () => clearInterval(id);
   }, [freshGet, rawSet]);
 

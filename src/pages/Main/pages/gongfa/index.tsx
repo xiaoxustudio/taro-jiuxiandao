@@ -13,13 +13,20 @@ import { GongFaType } from '@/types/gongfa';
 import { AddAttrType, ActorDataConfigForZhanDou } from '@/types/actor';
 import useActorController from '@/hooks/useActorController';
 import useValue, { IUseValueNotState } from '@/hooks/useValue';
-import { putCurrentGongfa, setCurrentGongFa } from '@/utils/gongfa';
+import {
+  getEffectiveAttr,
+  getLingGenExpRate,
+  getLingGenMatch,
+  putCurrentGongfa,
+  setCurrentGongFa
+} from '@/utils/gongfa';
 import { TimeArray } from '@/utils';
 import './index.less';
 
 function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
-  const { get } = useActorController();
-  const list = useMemo<GongFaType[]>(() => get('gongfa.ls'), [get]);
+  const { actor } = useActorController();
+  const list = useMemo<GongFaType[]>(() => actor?.gongfa?.ls ?? [], [actor]);
+  const linggen = (actor?.linggen as string) || '';
   const [, setSelectCache] = useState(''); // 添加状态用于刷新视图
   const selectGongfa = (id: string) => {
     if (id === select.value) {
@@ -33,20 +40,32 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 
   return (
     <>
-      {list.map((v: GongFaType) => (
-        <JXSpace
-          flexOne
-          key={v.id}
-          data-id={v.id}
-          data-state={v.id === select.value}
-          onClick={() => selectGongfa(v.id)}
-        >
-          <Text inline bold={v.id === select.value}>
-            {v.name}({v.pj})
-          </Text>
-          <Text inline>{v.id === select.value && <Text>已选中</Text>}</Text>
-        </JXSpace>
-      ))}
+      {list.map((v: GongFaType) => {
+        const match = getLingGenMatch(v, linggen);
+        const matchMap: Record<string, { label: string; color: string }> = {
+          match: { label: '契合', color: '#4caf50' },
+          conflict: { label: '冲突', color: '#999' },
+          common: { label: '通用', color: '#1890ff' }
+        };
+        const matchInfo = matchMap[match] || matchMap.common;
+        return (
+          <JXSpace
+            flexOne
+            key={v.id}
+            data-id={v.id}
+            data-state={v.id === select.value}
+            onClick={() => selectGongfa(v.id)}
+          >
+            <Text inline bold={v.id === select.value}>
+              {v.name}({v.pj})
+            </Text>
+            <Text inline color={matchInfo.color}>
+              {matchInfo.label}
+            </Text>
+            <Text inline>{v.id === select.value && <Text>已选中</Text>}</Text>
+          </JXSpace>
+        );
+      })}
     </>
   );
 }
@@ -55,6 +74,7 @@ export default function Gongfa() {
   const { get, set, actor } = useActorController();
   const [, select] = useValue('', true);
   const [refresh, setRefresh] = useState(0); // 添加状态用于强制刷新组件
+  const linggen = (actor?.linggen as string) || '';
   const current = useMemo<GongFaType | null>(
     () => get('gongfa.current'),
     [actor, get, refresh] // eslint-disable-line
@@ -63,8 +83,12 @@ export default function Gongfa() {
   const shouldGetExp = useMemo(() => {
     if (!current?.time) return 0;
     const elapsedMs = Math.max(0, Date.now() - current.time);
-    return new TimeArray(elapsedMs).toZhouTian() * 1000;
-  }, [current]);
+    return (
+      new TimeArray(elapsedMs).toZhouTian() *
+      1000 *
+      getLingGenExpRate(current, linggen)
+    );
+  }, [current, linggen]);
 
   const xiuxi = () => {
     JXModal.confirm({
@@ -92,7 +116,7 @@ export default function Gongfa() {
       const keys = Object.keys(
         updatedGongfa.attr || {}
       ) as (keyof ActorDataConfigForZhanDou)[];
-      const oldAttr = { ...updatedGongfa.attr };
+      const oldAttr = getEffectiveAttr(updatedGongfa, linggen);
       keys.forEach((key) => {
         if (updatedGongfa.attr[key]) {
           const increment =
@@ -103,10 +127,9 @@ export default function Gongfa() {
       });
       const currentAddAttr = get('addAttr') || ({} as AddAttrType);
       const nextAddAttr = { ...currentAddAttr };
+      const nextAttr = getEffectiveAttr(updatedGongfa, linggen);
       keys.forEach((key) => {
-        const delta =
-          (updatedGongfa.attr[key] || 0) -
-          ((oldAttr as typeof updatedGongfa.attr)[key] || 0);
+        const delta = (nextAttr[key] || 0) - (oldAttr[key] || 0);
         const k = key as keyof AddAttrType;
         nextAddAttr[k] = (nextAddAttr[k] || 0) + delta;
       });
@@ -115,7 +138,7 @@ export default function Gongfa() {
     updatedGongfa.time = Date.now();
     set('gongfa.current', updatedGongfa);
     JXToast(`冲击功法${updatedGongfa.name}：+${shouldGetExp}`).show();
-  }, [current, shouldGetExp, set, get]); // eslint-disable-line
+  }, [current, shouldGetExp, set, get, linggen]); // eslint-disable-line
 
   return (
     <Container

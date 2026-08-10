@@ -8,6 +8,7 @@ export default defineAppConfig({
     'pages/Main/pages/chuwu/index',
     'pages/Main/pages/actor-info/index',
     'pages/Main/pages/fangshi/index',
+    'pages/Main/pages/xianyuan/index',
     'pages/Main/pages/fabao/index',
     'pages/Main/pages/shilian-list/index',
     'pages/Main/pages/shilian/index',
@@ -15,6 +16,7 @@ export default defineAppConfig({
     'pages/Main/pages/gongfa/index',
     'pages/Main/pages/dongfu/index',
     'pages/Main/pages/yaoyuan/index',
+    'pages/Main/pages/lingshou/index',
     'pages/Main/pages/chengjiu/index',
     'pages/Main/pages/rebirth/index'
   ],

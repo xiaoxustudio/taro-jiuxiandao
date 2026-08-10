@@ -47,7 +47,16 @@ export default function Chengjiu() {
       gongfaCount: get('gongfa.ls')?.length || 0,
       fabaoCount: Object.values(get('fabao') || {}).filter(Boolean).length,
       danfangCount: get('danfang')?.length || 0,
-      qiandaoStreak: get('qiandao.streak') || 0
+      qiandaoStreak: get('qiandao.streak') || 0,
+      shilianCount: get('battleCount') || 0,
+      shilianPlaceCount: (get('shilianPlaces') as string[])?.length || 0,
+      lunhuiCount: get('lunhuiCount') || 0,
+      lingshouLv: get('lingShou')?.lv || 0,
+      yaoyuanPlots: ((get('yaoyuan')?.plots || []) as any[]).filter(
+        (p) => p.unlocked
+      ).length,
+      daolvCount: get('dongfu')?.daolv ? 1 : 0,
+      danweiTitleIndex: get('liandan')?.danyun || 0
     };
 
     const updated = updateAchievementProgress(data, actor, progress);
