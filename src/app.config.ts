@@ -17,6 +17,7 @@ export default defineAppConfig({
     'pages/Main/pages/dongfu/index',
     'pages/Main/pages/yaoyuan/index',
     'pages/Main/pages/lingshou/index',
+    'pages/Main/pages/lianqi/index',
     'pages/Main/pages/chengjiu/index',
     'pages/Main/pages/rebirth/index'
   ],

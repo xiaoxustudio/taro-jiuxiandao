@@ -1,8 +1,9 @@
 import cloneDeep from 'lodash-es/cloneDeep';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { BaseType, CWType } from '@/types';
+import { BaseType, CWType, DYItemType, FBItemType, QTItemType } from '@/types';
 import danfangData from '@/assets/danfang.json';
+import type { DanfangData } from '@/types/danfang';
 import { getActor } from './actor';
 /* 角色储物相关操作 */
 
@@ -11,6 +12,8 @@ export interface AddProps extends BaseType {
   type: CWType;
   [k: string]: any;
 }
+
+type CwArray = FBItemType[] & DYItemType[] & QTItemType[];
 
 export interface OperaterType {
   name: string;
@@ -85,11 +88,13 @@ function Remove(item: OperaterType) {
   const currentNum = cwArray[existingIndex]?.num ?? 1;
   const lessNum = currentNum - (item.num || 0);
   if (lessNum <= 0) {
-    updated.cw[typeKey] = cwArray.filter((_, i) => i !== existingIndex) as any;
+    updated.cw[typeKey] = cwArray.filter(
+      (_, i) => i !== existingIndex
+    ) as CwArray;
   } else {
     updated.cw[typeKey] = cwArray.map((v, i) =>
       i === existingIndex ? { ...v, num: lessNum } : v
-    ) as any;
+    ) as CwArray;
   }
   set(current, updated);
 }
@@ -145,9 +150,9 @@ function Add({
     if (totalSlots >= (updated.cw.max || 30)) {
       return false;
     }
-    cwArray.push(baseObject as any);
+    cwArray.push(baseObject);
   }
-  updated.cw[typeKey] = cwArray as any;
+  updated.cw[typeKey] = cwArray as CwArray;
   set(current, updated);
   return true;
 }
@@ -176,31 +181,31 @@ function AddDanFang(id: string) {
  */
 function UsePill(name: string): boolean {
   // 统一丹药效果查找链：danfang.json → danfangData缓存 → 储物attr
-  const entry = Object.values(danfangData as Record<string, any>).find(
-    (v: any) => v.name === name && v.attr
+  const entry = Object.values(danfangData).find(
+    (v) => v.name === name && v.attr
   );
   let attr: Record<string, number> | undefined;
   if (entry?.attr) {
-    attr = entry.attr as Record<string, number>;
+    attr = entry.attr;
   }
   // 如果静态数据没找到，尝试从角色的丹方缓存中查找
   if (!attr) {
     const acData = getActor();
-    const danfangDataCache = (acData as Record<string, any>).danfangData;
+    const danfangDataCache = acData.danfangData;
     if (danfangDataCache) {
-      const cachedEntry = Object.values(
-        danfangDataCache as Record<string, any>
-      ).find((v: any) => v.name === name && v.attr);
+      const cachedEntry = Object.values(danfangDataCache as DanfangData).find(
+        (v) => v.name === name && v.attr
+      );
       if (cachedEntry?.attr) {
-        attr = cachedEntry.attr as Record<string, number>;
+        attr = cachedEntry.attr;
       }
     }
   }
   // 最后从储物中的丹药本身查找
   if (!attr) {
     const item = Get({ name, type: CWType.DY });
-    if (item && (item as any).attr) {
-      attr = (item as any).attr as Record<string, number>;
+    if (item && 'attr' in item && item.attr) {
+      attr = item.attr as Record<string, number>;
     }
   }
   if (!attr) return false;
@@ -217,9 +222,9 @@ function UsePill(name: string): boolean {
       const maxShenshi = updated.max_shenshi || 100;
       updated.shenshi = Math.min((updated.shenshi || 0) + val, maxShenshi);
     } else {
-      const currentVal = (updated as any)[key];
+      const currentVal = (updated as unknown as Record<string, unknown>)[key];
       if (typeof currentVal === 'number') {
-        (updated as any)[key] = currentVal + val;
+        (updated as unknown as Record<string, unknown>)[key] = currentVal + val;
       }
     }
   });
@@ -230,11 +235,11 @@ function UsePill(name: string): boolean {
     const item = cwArray[idx];
     const newNum = (item.num || 1) - 1;
     if (newNum <= 0) {
-      updated.cw[typeKey] = cwArray.filter((_, i) => i !== idx) as any;
+      updated.cw[typeKey] = cwArray.filter((_, i) => i !== idx) as CwArray;
     } else {
       updated.cw[typeKey] = cwArray.map((v, i) =>
         i === idx ? { ...v, num: newNum } : v
-      ) as any;
+      ) as CwArray;
     }
   }
   set(current, updated);

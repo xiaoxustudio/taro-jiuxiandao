@@ -149,11 +149,15 @@ export function pickMaterialNameByGrade(params: {
   return pool[rnd(0, Math.max(0, pool.length - 1))]?.name || '妖丹';
 }
 
-export function resolveMaterialPoolByGrade(params: {
-  get: (key: string, defaultValue?: any) => any;
-  set: (key: string, data: any) => void;
-  storageGetSync: (key?: string) => any;
-}): MaterialPoolByGrade | undefined {
+interface PoolResolver {
+  get: (key: string, defaultValue?: unknown) => unknown;
+  set: (key: string, data: unknown) => void;
+  storageGetSync: (key?: string) => unknown;
+}
+
+export function resolveMaterialPoolByGrade(
+  params: PoolResolver
+): MaterialPoolByGrade | undefined {
   let materialPoolByGrade = params.get('materialPoolByGrade') as
     | MaterialPoolByGrade
     | undefined;
@@ -167,12 +171,12 @@ export function resolveMaterialPoolByGrade(params: {
         const loaded = params.storageGetSync(key);
         if (!Array.isArray(loaded)) return;
         if (loaded.length && typeof loaded[0] === 'string') {
-          next[grade] = (loaded as any[]).map((name) => ({
+          next[grade] = loaded.map((name: string) => ({
             name,
             itype: grade
           }));
         } else {
-          next[grade] = loaded as any;
+          next[grade] = loaded;
         }
       });
       if (Object.keys(next).length) {
@@ -184,11 +188,7 @@ export function resolveMaterialPoolByGrade(params: {
   return materialPoolByGrade;
 }
 
-export function resolveDanfangPoolByGrade(params: {
-  get: (key: string, defaultValue?: any) => any;
-  set: (key: string, data: any) => void;
-  storageGetSync: (key?: string) => any;
-}) {
+export function resolveDanfangPoolByGrade(params: PoolResolver) {
   let danfangPoolByGrade = params.get('danfangPoolByGrade') as
     | Record<string, any[]>
     | undefined;
@@ -201,7 +201,7 @@ export function resolveDanfangPoolByGrade(params: {
       Object.entries(keys).forEach(([grade, key]) => {
         const loaded = params.storageGetSync(key);
         if (!Array.isArray(loaded)) return;
-        next[grade] = loaded as any[];
+        next[grade] = loaded;
       });
       if (Object.keys(next).length) {
         danfangPoolByGrade = next;
@@ -212,11 +212,7 @@ export function resolveDanfangPoolByGrade(params: {
   return danfangPoolByGrade;
 }
 
-export function resolveSeedRegistry(params: {
-  get: (key: string, defaultValue?: any) => any;
-  set: (key: string, data: any) => void;
-  storageGetSync: (key?: string) => any;
-}) {
+export function resolveSeedRegistry(params: PoolResolver) {
   let seedRegistry = params.get('seedRegistry') as
     | SeedRegistryItem[]
     | undefined;
@@ -225,7 +221,7 @@ export function resolveSeedRegistry(params: {
     if (key) {
       const loaded = params.storageGetSync(key);
       if (Array.isArray(loaded)) {
-        seedRegistry = loaded as SeedRegistryItem[];
+        seedRegistry = loaded;
         params.set('seedRegistry', seedRegistry);
       }
     }

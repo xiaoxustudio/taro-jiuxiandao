@@ -1,5 +1,6 @@
 import { random } from 'lodash-es';
 import danfangData from '@/assets/danfang.json';
+import type { DanfangItem } from '@/types/danfang';
 import { CWType, FabaoPinjie } from '@/types';
 import {
   faBaoTierConfig,
@@ -163,9 +164,9 @@ const createFaBaoList = (): FangshiItem[] =>
  */
 export const createDanYaoList = (): FangshiItem[] =>
   danfangIds.map((id) => {
-    const base = danfangData[id] as any;
-    const cl = (base?.cl ?? []) as [string, number][];
-    const time = (base?.time ?? []) as number[];
+    const base = danfangData[id] as unknown as DanfangItem;
+    const { cl } = base;
+    const { time } = base;
     return {
       ...base,
       cl,

@@ -1,6 +1,13 @@
 import cloneDeep from 'lodash-es/cloneDeep';
+import type { ActorDataConfig, YaoyuanPlot } from '@/types';
 import type { AchievementItem, AchievementData } from '@/types/chengjiu';
 import { updateAchievementProgress, checkCondition } from './chengjiu';
+
+interface ActorCtx {
+  get(key: string): any;
+  set(key: string, v: unknown): void;
+  actor?: Partial<ActorDataConfig>;
+}
 
 /**
  * 检查并更新成就进度
@@ -8,7 +15,11 @@ import { updateAchievementProgress, checkCondition } from './chengjiu';
  * @param set - 设置角色数据的函数
  * @param actor - 角色数据
  */
-export const checkAchievements = (get: any, set: any, actor: any) => {
+export const checkAchievements = (
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor']
+) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
@@ -23,7 +34,7 @@ export const checkAchievements = (get: any, set: any, actor: any) => {
     shilianPlaceCount: (get('shilianPlaces') as string[])?.length || 0,
     lunhuiCount: get('lunhuiCount') || 0,
     lingshouLv: get('lingShou')?.lv || 0,
-    yaoyuanPlots: ((get('yaoyuan')?.plots || []) as any[]).filter(
+    yaoyuanPlots: ((get('yaoyuan')?.plots || []) as YaoyuanPlot[]).filter(
       (p) => p.unlocked
     ).length,
     daolvCount: get('dongfu')?.daolv ? 1 : 0,
@@ -42,9 +53,9 @@ export const checkAchievements = (get: any, set: any, actor: any) => {
  * @param isWin - 是否胜利
  */
 export const checkBattleAchievements = (
-  get: any,
-  set: any,
-  actor: any,
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor: ActorCtx['actor'],
   isWin: boolean
 ) => {
   const chengjiu = get('chengjiu');
@@ -70,7 +81,11 @@ export const checkBattleAchievements = (
  * @param set - 设置角色数据的函数
  * @param actor - 角色数据
  */
-export const checkCollectionAchievements = (get: any, set: any, actor: any) => {
+export const checkCollectionAchievements = (
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor']
+) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
@@ -91,9 +106,9 @@ export const checkCollectionAchievements = (get: any, set: any, actor: any) => {
  * @param actor - 角色数据
  */
 export const checkCultivationAchievements = (
-  get: any,
-  set: any,
-  actor: any
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor']
 ) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
@@ -111,7 +126,10 @@ export const checkCultivationAchievements = (
  * @param get - 获取角色数据的函数
  * @param set - 设置角色数据的函数
  */
-export const checkQiandaoAchievements = (get: any, set: any) => {
+export const checkQiandaoAchievements = (
+  get: ActorCtx['get'],
+  set: ActorCtx['set']
+) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
@@ -149,7 +167,11 @@ export const checkQiandaoAchievements = (get: any, set: any) => {
  * @param set - 设置角色数据的函数
  * @param actor - 角色数据
  */
-export const checkSocialAchievements = (get: any, set: any, actor: any) => {
+export const checkSocialAchievements = (
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor']
+) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
@@ -162,9 +184,9 @@ export const checkSocialAchievements = (get: any, set: any, actor: any) => {
 };
 
 export const checkShilianAchievements = (
-  get: any,
-  set: any,
-  actor: any,
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor'],
   dfName?: string
 ) => {
   const chengjiu = get('chengjiu');
@@ -186,7 +208,11 @@ export const checkShilianAchievements = (
   set('chengjiu', updated);
 };
 
-export const checkLunhuiAchievements = (get: any, set: any, actor: any) => {
+export const checkLunhuiAchievements = (
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor']
+) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 
@@ -198,7 +224,11 @@ export const checkLunhuiAchievements = (get: any, set: any, actor: any) => {
   set('chengjiu', updated);
 };
 
-export const checkLingShouAchievements = (get: any, set: any, actor: any) => {
+export const checkLingShouAchievements = (
+  get: ActorCtx['get'],
+  set: ActorCtx['set'],
+  actor?: ActorCtx['actor']
+) => {
   const chengjiu = get('chengjiu');
   if (!chengjiu) return;
 

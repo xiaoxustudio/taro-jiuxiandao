@@ -163,6 +163,12 @@ function Main() {
         }
       },
       {
+        name: '炼器',
+        click() {
+          navigateTo('Main/pages/lianqi/index');
+        }
+      },
+      {
         name: '法宝',
         click() {
           navigateTo('Main/pages/fabao/index');
