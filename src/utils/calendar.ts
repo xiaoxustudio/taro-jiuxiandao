@@ -4,7 +4,7 @@ export { TimeArray };
 
 export const currentTime = () => Date.now();
 
-export function getXiuxianCalendar(startAt: number, flow = 1) {
+function getXiuxianCalendar(startAt: number, flow = 1) {
   const base =
     typeof startAt === 'number' && startAt > 0 ? startAt : Date.now();
   const ms = Math.max(0, (Date.now() - base) * Math.max(0.01, flow));

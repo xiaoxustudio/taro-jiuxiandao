@@ -60,7 +60,7 @@ const rollbackStoredKeys = async (keys: string[]) => {
   await Promise.allSettled(keys.map((k) => storageRemove(k)));
 };
 
-const pickRarity = (p: number) => {
+export const pickRarity = (p: number) => {
   if (p < 0.5) return dyRarityLevels[0];
   if (p < 0.75) return dyRarityLevels[1];
   if (p < 0.9) return dyRarityLevels[2];
@@ -87,8 +87,9 @@ export const createDefaultYaoyuanPlots = (
     seed: null
   }));
 
-const createInitialSeeds = (registry: ReturnType<typeof createSeedRegistry>) =>
-  registry.slice(0, 2).map((item) => ({ ...item, num: 1 }));
+export const createInitialSeeds = (
+  registry: ReturnType<typeof createSeedRegistry>
+) => registry.slice(0, 2).map((item) => ({ ...item, num: 1 }));
 
 const dfNameSuffixPool = [
   '玄',

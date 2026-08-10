@@ -14,11 +14,13 @@ import styles from './index.module.less';
 export interface JXModalProps extends ModalProps {
   className: string;
   okText: string;
-  cancleText: string;
+  cancelText: string;
   onOk: () => void;
   onCancel: () => void;
   disableOk: boolean;
-  disableCancle: boolean;
+  disableCancel: boolean;
+  cancleText?: string;
+  disableCancle?: boolean;
   controller: ReturnType<typeof useModal>['state'];
 }
 
@@ -28,14 +30,18 @@ function JXModal({
   visible,
   actions,
   okText = '确认',
-  cancleText = '取消',
+  cancelText,
+  cancleText,
   disableOk = false,
-  disableCancle = false,
+  disableCancel,
+  disableCancle,
   onOk = () => {},
   onCancel = () => {},
   controller,
   ...props
 }: PropsWithChildren<Partial<JXModalProps>>) {
+  const finalCancelText = cancelText ?? cancleText ?? '取消';
+  const finalDisableCancel = disableCancel ?? disableCancle ?? false;
   const visibleMemo = useMemo(() => {
     const v =
       controller?.visiableModal !== undefined
@@ -56,10 +62,10 @@ function JXModal({
         onClick: onOk
       });
     }
-    if (!disableCancle) {
+    if (!finalDisableCancel) {
       defaultActions.push({
         key: 'cancle',
-        text: cancleText,
+        text: finalCancelText,
         disabled: false,
         className: styles.MadalCancle,
         onClick: onCancel
@@ -71,7 +77,15 @@ function JXModal({
     }
 
     return defaultActions;
-  }, [cancleText, disableCancle, disableOk, okText, onOk, onCancel, actions]);
+  }, [
+    finalCancelText,
+    finalDisableCancel,
+    disableOk,
+    okText,
+    onOk,
+    onCancel,
+    actions
+  ]);
 
   return (
     <Modal
@@ -89,6 +103,9 @@ function JXModal({
 
 JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
   const action: Action[] = [];
+  const finalCancelText = props.cancelText ?? props.cancleText ?? '取消';
+  const finalDisableCancel =
+    props.disableCancel ?? props.disableCancle ?? false;
 
   if (props.disableOk !== true) {
     action.push({
@@ -99,10 +116,10 @@ JXModal.show = (props: Partial<ModalShowProps & JXModalProps>) => {
       onClick: props.onOk
     });
   }
-  if (props.disableCancle !== true) {
+  if (!finalDisableCancel) {
     action.push({
       key: 'cancle',
-      text: props.cancleText || '取消',
+      text: finalCancelText,
       disabled: false,
       className: styles.MadalCancle,
       onClick: props.onCancel

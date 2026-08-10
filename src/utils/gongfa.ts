@@ -86,7 +86,7 @@ export function getLingGenExpRate(
   return 1;
 }
 
-export function getLingGenAttrRate(
+function getLingGenAttrRate(
   gf: Pick<GongFaType, 'lg'>,
   linggen: string
 ): number {

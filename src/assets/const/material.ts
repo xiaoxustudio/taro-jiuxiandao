@@ -25,7 +25,6 @@ export const clGradePrice: Record<(typeof clGrades)[number], [number, number]> =
     八品: [64000, 160000]
   };
 
-export const MATERIAL_INIT_COUNT = 1000;
 export const ACTOR_POOL_CONFIG = {
   countPerGrade: 20,
   gongfaCountPerGrade: 30

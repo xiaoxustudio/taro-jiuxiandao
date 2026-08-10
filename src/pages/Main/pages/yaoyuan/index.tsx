@@ -21,21 +21,16 @@ import {
   MaterialPoolByGrade,
   SeedRegistryItem
 } from '@/assets/const';
+import {
+  createDefaultYaoyuanPlots,
+  createInitialSeeds,
+  getYaoyuanTotalSlots
+} from '@/services/actorGenerator';
 import chuwu from '@/utils/chuwu';
 import { checkAchievements } from '@/utils/chengjiuHelper';
 import { numberToChinese, TimeArray } from '@/utils';
 import { CWType, YaoyuanData } from '@/types';
 import './index.less';
-
-const getPlotSlotCount = (lv: number) => Math.min(100, 2 + Math.max(0, lv - 1));
-
-const createDefaultPlots = (totalSlots: number, unlockedCount = 2) =>
-  Array.from({ length: totalSlots }, (_, index) => ({
-    id: index + 1,
-    lv: 1,
-    unlocked: index < unlockedCount,
-    seed: null
-  }));
 
 const ensurePlotSlots = (plots: YaoyuanData['plots'], totalSlots: number) => {
   if (plots.length >= totalSlots) return plots;
@@ -50,9 +45,6 @@ const ensurePlotSlots = (plots: YaoyuanData['plots'], totalSlots: number) => {
   }
   return next;
 };
-
-const createInitialSeeds = (registry: SeedRegistryItem[]) =>
-  registry.slice(0, 2).map((item) => ({ ...item, num: 1 }));
 
 const getRemainingMs = (
   seed: SeedRegistryItem & { plantTime: number },
@@ -101,10 +93,10 @@ export default function Yaoyuan() {
   useEffect(() => {
     const current = (get('yaoyuan') as YaoyuanData | null) || null;
     const baseLv = current?.lv ?? 1;
-    const totalSlots = getPlotSlotCount(baseLv);
+    const totalSlots = getYaoyuanTotalSlots(baseLv);
     const nextPlots = current?.plots?.length
       ? ensurePlotSlots(current.plots, totalSlots)
-      : createDefaultPlots(totalSlots);
+      : createDefaultYaoyuanPlots(totalSlots);
 
     const materialPoolByGrade = get('materialPoolByGrade') as
       | MaterialPoolByGrade
@@ -296,7 +288,7 @@ export default function Yaoyuan() {
       return;
     }
     const nextLv = lv + 1;
-    const nextTotalSlots = getPlotSlotCount(nextLv);
+    const nextTotalSlots = getYaoyuanTotalSlots(nextLv);
     const nextPlots = ensurePlotSlots(yaoyuan.plots, nextTotalSlots);
     updateYaoyuan({ ...yaoyuan, lv: nextLv, plots: nextPlots });
     stateUpgrade.setVisiableModal(false);

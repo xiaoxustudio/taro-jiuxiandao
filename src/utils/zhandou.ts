@@ -30,7 +30,7 @@ export const STAGE_INDEX_MAP: Record<string, number> = {
   圆满: 3,
   大圆满: 4
 };
-export const STAGE_COEF_MAP: Record<string, number> = {
+const STAGE_COEF_MAP: Record<string, number> = {
   初期: 1.0,
   中期: 1.12,
   后期: 1.25,
