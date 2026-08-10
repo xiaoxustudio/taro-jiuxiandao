@@ -105,6 +105,16 @@ export interface LingShouData {
  * @description: 角色属性
  * @return {*}
  */
+export type ZongmenData = {
+  name: string;
+  level: number;
+  exp: number;
+  maxExp: number;
+  members: string[];
+  gongxian: number;
+  lastTaskDate?: string;
+};
+
 export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   uuid: string; // 唯一id
   daohao: string; // 道号
@@ -181,4 +191,5 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   rebirthReward?: RebirthReward[]; // 重生奖励
   rebirthKeepConfig?: RebirthKeepConfig; // 重生保留配置
   lunhuiCount?: number; // 轮回次数
+  zongmen?: ZongmenData;
 }

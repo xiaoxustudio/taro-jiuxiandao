@@ -9,6 +9,7 @@ export default defineAppConfig({
     'pages/Main/pages/actor-info/index',
     'pages/Main/pages/fangshi/index',
     'pages/Main/pages/xianyuan/index',
+    'pages/Main/pages/zongmen/index',
     'pages/Main/pages/fabao/index',
     'pages/Main/pages/shilian-list/index',
     'pages/Main/pages/shilian/index',

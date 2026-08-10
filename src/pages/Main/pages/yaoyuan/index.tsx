@@ -3,13 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Container,
   JXButton,
-  JXInput,
   JXModal,
   JXSpace,
   JXToast,
   Text
 } from '@/components';
 import JXGrid from '@/components/Grid';
+import TujianModal from '@/components/TujianModal';
 import useModal from '@/hooks/useModal';
 import useActorController from '@/hooks/useActorController';
 import {
@@ -23,7 +23,7 @@ import {
 } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import { checkAchievements } from '@/utils/chengjiuHelper';
-import { getGradeColor, numberToChinese, TimeArray } from '@/utils';
+import { numberToChinese, TimeArray } from '@/utils';
 import { CWType, YaoyuanData } from '@/types';
 import './index.less';
 
@@ -81,8 +81,6 @@ export default function Yaoyuan() {
   const [activePlotId, setActivePlotId] = useState<number | null>(null);
   const [selectedSeedName, setSelectedSeedName] = useState('');
   const [tujianVisible, setTujianVisible] = useState(false);
-  const [tujianGrade, setTujianGrade] = useState('全部');
-  const [tujianKeyword, setTujianKeyword] = useState('');
   const [, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 10000);
@@ -169,14 +167,6 @@ export default function Yaoyuan() {
     [activePlotId, plots]
   );
   const unlockCost = useMemo(() => (plot ? plot.id * 1000 : 0), [plot]);
-  const filteredSeedRegistry = useMemo(() => {
-    const keyword = tujianKeyword.trim();
-    return seedRegistry.filter((item) => {
-      if (tujianGrade !== '全部' && item.itype !== tujianGrade) return false;
-      if (keyword && !item.name?.includes(keyword)) return false;
-      return true;
-    });
-  }, [seedRegistry, tujianGrade, tujianKeyword]);
 
   const handleOpenPlot = useCallback(
     (id: number) => {
@@ -515,59 +505,13 @@ export default function Yaoyuan() {
           )}
         </JXSpace>
       </JXModal>
-      <JXModal
+      <TujianModal
         visible={tujianVisible}
-        cancleText='关闭'
-        onCancel={() => setTujianVisible(false)}
-        closeOnMaskClick
-        disableOk
-        content={
-          <JXSpace direction='vertical' gap={10}>
-            <JXSpace between>
-              <Text size={18} bold>
-                种子图鉴
-              </Text>
-            </JXSpace>
-            <View style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {['全部', ...clGrades].map((grade) => (
-                <JXButton
-                  key={grade}
-                  size='mini'
-                  disabled={tujianGrade === grade}
-                  onClick={() => setTujianGrade(grade)}
-                >
-                  {grade}
-                </JXButton>
-              ))}
-            </View>
-            <JXInput
-              placeholder='按名称搜索'
-              value={tujianKeyword}
-              onChange={(val) => setTujianKeyword(val)}
-            />
-            <View style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-              {filteredSeedRegistry.length ? (
-                <JXGrid columns={4} gap={8} height={200}>
-                  {filteredSeedRegistry.map((item, index) => (
-                    <JXGrid.Item
-                      key={`${item.name}-${item.itype}-${index}`}
-                      align='center'
-                    >
-                      <JXSpace direction='vertical' gap={2}>
-                        <Text>{item.name}</Text>
-                        <Text color={getGradeColor(item.itype) || '#888'}>
-                          {item.itype}
-                        </Text>
-                      </JXSpace>
-                    </JXGrid.Item>
-                  ))}
-                </JXGrid>
-              ) : (
-                <Text color='#888'>暂无种子数据</Text>
-              )}
-            </View>
-          </JXSpace>
-        }
+        onClose={() => setTujianVisible(false)}
+        get={get}
+        set={set}
+        actor={actor}
+        seeds={seedRegistry}
       />
     </Container>
   );
