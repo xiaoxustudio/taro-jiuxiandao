@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import useStorageStore from '@/services/storage';
@@ -11,29 +12,24 @@ import { GongFaType } from '@/types/gongfa';
  * @return {*}
  */
 function useActorController() {
-  const { current, set: setCurrent } = useStore();
-  const { actors } = useActorStore();
-  const actorKeys = useMemo(() => Object.keys(actors), [actors]);
+  const current = useStore((s) => s.current);
+  const setCurrent = useStore((s) => s.set);
+  const actorKeys = useActorStore(useShallow((s) => Object.keys(s.actors)));
   const resolvedKey = useMemo(() => {
-    if (current && actors[current]) {
+    if (current && actorKeys.includes(current)) {
       return current;
     }
     return actorKeys[0] || '';
-  }, [actorKeys, actors, current]);
-  const actor = useMemo(
-    () => (resolvedKey ? actors[resolvedKey] : undefined),
-    [resolvedKey, actors]
+  }, [actorKeys, current]);
+  const actor = useActorStore((s) =>
+    resolvedKey ? s.actors[resolvedKey] : undefined
   );
 
   useEffect(() => {
-    if (
-      (!current || !actors[current]) &&
-      resolvedKey &&
-      resolvedKey !== current
-    ) {
+    if ((!current || !actor) && resolvedKey && resolvedKey !== current) {
       setCurrent(resolvedKey);
     }
-  }, [actors, current, resolvedKey, setCurrent]);
+  }, [actor, current, resolvedKey, setCurrent]);
 
   const loadingRef = useRef<string | null>(null);
 

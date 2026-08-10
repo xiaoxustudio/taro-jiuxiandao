@@ -220,6 +220,8 @@ export default function Shilian() {
     end: true, // 是否战斗结束
     can: false // 是否可以开始战斗
   });
+  const MAX_LOG_SIZE = 100;
+  const MAX_HISTORY_SIZE = 50;
   const endRef = useRef(HuiheState.end);
   const guajiLockRef = useRef(false);
   const autoBattleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -318,7 +320,7 @@ export default function Shilian() {
               </>
             )
           }
-        ]
+        ].slice(-MAX_LOG_SIZE)
       }));
       return defender;
     },
@@ -336,7 +338,7 @@ export default function Shilian() {
             {
               text: <>势尽力竭，你踉跄后退终究倒下。眼前一黑，此战以败收场…</>
             }
-          ]
+          ].slice(-MAX_LOG_SIZE)
         }));
         clearInterval(timer.current!);
         setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
@@ -354,7 +356,7 @@ export default function Shilian() {
                 rounds,
                 result: '负'
               }
-            ]
+            ].slice(-MAX_HISTORY_SIZE)
           }));
           currentGuajiFightRoundsRef.current = 0;
         }
@@ -471,7 +473,7 @@ export default function Shilian() {
             {
               text: <>战斗结束</>
             }
-          ]
+          ].slice(-MAX_LOG_SIZE)
         }));
         clearInterval(timer.current!);
         chuwu.Add(clData);
@@ -541,7 +543,7 @@ export default function Shilian() {
                 rounds,
                 result: '胜'
               }
-            ]
+            ].slice(-MAX_HISTORY_SIZE)
           }));
           currentGuajiFightRoundsRef.current = 0;
         }
@@ -800,7 +802,7 @@ export default function Shilian() {
             </>
           )
         }
-      ]
+      ].slice(-MAX_LOG_SIZE)
     }));
     const seq = fightSeqRef.current;
     setTimeout(() => {

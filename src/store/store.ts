@@ -16,7 +16,8 @@ const useStore = create<StoreParams>()(
     {
       name: 'store',
       storage: createJSONStorage(createPersistStorage),
-      version: 1
+      version: 1,
+      migrate: (persisted) => persisted as StoreParams
     }
   )
 );

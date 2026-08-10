@@ -63,6 +63,7 @@ const useActorStore = create<ActorStore>()(
       name: 'actor',
       storage: createJSONStorage(createPersistStorage),
       version: 1,
+      migrate: (persisted) => persisted as ActorStore,
       partialize: (state) => ({
         actors: Object.fromEntries(
           Object.entries(state.actors).map(([key, actor]) => [

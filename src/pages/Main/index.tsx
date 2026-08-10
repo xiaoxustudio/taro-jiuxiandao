@@ -175,29 +175,29 @@ function Main() {
             JXToast(`目前已达到大圆满，请寻找机缘突破！`).show();
             return;
           }
-          const newLv = get('lv') + 1;
+          const curLv = get('lv');
+          const newLv = curLv + 1;
           const jjBase = getLingQiForJingJie();
           const jjIdx = getLingQiToNumber();
           const logFactor = 1 + Math.log(Math.max(1, newLv)) / 12;
           const calc = Math.ceil(jjBase * (1 + jjIdx * 0.3) * logFactor);
-          set('lv', newLv);
-          set('xiuwei', Math.ceil(get('xiuwei') - get('max_xiuwei')));
-          set('max_xiuwei', calc);
-          const lv1 = get('lv') / 20 + 1;
-          if (get('jingjie') !== '练气') {
-            const calcSudu = Math.round(get('sudu') * (1 + 0.003 * lv1));
-            set('sudu', calcSudu);
-          }
+          const lv1 = newLv / 20 + 1;
+
+          const calcXiuwei = Math.ceil(get('xiuwei') - get('max_xiuwei'));
           const nextJingjie2 = JingJie2Transform(get('jingjie2'));
-          set('jingjie2', nextJingjie2);
+          let nextJingjie1 = get('jingjie1');
           if (nextJingjie2 === '大圆满') {
             const currentJ1Num = chineseToNumber(
               (get('jingjie1') as string).replace('阶', '')
             );
             const maxDep = getJingJieMaxDep();
             const nextJ1 = Math.min(maxDep, Math.max(1, currentJ1Num + 1));
-            set('jingjie1', `${numberToChinese(nextJ1)}阶`);
+            nextJingjie1 = `${numberToChinese(nextJ1)}阶`;
           }
+          const calcSudu =
+            get('jingjie') !== '练气'
+              ? Math.round(get('sudu') * (1 + 0.003 * lv1))
+              : get('sudu');
           const calcGongji = Math.round(get('gongji') * (1 + 0.006 * lv1));
           const calcQixue = Math.round(get('qixue') * (1 + 0.01 * lv1));
           const calcFashu = Math.round(get('fashu') * (1 + 0.004 * lv1));
@@ -206,11 +206,32 @@ function Main() {
             80,
             Math.round((get('baoji') || 0) + 0.1 * lv1)
           );
-          set('gongji', calcGongji);
-          set('qixue', calcQixue);
-          set('fashu', calcFashu);
-          set('fangyu', calcFangyu);
-          set('baoji', calcBaoji);
+
+          const updates = {
+            lv: newLv,
+            xiuwei: calcXiuwei,
+            max_xiuwei: calc,
+            sudu: calcSudu,
+            jingjie2: nextJingjie2,
+            jingjie1: nextJingjie1,
+            gongji: calcGongji,
+            qixue: calcQixue,
+            fashu: calcFashu,
+            fangyu: calcFangyu,
+            baoji: calcBaoji
+          };
+          useActorStore.setState((state) => {
+            const { current: curr } = useStore.getState();
+            const currentActor = state.actors[curr];
+            if (!currentActor) return state;
+            return {
+              ...state,
+              actors: {
+                ...state.actors,
+                [curr]: { ...currentActor, ...updates }
+              }
+            };
+          });
           checkAchievements(get, set, actor);
           JXToast().show(
             `目前气血：${calcQixue}，攻击：${calcGongji}，法术：${calcFashu}`
