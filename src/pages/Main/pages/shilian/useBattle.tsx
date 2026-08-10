@@ -1,5 +1,5 @@
 import { random } from 'lodash-es';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { JXToast, Text } from '@/components';
 import {
   REALM_GRADE_WEIGHTS,
@@ -226,6 +226,51 @@ export function useBattle(
   useEffect(() => {
     isGuajiRef.current = isGuaji;
   }, [isGuaji]);
+  const guardClear = useCallback(
+    (seq: number, fn: () => void, delay = 1200) => {
+      setTimeout(() => {
+        if (fightSeqRef.current === seq) {
+          fn();
+        }
+      }, delay);
+    },
+    []
+  );
+  const pushLog = useCallback((text: ReactNode) => {
+    setHuiheState((v) => ({
+      ...v,
+      logs: [...v.logs, { text }].slice(-MAX_LOG_SIZE)
+    }));
+  }, []);
+  const endBattle = useCallback(
+    (result: 'win' | 'lose', rounds: number, ys: YaoShouZDType | null) => {
+      clearInterval(timer.current!);
+      setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+      if (isGuajiRef.current) {
+        setGuajiStats((s) => ({
+          totalRounds: s.totalRounds + rounds,
+          wins: s.wins + (result === 'win' ? 1 : 0),
+          losses: s.losses + (result === 'lose' ? 1 : 0),
+          history: [
+            ...s.history,
+            {
+              name: ys?.name ?? '',
+              df: ys?.df ?? '',
+              rounds,
+              result: result === 'win' ? '胜' : '负'
+            }
+          ].slice(-MAX_HISTORY_SIZE)
+        }));
+        currentGuajiFightRoundsRef.current = 0;
+      }
+      guardClear(fightSeqRef.current, () => {
+        setYaoShouInstance(null);
+        setYaoshouMaxQixue(0);
+      });
+      setActorInstance(null);
+    },
+    [guardClear]
+  );
   const zhandouLogic = useCallback(
     (zd1: YaoShouZDType | ActorZDType, zd2: YaoShouZDType | ActorZDType) => {
       const { isCrit, damage, fashuBonus, defender } = calcZhanDouHit(zd1, zd2);
@@ -239,112 +284,69 @@ export function useBattle(
       } else {
         setEnemyDamage({ value: damage, key: damageKey, isCrit });
       }
-      setHuiheState((v) => ({
-        ...v,
-        logs: [
-          ...v.logs,
-          {
-            text: (
-              <>
-                <Text color={attackerColor} inline>
-                  【{isEnemyAttacker ? '敌' : '我'}】
-                  {renderNameWithRealmColor(zd1.name)}
-                </Text>
-                {isCrit ? (
-                  <>
-                    乘隙爆发，重拳落下，造成
-                    <Text color='red' inline bold>
-                      {damage}
-                    </Text>
-                    点伤害
-                    {fashuBonus > 0 ? (
-                      <>
-                        （含法术
-                        <Text color='purple' inline>
-                          {fashuBonus}
-                        </Text>
-                        ）
-                      </>
-                    ) : null}
-                    ；
-                  </>
-                ) : (
-                  <>
-                    抓住空档一击，造成
-                    <Text color='red' inline>
-                      {damage}
-                    </Text>
-                    点伤害
-                    {fashuBonus > 0 ? (
-                      <>
-                        （含法术
-                        <Text color='purple' inline>
-                          {fashuBonus}
-                        </Text>
-                        ）
-                      </>
-                    ) : null}
-                    ；
-                  </>
-                )}
-                <Text color={defenderColor} inline>
-                  【{isEnemyDefender ? '敌' : '我'}】
-                  {renderNameWithRealmColor(zd2.name)}
-                </Text>
-                气血仅余
-                <Text color='red' inline>
-                  {defender.qixue}
-                </Text>
-              </>
-            )
-          }
-        ].slice(-MAX_LOG_SIZE)
-      }));
+      pushLog(
+        <>
+          <Text color={attackerColor} inline>
+            【{isEnemyAttacker ? '敌' : '我'}】
+            {renderNameWithRealmColor(zd1.name)}
+          </Text>
+          {isCrit ? (
+            <>
+              乘隙爆发，重拳落下，造成
+              <Text color='red' inline bold>
+                {damage}
+              </Text>
+              点伤害
+              {fashuBonus > 0 ? (
+                <>
+                  （含法术
+                  <Text color='purple' inline>
+                    {fashuBonus}
+                  </Text>
+                  ）
+                </>
+              ) : null}
+              ；
+            </>
+          ) : (
+            <>
+              抓住空档一击，造成
+              <Text color='red' inline>
+                {damage}
+              </Text>
+              点伤害
+              {fashuBonus > 0 ? (
+                <>
+                  （含法术
+                  <Text color='purple' inline>
+                    {fashuBonus}
+                  </Text>
+                  ）
+                </>
+              ) : null}
+              ；
+            </>
+          )}
+          <Text color={defenderColor} inline>
+            【{isEnemyDefender ? '敌' : '我'}】
+            {renderNameWithRealmColor(zd2.name)}
+          </Text>
+          气血仅余
+          <Text color='red' inline>
+            {defender.qixue}
+          </Text>
+        </>
+      );
       return defender;
     },
-    []
+    [pushLog]
   );
 
   const zhandou = useCallback(() => {
     if (ActorInstance && YaoShouInstance) {
       if (ActorInstance.qixue <= 0) {
-        setHuiheState((v) => ({
-          ...v,
-          logs: [
-            ...v.logs,
-            {
-              text: <>势尽力竭，你踉跄后退终究倒下。眼前一黑，此战以败收场…</>
-            }
-          ].slice(-MAX_LOG_SIZE)
-        }));
-        clearInterval(timer.current!);
-        setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
-        if (isGuajiRef.current) {
-          const rounds = currentGuajiFightRoundsRef.current;
-          setGuajiStats((s) => ({
-            totalRounds: s.totalRounds + rounds,
-            wins: s.wins,
-            losses: s.losses + 1,
-            history: [
-              ...s.history,
-              {
-                name: YaoShouInstance.name,
-                df: YaoShouInstance.df,
-                rounds,
-                result: '负'
-              }
-            ].slice(-MAX_HISTORY_SIZE)
-          }));
-          currentGuajiFightRoundsRef.current = 0;
-        }
-        const seq = fightSeqRef.current;
-        setTimeout(() => {
-          if (fightSeqRef.current === seq) {
-            setYaoShouInstance(null);
-            setYaoshouMaxQixue(0);
-          }
-        }, 1200);
-        setActorInstance(null);
+        pushLog(<>势尽力竭，你踉跄后退终究倒下。眼前一黑，此战以败收场…</>);
+        endBattle('lose', currentGuajiFightRoundsRef.current, YaoShouInstance);
         const currentAchievementData = get('chengjiu') || {
           achievements: {},
           claimedIds: [],
@@ -411,47 +413,28 @@ export function useBattle(
         if (slotCount >= cwMax) {
           JXToast('储物空间已满，战利品将丢失！').show();
         }
-        setHuiheState((v) => ({
-          ...v,
-          logs: [
-            ...v.logs,
-            {
-              text: (
-                <>
-                  <Text color='black' inline>
-                    {renderNameWithRealmColor(YaoShouInstance.name)}
-                  </Text>
-                  倒地不起，你收剑而立，心神一清，悟得一缕斗法之理（修为+
-                  <Text color='red' inline>
-                    {reward}
-                  </Text>
-                  ）
-                </>
-              )
-            },
-            {
-              text: (
-                <>
-                  你获得材料：{clData.name}X{clData.num}
-                </>
-              )
-            },
-            {
-              text: <>获得灵石：{lingShiDrop}</>
-            },
-            ...(seedDrop
-              ? [
-                  {
-                    text: <>获得种子：{seedDrop.name}</>
-                  }
-                ]
-              : []),
-            {
-              text: <>战斗结束</>
-            }
-          ].slice(-MAX_LOG_SIZE)
-        }));
-        clearInterval(timer.current!);
+        pushLog(
+          <>
+            <Text color='black' inline>
+              {renderNameWithRealmColor(YaoShouInstance.name)}
+            </Text>
+            倒地不起，你收剑而立，心神一清，悟得一缕斗法之理（修为+
+            <Text color='red' inline>
+              {reward}
+            </Text>
+            ）
+          </>
+        );
+        pushLog(
+          <>
+            你获得材料：{clData.name}X{clData.num}
+          </>
+        );
+        pushLog(<>获得灵石：{lingShiDrop}</>);
+        if (seedDrop) {
+          pushLog(<>获得种子：{seedDrop.name}</>);
+        }
+        pushLog(<>战斗结束</>);
         chuwu.Add(clData);
         chuwu.Add({
           name: '灵石',
@@ -505,33 +488,7 @@ export function useBattle(
           ...prev,
           [clData.name]: (prev[clData.name] || 0) + clData.num!
         }));
-        if (isGuajiRef.current) {
-          const rounds = currentGuajiFightRoundsRef.current;
-          setGuajiStats((s) => ({
-            totalRounds: s.totalRounds + rounds,
-            wins: s.wins + 1,
-            losses: s.losses,
-            history: [
-              ...s.history,
-              {
-                name: YaoShouInstance.name,
-                df: YaoShouInstance.df,
-                rounds,
-                result: '胜'
-              }
-            ].slice(-MAX_HISTORY_SIZE)
-          }));
-          currentGuajiFightRoundsRef.current = 0;
-        }
-        setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
-        const seq2 = fightSeqRef.current;
-        setTimeout(() => {
-          if (fightSeqRef.current === seq2) {
-            setYaoShouInstance(null);
-            setYaoshouMaxQixue(0);
-          }
-        }, 1200);
-        setActorInstance(null);
+        endBattle('win', currentGuajiFightRoundsRef.current, YaoShouInstance);
         const currentAchievementData = get('chengjiu') || {
           achievements: {},
           claimedIds: [],
@@ -582,6 +539,8 @@ export function useBattle(
     df.name,
     get,
     set,
+    pushLog,
+    endBattle,
     zhandouLogic
   ]);
 
@@ -663,41 +622,40 @@ export function useBattle(
     );
     const cost = Math.min(baseCost, shen);
     set('shenshi', shen - cost);
-    setHuiheState((v) => ({
-      ...v,
-      can: false,
-      end: true,
-      target: 0,
-      logs: [
-        ...v.logs,
-        {
-          text: (
-            <>
-              <Text color='blue' inline>
-                【我】{get('daohao')}
-              </Text>
-              遁光一闪，脱离战圈（神识-
-              <Text color='red' inline>
-                {cost}
-              </Text>
-              ）
-            </>
-          )
-        }
-      ].slice(-MAX_LOG_SIZE)
-    }));
-    const seq = fightSeqRef.current;
-    setTimeout(() => {
-      if (fightSeqRef.current === seq) {
+    pushLog(
+      <>
+        <Text color='blue' inline>
+          【我】{get('daohao')}
+        </Text>
+        遁光一闪，脱离战圈（神识-
+        <Text color='red' inline>
+          {cost}
+        </Text>
+        ）
+      </>
+    );
+    setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+    guardClear(
+      fightSeqRef.current,
+      () => {
         setYaoShouInstance(null);
         setYaoshouMaxQixue(0);
-      }
-    }, 800);
+      },
+      800
+    );
     setActorInstance(null);
     if (isGuajiRef.current) {
       setGuaji(false);
     }
-  }, [ActorInstance, HuiheState.end, YaoShouInstance, get, set]);
+  }, [
+    ActorInstance,
+    HuiheState.end,
+    YaoShouInstance,
+    get,
+    set,
+    guardClear,
+    pushLog
+  ]);
 
   const handleSearchYaoShouRef = useRef(handleSearchYaoShou);
   const getRef = useRef(get);

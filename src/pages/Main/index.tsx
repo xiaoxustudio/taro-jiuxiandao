@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash-es';
 import { Image } from 'antd-mobile';
 import { View } from '@tarojs/components';
 import Taro from '@tarojs/taro';
@@ -16,8 +15,6 @@ import {
 import JXGrid from '@/components/Grid';
 import TujianModal from '@/components/TujianModal';
 import useActorController from '@/hooks/useActorController';
-import useActorStore from '@/store/actor';
-import useStore from '@/store/store';
 import {
   navigateTo,
   TimeArray,
@@ -28,10 +25,18 @@ import {
 
 import { XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import styles from './index.module.less';
+import useOfflineRecover from './useOfflineRecover';
 import { calcShengjie, calcTupo, openXiulianDialog } from './operates';
 
 function Main() {
   const { get, set, actor } = useActorController();
+  const {
+    getOfflineGains,
+    getDaysElapsed,
+    calcPassiveRecover,
+    applyShenshiRecover,
+    applyDailyCost
+  } = useOfflineRecover(actor, get, set);
   const rebirthPromptedRef = useRef(false);
   const [tujianVisible, setTujianVisible] = useState(false);
   useEffect(() => {
@@ -54,21 +59,11 @@ function Main() {
   }, [get, set, actor]);
 
   useEffect(() => {
-    const lastTime = get('time1');
-    if (!lastTime) return;
-    const elapsedHours = (Date.now() - lastTime) / TimeArray.Map.hour;
-    if (elapsedHours < 1) return;
-
-    const maxShenshi = get('max_shenshi') || 0;
-    const currentShenshi = get('shenshi') || 0;
-    const shenshiRecover = Math.round(
-      Math.min(maxShenshi - currentShenshi, (maxShenshi * elapsedHours) / 6)
-    );
+    const { lastTime, elapsedHours, daysElapsed, shenshiRecover } =
+      getOfflineGains();
+    if (!lastTime || elapsedHours < 1) return;
 
     const xiulianData = get('xiulian') as { time: number } | null;
-    const daysElapsed = Math.floor(elapsedHours / 24);
-    const shouyuanCost = daysElapsed;
-
     const xiulianOfflineZhoutian = xiulianData
       ? new TimeArray(Date.now() - xiulianData.time).toZhouTian()
       : 0;
@@ -78,21 +73,15 @@ function Main() {
     ];
 
     if (shenshiRecover > 0) {
-      set('shenshi', currentShenshi + shenshiRecover);
-      set('shenshiTime', Date.now());
+      applyShenshiRecover(shenshiRecover);
       contentLines.push(
         <Text key='shenshi'>神识自动恢复：{shenshiRecover} 点</Text>
       );
     }
 
-    if (shouyuanCost > 0) {
-      const curShouyuan = Math.max(0, (get('shouyuan') || 0) - shouyuanCost);
-      set('shouyuan', curShouyuan);
-      const newTime1 = lastTime + daysElapsed * TimeArray.Map.hour * 24;
-      set('time1', Math.round(newTime1));
-      contentLines.push(
-        <Text key='shouyuan'>寿元消耗：{shouyuanCost} 天</Text>
-      );
+    if (daysElapsed > 0) {
+      applyDailyCost(daysElapsed);
+      contentLines.push(<Text key='shouyuan'>寿元消耗：{daysElapsed} 天</Text>);
     }
 
     if (xiulianData && xiulianOfflineZhoutian > 0.01) {
@@ -112,7 +101,7 @@ function Main() {
         disableOk: true
       });
     }
-  }, [get, set]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [get, getOfflineGains, applyShenshiRecover, applyDailyCost]);
 
   const xiulian = useMemo(() => actor?.xiulian ?? 0, [actor]);
   const canRed = useMemo(
@@ -267,67 +256,19 @@ function Main() {
     openXiulianDialog(actor, get, set);
   };
 
-  const freshGet = useCallback((key: string) => {
-    const { actors } = useActorStore.getState();
-    const { current: curr } = useStore.getState();
-    const ac = actors[curr];
-    if (!ac) return null;
-    return key
-      .split('.')
-      .reduce((obj: any, part: string) => obj?.[part] ?? null, ac);
-  }, []);
-
-  const rawSet = useCallback((key: string, val: any) => {
-    const storeActor = useActorStore.getState();
-    const curr = useStore.getState().current;
-    const ac = storeActor.actors[curr];
-    if (!ac) return;
-    const updated = cloneDeep(ac);
-    const parts = key.split('.');
-    let target: any = updated;
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (!target[parts[i]]) target[parts[i]] = {};
-      target = target[parts[i]];
-    }
-    target[parts[parts.length - 1]] = val;
-    useActorStore.setState((state) => ({
-      ...state,
-      actors: { ...state.actors, [curr]: updated }
-    }));
-  }, []);
-
   useEffect(() => {
     const tick = () => {
-      const maxShenShi = freshGet('max_shenshi') || 0;
-      const currentShenshi = freshGet('shenshi') || 0;
+      const maxShenShi = get('max_shenshi') || 0;
+      const currentShenshi = get('shenshi') || 0;
       if (currentShenshi < maxShenShi) {
-        const passiveRecovery = Math.max(1, Math.round(maxShenShi / 360));
-        const newShenshi = Math.min(
-          maxShenShi,
-          currentShenshi + passiveRecovery
-        );
-        rawSet('shenshi', newShenshi);
-        rawSet('shenshiTime', Date.now());
+        applyShenshiRecover(calcPassiveRecover(maxShenShi));
       }
 
-      const time1 = freshGet('time1') || Date.now();
-      const elapsedHours = (Date.now() - time1) / TimeArray.Map.hour;
-      const daysElapsed = Math.floor(elapsedHours / 24);
+      const time1 = get('time1') || Date.now();
+      const daysElapsed = getDaysElapsed(time1);
       if (daysElapsed >= 1) {
-        const advance = time1 + daysElapsed * TimeArray.Map.hour * 24;
-        rawSet('time1', Math.round(advance));
-        const maxShouyuan = freshGet('max_shouyuan') || 0;
-        let currentShouyuan = freshGet('shouyuan') || 0;
-        for (let d = 0; d < daysElapsed && currentShouyuan > 0; d++) {
-          currentShouyuan = Math.round(currentShouyuan - 1);
-        }
-        const newShouyuan = Math.max(0, Math.min(currentShouyuan, maxShouyuan));
-        rawSet('shouyuan', newShouyuan);
-        if (
-          newShouyuan <= 0 &&
-          (freshGet('shouyuan') || 0) <= 0 &&
-          !rebirthPromptedRef.current
-        ) {
+        const newShouyuan = applyDailyCost(daysElapsed);
+        if (newShouyuan <= 0 && !rebirthPromptedRef.current) {
           rebirthPromptedRef.current = true;
           JXModal.show({
             visible: true,
@@ -353,7 +294,13 @@ function Main() {
     tick();
     const id = setInterval(tick, 60000);
     return () => clearInterval(id);
-  }, [freshGet, rawSet]);
+  }, [
+    get,
+    getDaysElapsed,
+    calcPassiveRecover,
+    applyShenshiRecover,
+    applyDailyCost
+  ]);
 
   return (
     <View>
