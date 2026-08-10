@@ -90,4 +90,45 @@ const useStorageStore = create<StorageStore>(() => {
   };
 });
 
+export interface PersistStorage {
+  getItem: (name: string) => string | null;
+  setItem: (name: string, value: string) => void;
+  removeItem: (name: string) => void;
+}
+
+export const createPersistStorage = (): PersistStorage => {
+  const anyTaro = Taro as any;
+  return {
+    getItem: (name: string): string | null => {
+      if (typeof anyTaro.getStorageSync === 'function') {
+        const raw = anyTaro.getStorageSync(name);
+        if (raw == null) return null;
+        return typeof raw === 'string' ? raw : JSON.stringify(raw);
+      }
+      if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem(name);
+      }
+      return null;
+    },
+    setItem: (name: string, value: string) => {
+      if (typeof anyTaro.setStorageSync === 'function') {
+        anyTaro.setStorageSync(name, value);
+        return;
+      }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(name, value);
+      }
+    },
+    removeItem: (name: string) => {
+      if (typeof anyTaro.removeStorageSync === 'function') {
+        anyTaro.removeStorageSync(name);
+        return;
+      }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(name);
+      }
+    }
+  };
+};
+
 export default useStorageStore;

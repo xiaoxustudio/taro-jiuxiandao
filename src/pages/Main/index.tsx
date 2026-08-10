@@ -25,7 +25,6 @@ import {
   navigateTo,
   numberToChinese,
   TimeArray,
-  ZhouTian,
   formatXiuxianCalendar
 } from '@/utils';
 import {
@@ -88,7 +87,9 @@ function Main() {
     const daysElapsed = Math.floor(elapsedHours / 24);
     const shouyuanCost = daysElapsed;
 
-    const xiulianOfflineZhoutian = xiulianData ? ZhouTian(lastTime) : 0;
+    const xiulianOfflineZhoutian = xiulianData
+      ? new TimeArray(Date.now() - xiulianData.time).toZhouTian()
+      : 0;
 
     const contentLines = [
       <Text key='hours'>你离开了 {Math.round(elapsedHours)} 小时</Text>
@@ -275,12 +276,12 @@ function Main() {
                   const nextActor = {
                     ...actor,
                     lv: 1,
-                    xiuwei: initialXiuweiBonus * newLunhuiCount,
+                    xiuwei: initialXiuweiBonus,
                     max_xiuwei: 500,
-                    shenshi: 100 + maxShenshiBonus * newLunhuiCount,
-                    max_shenshi: 100 + maxShenshiBonus * newLunhuiCount,
-                    shouyuan: 100 + shouyuanBonus * newLunhuiCount,
-                    max_shouyuan: 100 + shouyuanBonus * newLunhuiCount,
+                    shenshi: 100 + maxShenshiBonus,
+                    max_shenshi: 100 + maxShenshiBonus,
+                    shouyuan: 100 + shouyuanBonus,
+                    max_shouyuan: 100 + shouyuanBonus,
                     jingjie: '练气',
                     jingjie1: '一阶',
                     jingjie2: '初期',
@@ -290,7 +291,7 @@ function Main() {
                     baoji: 2,
                     sudu: 20,
                     fashu: 0,
-                    xiulianbeilv: 10 + xiulianbeilvBonus * newLunhuiCount,
+                    xiulianbeilv: 10 + xiulianbeilvBonus,
                     addAttr: {
                       qixue: 0,
                       gongji: 0,
@@ -831,22 +832,22 @@ function Main() {
 
     const dfLingchi = get('dongfu') ? get('dongfu').lingchi : 0;
 
-    const zhoutian = ZhouTian(xiulian.time);
+    const zhoutian = new TimeArray(Date.now() - xiulian.time).toZhouTian();
 
     const basePerHour = needAddXiuWeiJJ * 0.01;
-    const shouldGetXiu = basePerHour * jjRate * xlBeilv;
+    const shouldGetXiu = basePerHour * 24 * jjRate * xlBeilv;
 
     const zhotianByzhoutian =
       Math.round(shouldGetXiu) * (0.5 + zhongzuRate + linggenRate);
 
     const baseXiu = round(zhotianByzhoutian * zhoutian * (1 + gongfaRate), 2);
-    const lingchiPerZhouTian = 1;
+    const lingchiPerZhouTian = 24;
     const consumedLingchi = Math.min(
       dfLingchi,
       Math.floor(zhoutian * lingchiPerZhouTian)
     );
     const calcXiu = round(baseXiu + consumedLingchi, 2);
-    const lingShiPerZhouTian = getLingQiToNumber() + 1;
+    const lingShiPerZhouTian = (getLingQiToNumber() + 1) * 24;
     const lingShiGain = Math.floor(zhoutian * lingShiPerZhouTian);
 
     const content = (
@@ -861,7 +862,7 @@ function Main() {
         <br />
         洞府增益：{consumedLingchi}/{dfLingchi}
         <br />
-        已修炼小周天：{ZhouTian(xiulian.time).toFixed(2)}
+        已修炼小周天：{zhoutian.toFixed(2)}
         <br />
         总获取修为合计：{calcXiu.toFixed(2)}
         <br />
@@ -1035,7 +1036,9 @@ function Main() {
           {!xiulian && <Text> 未开始修炼</Text>}
           {xiulian && (
             <JXButton size='small' transparent onClick={handleOpenXiuLian}>
-              已修炼 {ZhouTian(xiulian.time).toFixed(2)} 个小周天
+              已修炼{' '}
+              {new TimeArray(Date.now() - xiulian.time).toZhouTian().toFixed(2)}{' '}
+              个小周天
             </JXButton>
           )}
         </JXSpace>

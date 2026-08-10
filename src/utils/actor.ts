@@ -1,5 +1,6 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
+import type { ActorDataConfig } from '@/types';
 import { chineseToNumber, numberToChinese } from '.';
 
 const MAJOR_REALMS = [
@@ -43,6 +44,14 @@ function getActor() {
 }
 
 /**
+ * @description: 获取当前角色数据，不存在时返回 null
+ * @return {*}
+ */
+function getSafeActor(): ActorDataConfig | null {
+  return getActor() ?? null;
+}
+
+/**
  * @description: 判断是否有该角色
  * @param {string} name
  * @return {*}
@@ -58,9 +67,9 @@ function HasActor(name: string) {
  * @return {*}
  */
 function getLingQiToNumber() {
-  const actor = getActor();
+  const actor = getSafeActor();
   const idx = MAJOR_REALMS.indexOf(
-    actor.jingjie as (typeof MAJOR_REALMS)[number]
+    (actor?.jingjie ?? '') as (typeof MAJOR_REALMS)[number]
   );
   return idx >= 0 ? idx : 0;
 }
@@ -70,9 +79,9 @@ function getLingQiToNumber() {
  * @return {*}
  */
 function getLingQiForJingJie() {
-  const actor = getActor();
+  const actor = getSafeActor();
   const idx = MAJOR_REALMS.indexOf(
-    actor.jingjie as (typeof MAJOR_REALMS)[number]
+    (actor?.jingjie ?? '') as (typeof MAJOR_REALMS)[number]
   );
   const i = idx >= 0 ? idx : 0;
   return BASE_XIUWEI_BY_REALM[i];
@@ -83,9 +92,9 @@ function getLingQiForJingJie() {
  * @return {*}
  */
 function getLingQiForRate() {
-  const actor = getActor();
+  const actor = getSafeActor();
   const idx = MAJOR_REALMS.indexOf(
-    actor.jingjie as (typeof MAJOR_REALMS)[number]
+    (actor?.jingjie ?? '') as (typeof MAJOR_REALMS)[number]
   );
   const i = idx >= 0 ? idx : 0;
   return RATE_OF_LING_BY_REALM[i];
@@ -96,9 +105,9 @@ function getLingQiForRate() {
  * @return {*}
  */
 export const getJingJieMaxDep = () => {
-  const actor = getActor();
+  const actor = getSafeActor();
   const idx = MAJOR_REALMS.indexOf(
-    actor.jingjie as (typeof MAJOR_REALMS)[number]
+    (actor?.jingjie ?? '') as (typeof MAJOR_REALMS)[number]
   );
   const i = idx >= 0 ? idx : 0;
   return MAX_MINOR_BY_REALM[i] ?? 9;

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { createPersistStorage } from '@/services/storage';
 
 interface StoreParams {
   current: string; // 当前选择的存档
@@ -13,7 +14,9 @@ const useStore = create<StoreParams>()(
       set: (val: string) => set((state) => ({ ...state, current: val }))
     }),
     {
-      name: 'store'
+      name: 'store',
+      storage: createJSONStorage(createPersistStorage),
+      version: 1
     }
   )
 );

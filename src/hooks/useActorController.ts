@@ -162,28 +162,30 @@ function useActorController() {
    * @description: 获取属性（支持嵌套路径如 "a.b" 和单层键如 "a"）
    */
   const safeActor = useMemo(() => actor ?? ({} as ActorDataConfig), [actor]);
-  const get = useCallback(
-    (key: string, defaultValue: any = null) => {
-      // 合法性校验
-      if (/\s/.test(key)) {
-        throw new Error('Key 包含非法空格');
+  const actorRef = useRef(safeActor);
+  useEffect(() => {
+    actorRef.current = safeActor;
+  }, [safeActor]);
+
+  const get = useCallback((key: string, defaultValue: any = null) => {
+    // 合法性校验
+    if (/\s/.test(key)) {
+      throw new Error('Key 包含非法空格');
+    }
+
+    const pathParts = key.split('.');
+    let currentValue: any = actorRef.current;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const part of pathParts) {
+      if (currentValue === null || currentValue === undefined) {
+        return defaultValue;
       }
+      currentValue = currentValue[part];
+    }
 
-      const pathParts = key.split('.');
-      let currentValue: any = safeActor;
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const part of pathParts) {
-        if (currentValue === null || currentValue === undefined) {
-          return defaultValue;
-        }
-        currentValue = currentValue[part];
-      }
-
-      return currentValue ?? defaultValue;
-    },
-    [safeActor]
-  );
+    return currentValue ?? defaultValue;
+  }, []);
 
   const persistStorage = useCallback((key: string, val: any, uuid: string) => {
     const storageKeyMap: Record<string, string> = {

@@ -1,8 +1,8 @@
 import { omit } from 'lodash-es';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { ActorDataConfig } from '@/types';
-import useStorageStore from '@/services/storage';
+import useStorageStore, { createPersistStorage } from '@/services/storage';
 
 interface ActorStore {
   set: (store: string, newVal: ActorDataConfig) => void;
@@ -61,6 +61,8 @@ const useActorStore = create<ActorStore>()(
     }),
     {
       name: 'actor',
+      storage: createJSONStorage(createPersistStorage),
+      version: 1,
       partialize: (state) => ({
         actors: Object.fromEntries(
           Object.entries(state.actors).map(([key, actor]) => [

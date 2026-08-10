@@ -181,7 +181,12 @@ function putCurrentGongfa(): Promise<boolean> {
     const timeArr = new TimeArray(elapsedMs);
     const addExp = timeArr.toZhouTian() * 1000;
     gf!.exp += addExp;
-    add(gf!, false, false);
+    const existingIndex = updated.gongfa.ls.findIndex((v) => v.id === gf!.id);
+    if (existingIndex === -1) {
+      updated.gongfa.ls.push(gf!);
+    } else {
+      updated.gongfa.ls[existingIndex] = gf!;
+    }
     updated.gongfa.current = null;
     state = true;
     const adds = gf!.attr;

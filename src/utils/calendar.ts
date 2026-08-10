@@ -4,18 +4,6 @@ export { TimeArray };
 
 export const currentTime = () => Date.now();
 
-export function ZhouTian(
-  n: number,
-  limit = 12,
-  unit: 'h' | 'm' | 's' = 'h'
-): number {
-  const msDiff = Date.now() - n;
-  let divisor = 3600000;
-  if (unit === 'm') divisor = 60000;
-  if (unit === 's') divisor = 1000;
-  return Math.min(msDiff / divisor, limit);
-}
-
 export function getXiuxianCalendar(startAt: number, flow = 1) {
   const base =
     typeof startAt === 'number' && startAt > 0 ? startAt : Date.now();
