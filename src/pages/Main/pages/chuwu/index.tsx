@@ -216,17 +216,7 @@ export default function Chuwu() {
                           text: '出售换灵石',
                           onClick() {
                             const num = v.num ?? 1;
-                            chuwu.Remove({
-                              name: v.name,
-                              type: CWType.QT,
-                              num
-                            });
-                            chuwu.Add({
-                              name: '灵石',
-                              type: CWType.QT,
-                              isPile: true,
-                              num: getSellPrice(v) * num
-                            });
+                            chuwu.sellItem(v.name, v.type, getSellPrice(v));
                             JXToast(
                               `出售${v.name}，获得灵石${getSellPrice(v) * num}`
                             ).show();

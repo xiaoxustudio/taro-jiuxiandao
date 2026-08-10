@@ -10,7 +10,6 @@ import {
 } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { REALM_ORDER } from '@/assets/const';
-import { CWType } from '@/types';
 import chuwu from '@/utils/chuwu';
 import { getTotalAttr } from '@/utils';
 import './index.less';
@@ -89,10 +88,7 @@ function Feisheng() {
 
   const handleFeisheng = () => {
     const xianyuan = get('xianyuan') || 0;
-    const hasLingShi = chuwu.Has({ name: '灵石', type: CWType.QT }) !== -1;
-    const lingShi = hasLingShi
-      ? chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0
-      : 0;
+    const lingShi = chuwu.getLingshi();
     const instance = JXModal.show({
       title: '飞升',
       content: (
@@ -123,11 +119,7 @@ function Feisheng() {
                 JXToast(`灵石不足，还差${LINGSHI_COST - lingShi}`).show();
                 return;
               }
-              chuwu.Remove({
-                name: '灵石',
-                type: CWType.QT,
-                num: LINGSHI_COST
-              });
+              chuwu.payLingshi(LINGSHI_COST);
               doFeisheng();
             }}
           >

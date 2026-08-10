@@ -58,41 +58,21 @@ export default function Fangshi() {
     [snapshot, type]
   );
 
-  const sellItem = (v: FangshiItem) => {
-    if (v.isPile) {
-      const owned = chuwu.Get({ name: v.name, type: v.type as CWType });
-      if (!owned || !owned.num) {
-        JXToast('背包中无该物品').show();
-        return;
-      }
-      const price = Math.floor(v.ls * 0.5);
-      const { num } = owned;
-      chuwu.Remove({ name: v.name, type: v.type as CWType, num });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: price * num
-      });
-      setVersion((p) => p + 1);
-      JXToast(`出售${v.name}×${num}，获得灵石${price * num}`).show();
-      return;
-    }
+  const handleSell = (v: FangshiItem) => {
     const owned = chuwu.Get({ name: v.name, type: v.type as CWType });
-    if (!owned) {
+    if (!owned || !owned.num) {
       JXToast('背包中无该物品').show();
       return;
     }
     const price = Math.floor(v.ls * 0.5);
-    chuwu.Remove({ name: v.name, type: v.type as CWType });
-    chuwu.Add({
-      name: '灵石',
-      type: CWType.QT,
-      isPile: true,
-      num: price
-    });
+    const { num } = owned;
+    chuwu.sellItem(v.name, v.type as CWType, price);
     setVersion((p) => p + 1);
-    JXToast(`出售${v.name}，获得灵石${price}`).show();
+    JXToast(
+      v.isPile
+        ? `出售${v.name}×${num}，获得灵石${price * num}`
+        : `出售${v.name}，获得灵石${price}`
+    ).show();
   };
   const list = useMemo(() => {
     const targetList = currentList;
@@ -108,7 +88,7 @@ export default function Fangshi() {
               transparent
               onClick={(e) => {
                 e.stopPropagation();
-                sellItem(v);
+                handleSell(v);
               }}
             >
               出售
@@ -185,13 +165,12 @@ export default function Fangshi() {
               JXToast('已拥有该物品！').show();
               return;
             }
-            const curLS =
-              chuwu.Get({ name: '灵石', type: CWType.QT })?.num ?? 0;
+            const curLS = chuwu.getLingshi();
             if (curLS < v.ls) {
               JXToast(`灵石不足，还差${v.ls - curLS}`).show();
               return;
             }
-            chuwu.Remove({ name: '灵石', type: CWType.QT, num: v.ls });
+            chuwu.payLingshi(v.ls);
             if (action === 'danfang') {
               if (v.id) {
                 if (!(danfangData as Record<string, any>)[v.id]) {

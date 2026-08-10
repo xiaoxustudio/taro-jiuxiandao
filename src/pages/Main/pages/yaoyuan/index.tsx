@@ -273,7 +273,7 @@ export default function Yaoyuan() {
       JXToast().show('灵石不足');
       return;
     }
-    chuwu.Remove({ name: '灵石', type: CWType.QT, num: cost });
+    chuwu.payLingshi(cost);
     const nextPlots = yaoyuan.plots.map((item) =>
       item.id === plot.id ? { ...item, lv: item.lv + 1 } : item
     );
@@ -292,7 +292,7 @@ export default function Yaoyuan() {
         return;
       }
     } else if (lingshi >= needUpLingshi) {
-      chuwu.Remove({ name: '灵石', type: CWType.QT, num: needUpLingshi });
+      chuwu.payLingshi(needUpLingshi);
     } else {
       JXToast().show('灵石不足');
       return;
@@ -315,7 +315,7 @@ export default function Yaoyuan() {
       JXToast().show('灵石不足');
       return;
     }
-    chuwu.Remove({ name: '灵石', type: CWType.QT, num: unlockCost });
+    chuwu.payLingshi(unlockCost);
     const nextPlots = yaoyuan.plots.map((item) =>
       item.id === plot.id ? { ...item, unlocked: true } : item
     );

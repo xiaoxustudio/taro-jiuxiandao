@@ -23,25 +23,21 @@ export default function Fabao() {
   const handleStrengthen = useCallback(() => {
     if (!targetFB) return;
     const costLs = (targetFB.lv + 1) * 500 + 500;
-    const currentLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
+    const currentLs = chuwu.getLingshi();
     if (currentLs < costLs) {
       JXToast(`灵石不足，需要${costLs}灵石`).show();
       return;
     }
     const successRate = Math.max(0.05, 1 - targetFB.lv * 0.05);
     if (Math.random() < successRate) {
-      chuwu.Remove({ name: '灵石', type: CWType.QT, num: costLs });
+      chuwu.payLingshi(costLs);
       const updatedFB: FBItemType = { ...targetFB, lv: targetFB.lv + 1 };
       const slotName = targetFB.itype;
       const currentFabao = get('fabao');
       set('fabao', { ...currentFabao, [slotName]: updatedFB });
       JXToast(`强化成功！${targetFB.name} 提升至 +${updatedFB.lv}`).show();
     } else {
-      chuwu.Remove({
-        name: '灵石',
-        type: CWType.QT,
-        num: Math.floor(costLs * 0.5)
-      });
+      chuwu.payLingshi(Math.floor(costLs * 0.5));
       JXToast(`强化失败，消耗${Math.floor(costLs * 0.5)}灵石`).show();
     }
     updateInfo();
@@ -65,12 +61,12 @@ export default function Fabao() {
       return;
     }
     const costLs = (curIdx + 1) * 3000;
-    const currentLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
+    const currentLs = chuwu.getLingshi();
     if (currentLs < costLs) {
       JXToast(`灵石不足，需要${costLs}灵石`).show();
       return;
     }
-    chuwu.Remove({ name: '灵石', type: CWType.QT, num: costLs });
+    chuwu.payLingshi(costLs);
     const nextPj = tierOrder[curIdx + 1];
     const updatedFB: FBItemType = {
       ...targetFB,

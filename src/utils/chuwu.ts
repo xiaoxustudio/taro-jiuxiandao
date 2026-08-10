@@ -246,6 +246,29 @@ function UsePill(name: string): boolean {
   return true;
 }
 
+export function getLingshi(): number {
+  return Get({ name: '灵石', type: CWType.QT })?.num || 0;
+}
+
+export function payLingshi(num: number): boolean {
+  if (getLingshi() < num) return false;
+  Remove({ name: '灵石', type: CWType.QT, num });
+  return true;
+}
+
+export function sellItem(name: string, type: CWType, sellPrice: number): void {
+  const owned = Get({ name, type });
+  if (!owned) return;
+  const num = owned.num ?? 1;
+  Remove({ name, type, num });
+  Add({
+    name: '灵石',
+    type: CWType.QT,
+    isPile: true,
+    num: sellPrice * num
+  });
+}
+
 export default {
   Add,
   AddDanFang,
@@ -256,5 +279,8 @@ export default {
   RemoveArr,
   UsePill,
   getActor,
-  TR
+  TR,
+  getLingshi,
+  payLingshi,
+  sellItem
 };

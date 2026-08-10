@@ -45,12 +45,11 @@ function Zongmen() {
       JXToast().show('灵石不足');
       return;
     }
-    const ls = chuwu.Get({ name: '灵石', type: CWType.QT });
-    if (!ls || (ls.num || 0) < 5000) {
+    if (chuwu.getLingshi() < 5000) {
       JXToast().show('创建宗门需要 5000 灵石');
       return;
     }
-    chuwu.Remove({ name: '灵石', type: CWType.QT, num: 5000 });
+    chuwu.payLingshi(5000);
     set('zongmen', {
       name: trimmed,
       level: 1,

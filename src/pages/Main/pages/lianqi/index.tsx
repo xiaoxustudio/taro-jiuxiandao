@@ -151,11 +151,10 @@ export default function LianQi() {
       JXToast(`缺少${rule.clGrade}材料，需要${rule.clNum}个`).show();
       return;
     }
-    if (lsNum < rule.ls) {
+    if (!chuwu.payLingshi(rule.ls)) {
       JXToast(`灵石不足，需要${rule.ls}灵石`).show();
       return;
     }
-    chuwu.Remove({ name: '灵石', type: CWType.QT, num: rule.ls });
     const materials = qt.filter((v) => v.itype === rule.clGrade);
     let left = rule.clNum;
     for (const m of materials) {
