@@ -20,7 +20,8 @@ export default defineAppConfig({
     'pages/Main/pages/lingshou/index',
     'pages/Main/pages/lianqi/index',
     'pages/Main/pages/chengjiu/index',
-    'pages/Main/pages/rebirth/index'
+    'pages/Main/pages/rebirth/index',
+    'pages/Main/pages/feisheng/index'
   ],
 
   window: {

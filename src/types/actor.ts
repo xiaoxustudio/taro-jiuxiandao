@@ -90,6 +90,14 @@ export type RebirthReward = {
   value: number;
 };
 
+export type FeishengData = {
+  realm: string;
+  level: number;
+  exp: number;
+  maxExp: number;
+  power: number;
+};
+
 export interface LingShouData {
   name: string;
   lv: number;
@@ -192,4 +200,5 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
   rebirthKeepConfig?: RebirthKeepConfig; // 重生保留配置
   lunhuiCount?: number; // 轮回次数
   zongmen?: ZongmenData;
+  feisheng?: FeishengData;
 }

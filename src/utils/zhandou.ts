@@ -1,12 +1,16 @@
 import { random } from 'lodash-es';
 import type { MaterialPoolByGrade, SeedRegistryItem } from '@/assets/const';
+import type { DanfangItem } from '@/types/danfang';
+import type {
+  BuildMonsterBaseAttributesParams,
+  MonsterRawAttributes,
+  PickMaterialNameByGradeParams,
+  PoolResolver,
+  ZhanDouHitOptions,
+  ZhanDouHitResult
+} from '@/types/zhandou';
 
-export type ZhanDouHitResult<D extends { fangyu: number; qixue: number }> = {
-  isCrit: boolean;
-  damage: number;
-  fashuBonus: number;
-  defender: D;
-};
+export type { ZhanDouHitResult };
 
 export const TIER_MAP: Record<string, number> = {
   练气: 1,
@@ -40,7 +44,7 @@ export const MONSTER_NAME_PARTS = {
 export function pickWeightedIndex(
   weights: number[],
   rnd: (min: number, max: number) => number = random
-) {
+): number {
   const sum = weights.reduce((a, b) => a + b, 0) || 1;
   const r = rnd(1, sum);
   let acc = 0;
@@ -50,7 +54,7 @@ export function pickWeightedIndex(
   }
   return 0;
 }
-export function calcRealmDifficulty(tier: number) {
+export function calcRealmDifficulty(tier: number): number {
   return 1 + Math.max(0, (tier - 1) * 0.12);
 }
 export function calcWinStreakFromHistory(
@@ -63,7 +67,10 @@ export function calcWinStreakFromHistory(
   }
   return cnt;
 }
-export function compositeDifficultyCoef(tier: number, winStreak: number) {
+export function compositeDifficultyCoef(
+  tier: number,
+  winStreak: number
+): number {
   const realm = calcRealmDifficulty(tier);
   const streak = 1 + Math.min(0.25, winStreak * 0.03);
   const cap = Math.min(2.0, 1.2 + tier * 0.05);
@@ -74,17 +81,14 @@ export function calcAttrScale(
   add: number,
   weight: number,
   cap: number
-) {
+): number {
   const safeBase = Math.max(1, base);
   const ratio = Math.max(0, add / safeBase);
   return 1 + Math.min(cap, ratio * weight);
 }
-export function buildMonsterBaseAttributes(params: {
-  tier: number;
-  jj1: number;
-  jj2: string;
-  rnd?: (min: number, max: number) => number;
-}) {
+export function buildMonsterBaseAttributes(
+  params: BuildMonsterBaseAttributesParams
+): MonsterRawAttributes {
   const rnd = params.rnd ?? random;
   const j1Coef = 1 + (params.jj1 - 1) * 0.12;
   const stageCoef = STAGE_COEF_MAP[params.jj2] || 1.0;
@@ -120,13 +124,9 @@ const clGradesOrder = [
   '八品'
 ];
 
-export function pickMaterialNameByGrade(params: {
-  materialPoolByGrade?: Record<string, { name: string; itype: string }[]>;
-  registry: { name: string; itype: string }[];
-  targetGrade: string;
-  rnd?: (min: number, max: number) => number;
-  maxGradeIdx?: number;
-}) {
+export function pickMaterialNameByGrade(
+  params: PickMaterialNameByGradeParams
+): string {
   const rnd = params.rnd ?? random;
   const fromMap = params.materialPoolByGrade?.[params.targetGrade] ?? [];
   let pool = fromMap;
@@ -147,12 +147,6 @@ export function pickMaterialNameByGrade(params: {
     }
   }
   return pool[rnd(0, Math.max(0, pool.length - 1))]?.name || '妖丹';
-}
-
-interface PoolResolver {
-  get: (key: string, defaultValue?: unknown) => unknown;
-  set: (key: string, data: unknown) => void;
-  storageGetSync: (key?: string) => unknown;
 }
 
 export function resolveMaterialPoolByGrade(
@@ -188,16 +182,18 @@ export function resolveMaterialPoolByGrade(
   return materialPoolByGrade;
 }
 
-export function resolveDanfangPoolByGrade(params: PoolResolver) {
+export function resolveDanfangPoolByGrade(
+  params: PoolResolver
+): Record<string, DanfangItem[]> | undefined {
   let danfangPoolByGrade = params.get('danfangPoolByGrade') as
-    | Record<string, any[]>
+    | Record<string, DanfangItem[]>
     | undefined;
   if (!danfangPoolByGrade) {
     const keys = params.get('danfangPoolStorageKeysByGrade') as
       | Record<string, string>
       | undefined;
     if (keys && Object.keys(keys).length) {
-      const next: Record<string, any[]> = {};
+      const next: Record<string, DanfangItem[]> = {};
       Object.entries(keys).forEach(([grade, key]) => {
         const loaded = params.storageGetSync(key);
         if (!Array.isArray(loaded)) return;
@@ -212,7 +208,9 @@ export function resolveDanfangPoolByGrade(params: PoolResolver) {
   return danfangPoolByGrade;
 }
 
-export function resolveSeedRegistry(params: PoolResolver) {
+export function resolveSeedRegistry(
+  params: PoolResolver
+): SeedRegistryItem[] | undefined {
   let seedRegistry = params.get('seedRegistry') as
     | SeedRegistryItem[]
     | undefined;
@@ -239,16 +237,7 @@ export function resolveSeedRegistry(params: PoolResolver) {
 export function calcZhanDouHit<
   A extends { gongji: number; baoji: number; fashu?: number },
   D extends { fangyu: number; qixue: number }
->(
-  attacker: A,
-  defender: D,
-  options?: {
-    randomInt?: (min: number, max: number) => number;
-    critMul?: number;
-    minDamage?: number;
-    fashuMul?: number;
-  }
-) {
+>(attacker: A, defender: D, options?: ZhanDouHitOptions): ZhanDouHitResult<D> {
   const randomInt = options?.randomInt ?? random;
   const isCrit = randomInt(1, 100) <= attacker.baoji;
   const critMul = options?.critMul ?? 1.5;
