@@ -31,6 +31,7 @@ import chuwu from '@/utils/chuwu';
 import useContainer from '@/hooks/useContainer';
 import useActorController from '@/hooks/useActorController';
 import useStorageStore from '@/services/storage';
+import PageHeader from '@/components/PageHeader';
 import './index.less';
 
 export default function Fangshi() {
@@ -351,10 +352,10 @@ export default function Fangshi() {
       context={container}
       scroll
     >
-      <JXSpace between style={{ width: '100%', marginBottom: '10px' }}>
-        <Text>灵石：{lsMemo?.num || 0}</Text>
-        <Text align='right'>刷新：{refreshLeftText}</Text>
-      </JXSpace>
+      <PageHeader
+        left={<Text>灵石：{lsMemo?.num || 0}</Text>}
+        right={<Text align='right'>刷新：{refreshLeftText}</Text>}
+      />
       <JXSpace gap={10} style={{ width: '100%' }} hscroll>
         {fangshiCategories.map((item) => (
           <JXButton

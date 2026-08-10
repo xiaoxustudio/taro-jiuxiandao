@@ -19,11 +19,24 @@ interface ListProps extends JXSpaceProps {
   emptyText?: string;
 }
 
-function List({ list, noFlex, emptyText = '暂无数据' }: ListProps) {
+function List({
+  list,
+  noFlex,
+  emptyText = '暂无数据',
+  className,
+  style,
+  ...props
+}: ListProps) {
   return (
     <JXSpace
-      className={classNames(styles.List, noFlex && styles.ListNoFlex)}
+      className={classNames(
+        styles.List,
+        noFlex && styles.ListNoFlex,
+        className
+      )}
       direction='vertical'
+      style={style}
+      {...props}
     >
       {list.length ? (
         list.map((v, index) => (

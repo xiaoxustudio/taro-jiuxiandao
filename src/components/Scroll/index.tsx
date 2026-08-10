@@ -26,7 +26,7 @@ function Scroll({
   ...props
 }: PropsWithChildren<ScrollProps>) {
   const ScrollRef = useRef(null);
-  const id = useRef(`Conatiner-Header-${CreateUniqueIndex()}`);
+  const id = useRef(`Scroll-Header-${CreateUniqueIndex()}`);
   const [height, setHeight] = useState(0);
 
   const computeHeight = useCallback(

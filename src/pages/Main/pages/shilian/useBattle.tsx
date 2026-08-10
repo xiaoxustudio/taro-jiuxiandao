@@ -38,7 +38,8 @@ import {
   pickMaterialNameByGrade,
   pickWeightedIndex,
   resolveMaterialPoolByGrade,
-  splitNameByRealm
+  splitNameByRealm,
+  getTotalAttr
 } from '@/utils';
 
 export const renderNameWithRealmColor = (name: string) => {
@@ -603,14 +604,15 @@ export function useBattle(
     const lsBonus = ls
       ? getLingShouBonus(ls)
       : { gongji: 0, fangyu: 0, qixue: 0 };
+    const total = getTotalAttr(get);
     setActorInstance({
       name: get('daohao'),
-      qixue: get('qixue') + get('addAttr.qixue') + lsBonus.qixue,
-      gongji: get('gongji') + get('addAttr.gongji') + lsBonus.gongji,
-      fangyu: get('fangyu') + get('addAttr.fangyu') + lsBonus.fangyu,
-      sudu: get('sudu') + get('addAttr.sudu'),
-      baoji: Math.min(90, get('baoji') + get('addAttr.baoji')),
-      fashu: get('fashu') + get('addAttr.fashu')
+      qixue: total.qixue + lsBonus.qixue,
+      gongji: total.gongji + lsBonus.gongji,
+      fangyu: total.fangyu + lsBonus.fangyu,
+      sudu: total.sudu,
+      baoji: Math.min(90, total.baoji),
+      fashu: total.fashu
     });
 
     setHuiheState((prev) => ({

@@ -80,7 +80,7 @@ function JXModal({
       destroyOnClose
       closeOnMaskClick
       closeOnAction
-      actions={Array.isArray(actions) ? [...action, ...actions] : action}
+      actions={action}
       visible={visibleMemo}
       {...props}
     />

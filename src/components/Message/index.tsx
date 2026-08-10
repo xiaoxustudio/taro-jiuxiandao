@@ -47,5 +47,3 @@ export function JXToast(props?: JXToastProps) {
     }
   };
 }
-
-export default Toast;

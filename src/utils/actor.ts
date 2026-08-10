@@ -1,7 +1,7 @@
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
 import type { ActorDataConfig } from '@/types';
-import { chineseToNumber, numberToChinese } from '.';
+import { chineseToNumber } from '.';
 
 const MAJOR_REALMS = [
   '练气',
@@ -15,9 +15,6 @@ const MAJOR_REALMS = [
 ] as const;
 const BASE_XIUWEI_BY_REALM = [
   800, 3000, 12000, 50000, 200000, 800000, 3200000, 12800000
-];
-const RATE_OF_LING_BY_REALM = [
-  600, 1800, 5400, 16200, 48600, 145800, 437400, 1312200
 ];
 const MAX_MINOR_BY_REALM = [12, 9, 9, 9, 9, 9, 9, 9];
 
@@ -88,19 +85,6 @@ function getLingQiForJingJie() {
 }
 
 /**
- * @description: 根据境界获取修为增幅数值
- * @return {*}
- */
-function getLingQiForRate() {
-  const actor = getSafeActor();
-  const idx = MAJOR_REALMS.indexOf(
-    (actor?.jingjie ?? '') as (typeof MAJOR_REALMS)[number]
-  );
-  const i = idx >= 0 ? idx : 0;
-  return RATE_OF_LING_BY_REALM[i];
-}
-
-/**
  * @description: 获取每个境界最大小境界
  * @return {*}
  */
@@ -112,40 +96,6 @@ export const getJingJieMaxDep = () => {
   const i = idx >= 0 ? idx : 0;
   return MAX_MINOR_BY_REALM[i] ?? 9;
 };
-
-/**
- * @description: 小境界或数字转换为小境界
- * @param {string} s
- * @param {*} maxDep
- * @param {*} addNum
- * @return {*}
- */
-export function TransformToJingJie1(
-  s: string | number,
-  maxDep = 9,
-  addNum = 0
-) {
-  let current: number = 0;
-  if (typeof s === 'string') {
-    current = chineseToNumber(s);
-    if (
-      Number.isNaN(current) ||
-      (current === 0 && s.trim() !== '' && !s.includes('零'))
-    ) {
-      return s;
-    }
-  } else {
-    current = s;
-  }
-
-  let next = current + addNum;
-  if (next > maxDep) {
-    next = 1;
-  }
-
-  const nextChinese = numberToChinese(next);
-  return nextChinese ? `${nextChinese}阶` : '一阶';
-}
 
 /**
  * @description: 阶段境界转换
@@ -166,15 +116,6 @@ function JingJie2Transform(s: string) {
  */
 export const JingJie1ToNumber = (s: string) =>
   chineseToNumber(s.replace('阶', ''));
-
-/**
- * @description: 转换小境界
- * @param {string} j
- * @return {*}
- */
-const JingJie1Transform = (j: string) => {
-  return TransformToJingJie1(j, getJingJieMaxDep(), 1);
-};
 
 /**
  * @description: 转换大境界
@@ -205,10 +146,8 @@ const JingJieTransform = (j: string) => {
 export {
   getActor,
   getLingQiForJingJie,
-  getLingQiForRate,
   getLingQiToNumber,
   HasActor,
-  JingJie1Transform,
   JingJie2Transform,
   JingJieTransform
 };

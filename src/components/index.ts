@@ -6,7 +6,7 @@ export { default as JXModal } from './Modal';
 export { default as JXSpace } from './Space';
 
 // 修改
-export { JXToast, default as Toast } from './Message';
+export { JXToast } from './Message';
 export type { JXToastProps } from './Message';
 
 // 自定义组件
@@ -18,3 +18,5 @@ export { default as Paragraph } from './Paragraph';
 export { default as Text } from './Text';
 export { default as Scroll } from './Scroll';
 export { default as ItemCounter } from './ItemCounter';
+export { default as JXGrid } from './Grid';
+export { default as PageHeader } from './PageHeader';

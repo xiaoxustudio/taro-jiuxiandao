@@ -1,4 +1,3 @@
-import omit from 'lodash-es/omit';
 import cloneDeep from 'lodash-es/cloneDeep';
 import { GongFaType } from '@/types/gongfa';
 import type {
@@ -15,15 +14,6 @@ import { checkCollectionAchievements } from './chengjiuHelper';
 /* 功法相关 */
 
 /**
- * @description: 获取当前角色的功法列表
- * @return {*}
- */
-function getList(): GongFaType[] {
-  const acData = getActor();
-  return acData.gongfa.ls;
-}
-
-/**
  * @description: 根据 id 获取功法
  * @param {string} id
  * @return {*}
@@ -31,23 +21,6 @@ function getList(): GongFaType[] {
 function get(id: string): GongFaType | undefined {
   const acData = getActor();
   return acData.gongfa.ls.find((v) => v.id === id);
-}
-
-/**
- * @description: 移除指定功法（按 name 或 id）
- * @param {*} param0
- * @return {*}
- */
-function remove({ name, id }: { name?: string; id?: string }) {
-  const { set } = useActorStore.getState();
-  const { current } = useStore.getState();
-  const acData = cloneDeep(getActor());
-  if (name) {
-    acData.gongfa.ls = acData.gongfa.ls.filter((v) => v.name !== name);
-  } else if (id) {
-    acData.gongfa.ls = acData.gongfa.ls.filter((v) => v.id !== id);
-  }
-  set(current, acData);
 }
 
 /**
@@ -85,8 +58,6 @@ function add(gf: GongFaType, replace = false, checkAchievement = true) {
     );
   }
 }
-
-type GongFaTypeEx = GongFaType & { update: () => void };
 
 export type LingGenMatch = 'match' | 'conflict' | 'common';
 
@@ -139,23 +110,6 @@ export function getEffectiveAttr(
       });
   }
   return result;
-}
-
-/**
- * @description: 获取带 update 方法的功法对象（用于就地保存更新）
- * @param {string} id
- * @return {*}
- */
-function update(id: string) {
-  const gf = get(id);
-  if (gf)
-    return {
-      ...gf,
-      update(this: GongFaTypeEx) {
-        add(omit(this, 'update') as GongFaType);
-      }
-    } as GongFaTypeEx;
-  return null;
 }
 
 /**
@@ -254,13 +208,5 @@ function putCurrentGongfa(): Promise<boolean> {
   return Promise.resolve(state);
 }
 
-export {
-  getList,
-  get,
-  remove,
-  add,
-  update,
-  setCurrentGongFa,
-  putCurrentGongfa
-};
+export { get, add, setCurrentGongFa, putCurrentGongfa };
 export default {};

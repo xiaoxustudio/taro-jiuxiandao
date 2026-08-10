@@ -36,7 +36,7 @@ function Container({
   context,
   ...props
 }: PropsWithChildren<Partial<ContainerProps>>) {
-  const id = useRef(`Conatiner-Header-${CreateUniqueIndex()}`);
+  const id = useRef(`Container-Header-${CreateUniqueIndex()}`);
   const [height, setHeight] = useState(0);
 
   const handleBack = useCallback(() => {

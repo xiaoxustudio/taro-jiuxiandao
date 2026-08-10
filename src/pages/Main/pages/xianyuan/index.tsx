@@ -23,6 +23,7 @@ import useActorController from '@/hooks/useActorController';
 import useContainer from '@/hooks/useContainer';
 import { getRealmIndex } from '@/utils/fangshi';
 import { dyGrades } from '@/assets/const';
+import PageHeader from '@/components/PageHeader';
 import './index.less';
 
 const LINGGEN_OPTIONS = ['金', '木', '水', '火', '土', '风', '雷'];
@@ -307,10 +308,10 @@ export default function XianYuan() {
       context={container}
       scroll
     >
-      <JXSpace between style={{ width: '100%', marginBottom: '10px' }}>
-        <Text>仙缘：{xianyuan}</Text>
-        <Text align='right'>当前境界：{realm}</Text>
-      </JXSpace>
+      <PageHeader
+        left={<Text>仙缘：{xianyuan}</Text>}
+        right={<Text align='right'>当前境界：{realm}</Text>}
+      />
       <Scroll calc={container.calcHeight + 50} bottomBlankSpace={30}>
         {list.length ? <List list={list} noFlex /> : <Text>暂无商品</Text>}
       </Scroll>

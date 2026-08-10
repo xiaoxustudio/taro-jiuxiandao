@@ -27,8 +27,8 @@ function JXGrid({
 }
 
 export interface JXGridItemProps extends GridItemProps {
-  align: 'left' | 'right' | 'center';
-  style: CSSProperties;
+  align?: 'left' | 'right' | 'center';
+  style?: CSSProperties;
 }
 
 JXGrid.Item = function Item({

@@ -19,14 +19,8 @@ export default defineConfig<'vite'>(async (merge) => {
     },
     sourceRoot: 'src',
     outputRoot: 'dist',
-    plugins: [],
     alias: {
       '@': path.resolve(__dirname, '..', 'src')
-    },
-    defineConstants: {},
-    copy: {
-      patterns: [],
-      options: {}
     },
     framework: 'react',
     compiler: 'vite',

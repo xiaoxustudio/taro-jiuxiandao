@@ -18,7 +18,9 @@ import {
   getCurrentDate,
   getGradeColor,
   numberToChinese,
-  safeNumber
+  safeNumber,
+  getTotalAttr,
+  getRealmText
 } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import { checkAchievements } from '@/utils/chengjiuHelper';
@@ -100,13 +102,7 @@ export default function Dongfu() {
 
   const calcDaoLvAttr = useCallback(
     (quality: DaoLvQuality): Partial<ActorDataConfigForZhanDou> => {
-      const total = {
-        qixue: safeNumber(get('qixue')) + safeNumber(get('addAttr.qixue')),
-        gongji: safeNumber(get('gongji')) + safeNumber(get('addAttr.gongji')),
-        fangyu: safeNumber(get('fangyu')) + safeNumber(get('addAttr.fangyu')),
-        sudu: safeNumber(get('sudu')) + safeNumber(get('addAttr.sudu')),
-        baoji: safeNumber(get('baoji')) + safeNumber(get('addAttr.baoji'))
-      };
+      const total = getTotalAttr(get);
 
       switch (quality) {
         case '一品':
@@ -494,12 +490,7 @@ export default function Dongfu() {
             道侣：
             <Text inline style={{ color: getGradeColor(daolv.quality) }}>
               {daolv.name}（{daolv.quality}
-              {daolv.jingjie
-                ? `，${daolv.jingjie}${daolv.jingjie1 || ''}${
-                    daolv.jingjie2 || ''
-                  }`
-                : ''}
-              ）
+              {daolv.jingjie ? `，${getRealmText(daolv)}` : ''}）
             </Text>
             ，亲密度：{daolv.affinity}
           </Text>
@@ -618,12 +609,7 @@ export default function Dongfu() {
                     <Text>
                       <Text inline style={{ color: getGradeColor(c.quality) }}>
                         {c.name}（{c.quality}
-                        {c.jingjie
-                          ? `，${c.jingjie}${c.jingjie1 || ''}${
-                              c.jingjie2 || ''
-                            }`
-                          : ''}
-                        ）
+                        {c.jingjie ? `，${getRealmText(c)}` : ''}）
                       </Text>
                       ，亲密度：{c.affinity}
                     </Text>

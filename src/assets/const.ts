@@ -239,15 +239,6 @@ export const FANGSHI_CONFIG = {
 // ------------------------------
 // 材料配置
 // ------------------------------
-export const caiLiaoBaseList = [
-  { name: '洗骨花', desc: '材料，用于炼制丹药', itype: '一品', ls: 8 },
-  { name: '千叶草', desc: '材料，用于炼制丹药', itype: '一品', ls: 10 },
-  { name: '玫瑰花', desc: '材料，用于炼制丹药', itype: '一品', ls: 25 },
-  { name: '妖丹', desc: '材料，用于炼制丹药', itype: '一品', ls: 80 },
-  { name: '万灵草', desc: '材料，用于炼制丹药', itype: '三品', ls: 800 },
-  { name: '升灵石', desc: '稀有的洞府升阶材料', itype: '四品', ls: 5000 }
-];
-
 export const clNameParts = [
   ['灵', '玄', '玉', '雪', '苍', '赤', '紫', '青', '黑', '金', '霜', '炎'],
   ['心', '魄', '魂', '元', '神', '华', '纹', '影', '痕', '息', '骨', '髓'],
@@ -481,45 +472,6 @@ export const createSeedRegistry = (materials: MaterialRegistryItem[]) => {
     itype: item.itype,
     time: SEED_GROW_TIME_BY_GRADE[item.itype] ?? [0, 0, 5]
   }));
-};
-export const createMaterialPoolByGrade = (options?: {
-  seed?: string;
-  countPerGrade?: number;
-}) => {
-  const rng = createRng(options?.seed);
-  const countPerGrade =
-    options?.countPerGrade ?? ACTOR_POOL_CONFIG.countPerGrade;
-  const pool = clGrades.reduce((acc, grade) => {
-    acc[grade] = [];
-    return acc;
-  }, {} as MaterialPoolByGrade);
-  const used = new Set<string>();
-  MATERIAL_BASE_LIST.forEach((item) => {
-    used.add(item.name);
-    pool[item.itype].push(item);
-  });
-  clGrades.forEach((grade) => {
-    const current = pool[grade].length;
-    const need = Math.max(0, countPerGrade - current);
-    for (let i = 0; i < need; i += 1) {
-      let name = clNameParts
-        .map((part) => part[Math.floor(rng() * part.length)])
-        .join('');
-      let guard = 0;
-      while (used.has(name) && guard < 5) {
-        name = clNameParts
-          .map((part) => part[Math.floor(rng() * part.length)])
-          .join('');
-        guard += 1;
-      }
-      if (used.has(name)) {
-        name = appendUniqueSuffix(name, used, rng);
-      }
-      used.add(name);
-      pool[grade].push({ name, itype: grade });
-    }
-  });
-  return pool;
 };
 export const flattenMaterialPool = (pool?: MaterialPoolByGrade) => {
   if (!pool) return [];

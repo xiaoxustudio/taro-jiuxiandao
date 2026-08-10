@@ -12,6 +12,7 @@ import useActorController from '@/hooks/useActorController';
 import { REALM_ORDER } from '@/assets/const';
 import { CWType } from '@/types';
 import chuwu from '@/utils/chuwu';
+import { getTotalAttr } from '@/utils';
 import './index.less';
 
 const MAX_LEVEL = 9;
@@ -50,15 +51,12 @@ function Feisheng() {
         baoji: number;
       }
     ) => {
-      const qixue =
-        (get('qixue') || 0) + (get('addAttr.qixue') || 0) + bonus.qixue;
-      const gongji =
-        (get('gongji') || 0) + (get('addAttr.gongji') || 0) + bonus.gongji;
-      const fangyu =
-        (get('fangyu') || 0) + (get('addAttr.fangyu') || 0) + bonus.fangyu;
-      const sudu = (get('sudu') || 0) + (get('addAttr.sudu') || 0) + bonus.sudu;
-      const baoji =
-        (get('baoji') || 0) + (get('addAttr.baoji') || 0) + bonus.baoji;
+      const total = getTotalAttr(get);
+      const qixue = total.qixue + bonus.qixue;
+      const gongji = total.gongji + bonus.gongji;
+      const fangyu = total.fangyu + bonus.fangyu;
+      const sudu = total.sudu + bonus.sudu;
+      const baoji = total.baoji + bonus.baoji;
       return (
         Math.round(
           qixue / 10 + gongji * 2 + fangyu * 2 + sudu * 5 + baoji * 10

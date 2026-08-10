@@ -28,9 +28,7 @@ export interface DanLuLevelConfig {
   costItems: DanLuCostItem[];
 }
 
-export const DANLU_MAX_LV = 5;
-
-export const DANLU_LEVELS: DanLuLevelConfig[] = [
+const DANLU_LEVELS: DanLuLevelConfig[] = [
   {
     lv: 1,
     name: '凡品丹炉',

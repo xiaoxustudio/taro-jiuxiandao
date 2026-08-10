@@ -22,6 +22,7 @@ import chuwu from '@/utils/chuwu';
 import useActorController from '@/hooks/useActorController';
 import useContainer from '@/hooks/useContainer';
 import { clGrades, faBaoTierConfig, faBaoTypeConfig } from '@/assets/const';
+import PageHeader from '@/components/PageHeader';
 import './index.less';
 
 type CraftRule = {
@@ -188,12 +189,14 @@ export default function LianQi() {
       context={container}
       scroll
     >
-      <JXSpace between style={{ width: '100%', marginBottom: '10px' }}>
-        <Text>灵石：{lsNum}</Text>
-        <Text align='right'>
-          容量：{totalSlots}/{maxSlots}
-        </Text>
-      </JXSpace>
+      <PageHeader
+        left={<Text>灵石：{lsNum}</Text>}
+        right={
+          <Text align='right'>
+            容量：{totalSlots}/{maxSlots}
+          </Text>
+        }
+      />
       <JXSpace
         direction='vertical'
         gap={4}

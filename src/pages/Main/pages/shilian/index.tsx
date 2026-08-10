@@ -12,7 +12,7 @@ import {
 import useActorController from '@/hooks/useActorController';
 import useScroll from '@/hooks/useScroll';
 import { DiFangType } from '@/types';
-import { navigateTo } from '@/utils';
+import { navigateTo, getRealmText, getTotalAttr } from '@/utils';
 import { renderNameWithRealmColor, useBattle } from './useBattle';
 import styles from './index.module.less';
 
@@ -52,13 +52,11 @@ export default function Shilian() {
   const yaoshouName = YaoShouInstance
     ? renderNameWithRealmColor(YaoShouInstance.name)
     : '未遭遇';
-  const actorRealm = ActorInstance
-    ? `${get('jingjie') || ''}${get('jingjie1') || ''}${get('jingjie2') || ''}`
-    : '';
+  const actorRealm = ActorInstance ? getRealmText(get) : '';
   const enemyRealm = YaoShouInstance
     ? `${YaoShouInstance.jingjie || ''}${YaoShouInstance.jingjie1 || ''}${YaoShouInstance.jingjie2 || ''}`
     : '';
-  const actorMaxQixue = ActorInstance ? get('qixue') + get('addAttr.qixue') : 0;
+  const actorMaxQixue = ActorInstance ? getTotalAttr(get).qixue : 0;
   const actorHpPercent = actorMaxQixue
     ? Math.max(
         0,

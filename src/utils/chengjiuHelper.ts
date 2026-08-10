@@ -46,36 +46,6 @@ export const checkAchievements = (
 };
 
 /**
- * 检查战斗相关成就
- * @param get - 获取角色数据的函数
- * @param set - 设置角色数据的函数
- * @param actor - 角色数据
- * @param isWin - 是否胜利
- */
-export const checkBattleAchievements = (
-  get: ActorCtx['get'],
-  set: ActorCtx['set'],
-  actor: ActorCtx['actor'],
-  isWin: boolean
-) => {
-  const chengjiu = get('chengjiu');
-  if (!chengjiu) return;
-
-  const currentBattleCount = get('battleCount') || 0;
-  const currentWinStreak = get('winStreak') || 0;
-
-  const progress = {
-    battleCount: currentBattleCount + 1,
-    winStreak: isWin ? currentWinStreak + 1 : 0
-  };
-
-  const updated = updateAchievementProgress(chengjiu, actor, progress);
-  set('chengjiu', updated);
-  set('battleCount', progress.battleCount);
-  set('winStreak', progress.winStreak);
-};
-
-/**
  * 检查收集相关成就
  * @param get - 获取角色数据的函数
  * @param set - 设置角色数据的函数
@@ -93,28 +63,6 @@ export const checkCollectionAchievements = (
     gongfaCount: get('gongfa.ls')?.length || 0,
     fabaoCount: Object.values(get('fabao') || {}).filter(Boolean).length,
     danfangCount: get('danfang')?.length || 0
-  };
-
-  const updated = updateAchievementProgress(chengjiu, actor, progress);
-  set('chengjiu', updated);
-};
-
-/**
- * 检查修炼相关成就
- * @param get - 获取角色数据的函数
- * @param set - 设置角色数据的函数
- * @param actor - 角色数据
- */
-export const checkCultivationAchievements = (
-  get: ActorCtx['get'],
-  set: ActorCtx['set'],
-  actor?: ActorCtx['actor']
-) => {
-  const chengjiu = get('chengjiu');
-  if (!chengjiu) return;
-
-  const progress = {
-    lv: actor?.lv || 0
   };
 
   const updated = updateAchievementProgress(chengjiu, actor, progress);
@@ -158,28 +106,6 @@ export const checkQiandaoAchievements = (
       }
     }
   );
-  set('chengjiu', updated);
-};
-
-/**
- * 检查社交相关成就
- * @param get - 获取角色数据的函数
- * @param set - 设置角色数据的函数
- * @param actor - 角色数据
- */
-export const checkSocialAchievements = (
-  get: ActorCtx['get'],
-  set: ActorCtx['set'],
-  actor?: ActorCtx['actor']
-) => {
-  const chengjiu = get('chengjiu');
-  if (!chengjiu) return;
-
-  const progress = {
-    qiandaoStreak: get('qiandao.streak') || 0
-  };
-
-  const updated = updateAchievementProgress(chengjiu, actor, progress);
   set('chengjiu', updated);
 };
 

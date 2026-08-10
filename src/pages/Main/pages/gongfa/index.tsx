@@ -20,7 +20,7 @@ import {
   putCurrentGongfa,
   setCurrentGongFa
 } from '@/utils/gongfa';
-import { TimeArray } from '@/utils';
+import { AttrTransformChinese, TimeArray } from '@/utils';
 import './index.less';
 
 function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
@@ -73,11 +73,10 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 export default function Gongfa() {
   const { get, set, actor } = useActorController();
   const [, select] = useValue('', true);
-  const [refresh, setRefresh] = useState(0); // 添加状态用于强制刷新组件
   const linggen = (actor?.linggen as string) || '';
   const current = useMemo<GongFaType | null>(
-    () => get('gongfa.current'),
-    [actor, get, refresh] // eslint-disable-line
+    () => actor?.gongfa?.current ?? null,
+    [actor]
   );
 
   const shouldGetExp = useMemo(() => {
@@ -97,7 +96,6 @@ export default function Gongfa() {
       onConfirm() {
         setCurrentGongFa(select.value as string);
         select.set('-1');
-        setRefresh((prev) => prev + 1); // 强制刷新组件
       }
     });
   };
@@ -153,7 +151,6 @@ export default function Gongfa() {
             await putCurrentGongfa().then((s) => {
               if (s) {
                 JXToast('卸下成功').show();
-                setRefresh((prev) => prev + 1); // 强制刷新组件
               } else {
                 JXToast('未穿戴功法').show();
               }
@@ -195,7 +192,12 @@ export default function Gongfa() {
           <Text inline>
             {current?.attr
               ? Object.entries(current.attr)
-                  .map(([k, v]) => `${k}: ${v}`)
+                  .map(
+                    ([k, v]) =>
+                      `${AttrTransformChinese(
+                        k as keyof ActorDataConfigForZhanDou
+                      )}: ${v}`
+                  )
                   .join(' ')
               : '无'}
           </Text>

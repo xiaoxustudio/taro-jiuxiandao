@@ -1,5 +1,4 @@
-export const linggenArray = ['金', '木', '水', '火', '土', '风', '雷'] as const;
-
+// eslint-disable-next-line import/prefer-default-export
 export const DAOLV_QUALITIES = [
   '一品',
   '二品',

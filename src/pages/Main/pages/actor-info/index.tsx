@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { JXSpace, Text } from '@/components';
 import useActorController from '@/hooks/useActorController';
 import { getLunhuiBuffs } from '@/utils/actor';
-import { navigateBack } from '@/utils';
+import { getRealmText, getTotalAttr, navigateBack } from '@/utils';
 import './index.less';
 
 export default function ActorInfo() {
@@ -11,6 +11,7 @@ export default function ActorInfo() {
   const handleBack = useCallback(() => navigateBack(), []);
   const lunhuiCount = (get('lunhuiCount') as number) || 0;
   const lunhuiBuffs = getLunhuiBuffs(lunhuiCount);
+  const total = getTotalAttr(get);
   return (
     <View className='actor-info'>
       <View className='back-btn' onClick={handleBack}>
@@ -35,30 +36,28 @@ export default function ActorInfo() {
           等级：{get('lv')}
         </Text>
         <Text className='item' size={16} bold>
-          境界：{get('jingjie')}
-          {get('jingjie1')}
-          {get('jingjie2')}
+          境界：{getRealmText(get)}
         </Text>
         <Text className='item' size={16} bold>
           神识：{get('shenshi')}/{get('max_shenshi')}
         </Text>
         <Text className='item' size={16} bold>
-          气血：{get('qixue') + get('addAttr.qixue')}
+          气血：{total.qixue}
         </Text>
         <Text className='item' size={16} bold>
-          总攻击：{get('gongji') + get('addAttr.gongji')}
+          总攻击：{total.gongji}
         </Text>
         <Text className='item' size={16} bold>
-          总防御：{get('fangyu') + get('addAttr.fangyu')}
+          总防御：{total.fangyu}
         </Text>
         <Text className='item' size={16} bold>
-          攻速：{get('sudu') + get('addAttr.sudu')}
+          攻速：{total.sudu}
         </Text>
         <Text className='item' size={16} bold>
           仙缘：{get('xianyuan')}
         </Text>
         <Text className='item' size={16} bold>
-          暴击：{get('baoji') + get('addAttr.baoji')}
+          暴击：{total.baoji}
         </Text>
         <Text className='item' size={16} bold>
           灵根：{get('linggen')}灵根

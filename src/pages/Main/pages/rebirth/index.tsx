@@ -274,7 +274,7 @@ function RebirthPage() {
       desc='寿元已到极限，无法继续修仙之路。选择重生，重获新生...'
     >
       <JXSpace direction='vertical' gap={15}>
-        <Box style={{ background: '#fff', padding: 12, borderRadius: 8 }}>
+        <Box className='card'>
           <Text size={16} bold>
             当前状态：寿元已到极限
           </Text>
@@ -286,7 +286,7 @@ function RebirthPage() {
           </Text>
         </Box>
 
-        <Box style={{ background: '#fff', padding: 12, borderRadius: 8 }}>
+        <Box className='card'>
           <Text size={16} bold>
             保留选项
           </Text>
@@ -370,7 +370,7 @@ function RebirthPage() {
           </JXSpace>
         </Box>
 
-        <Box style={{ background: '#fff', padding: 12, borderRadius: 8 }}>
+        <Box className='card'>
           <Text size={16} bold>
             选择重生奖励
           </Text>

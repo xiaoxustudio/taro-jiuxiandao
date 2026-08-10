@@ -54,18 +54,8 @@ export function pickWeightedIndex(
   }
   return 0;
 }
-export function calcRealmDifficulty(tier: number): number {
+function calcRealmDifficulty(tier: number): number {
   return 1 + Math.max(0, (tier - 1) * 0.12);
-}
-export function calcWinStreakFromHistory(
-  history: Array<{ result: string }>
-): number {
-  let cnt = 0;
-  for (let i = history.length - 1; i >= 0; i -= 1) {
-    if (history[i]?.result === '胜') cnt += 1;
-    else break;
-  }
-  return cnt;
 }
 export function compositeDifficultyCoef(
   tier: number,

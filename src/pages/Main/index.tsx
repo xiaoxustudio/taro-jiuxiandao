@@ -18,7 +18,14 @@ import TujianModal from '@/components/TujianModal';
 import useActorController from '@/hooks/useActorController';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { navigateTo, TimeArray, formatXiuxianCalendar } from '@/utils';
+import {
+  navigateTo,
+  TimeArray,
+  formatXiuxianCalendar,
+  getRealmText,
+  getTotalAttr
+} from '@/utils';
+
 import { XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import styles from './index.module.less';
 import { calcShengjie, calcTupo, openXiulianDialog } from './operates';
@@ -178,7 +185,7 @@ function Main() {
       {
         name: `法术(${get('fashu')})`,
         click() {
-          const fashuTotal = get('fashu') + get('addAttr.fashu');
+          const fashuTotal = getTotalAttr(get).fashu;
           JXModal.alert({
             title: '法术',
             content: (
@@ -394,9 +401,7 @@ function Main() {
             <Text className={styles.AttrTitle} bold inline>
               境界：
             </Text>
-            {get('jingjie')}
-            {get('jingjie1')}
-            {get('jingjie2')}
+            {getRealmText(get)}
           </Text>
         </JXSpace>
         {/* 修炼 */}
