@@ -104,10 +104,7 @@ export default function LianQi() {
     return counts;
   }, [qt]);
 
-  const lsNum = useMemo(() => {
-    const item = qt.find((v) => v.name === '灵石');
-    return item?.num || 0;
-  }, [qt]);
+  const lsNum = chuwu.getLingshi();
 
   const totalSlots =
     (actor.cw?.fb?.length || 0) +

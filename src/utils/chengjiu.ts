@@ -173,7 +173,12 @@ export const updateAchievementProgress = (
 export const claimAchievementReward = (
   achievementData: AchievementData,
   achievementId: string
-): { success: boolean; rewards?: RewardItem[]; error?: string } => {
+): {
+  success: boolean;
+  rewards?: RewardItem[];
+  data?: AchievementData;
+  error?: string;
+} => {
   const achievement = achievementData.achievements[achievementId];
 
   if (!achievement) {
@@ -196,7 +201,8 @@ export const claimAchievementReward = (
 
   return {
     success: true,
-    rewards: achievement.reward
+    rewards: achievement.reward,
+    data: updatedData
   };
 };
 

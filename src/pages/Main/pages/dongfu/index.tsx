@@ -13,7 +13,7 @@ import useActorController from '@/hooks/useActorController';
 import { getGradeColor, numberToChinese, getRealmText } from '@/utils';
 import chuwu from '@/utils/chuwu';
 import { checkAchievements } from '@/utils/chengjiuHelper';
-import { ActorDataConfigForZhanDou, CWType, DaoLvCandidate } from '@/types';
+import { ActorDataConfigForZhanDou, DaoLvCandidate } from '@/types';
 import useModal from '@/hooks/useModal';
 import { useDaoLv } from './useDaoLv';
 import './index.less';
@@ -29,7 +29,7 @@ export default function Dongfu() {
   const pjMemo = useMemo(() => `${numberToChinese(lv)}阶`, [lv]);
 
   const lingshi = useMemo(
-    () => chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0,
+    () => chuwu.getLingshi(),
     [get, set] // eslint-disable-line
     // 使其强制刷新
   );
@@ -237,8 +237,7 @@ export default function Dongfu() {
   const handleShengjie = useCallback(() => {
     // 每10阶段需要一个升灵石
     if (lv % 10 === 0) {
-      if (chuwu.Get({ name: '升灵石', type: CWType.QT })?.num) {
-        chuwu.Remove({ name: '升灵石', type: CWType.QT, num: 1 });
+      if (chuwu.consumeShengLingShi()) {
         set('dongfu.lv', lv + 1);
       } else {
         JXToast('升灵石不足').show();

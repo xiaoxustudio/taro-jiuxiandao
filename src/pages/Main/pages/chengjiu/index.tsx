@@ -103,16 +103,10 @@ export default function Chengjiu() {
         });
       }
 
-      // 更新成就数据
-      const updated = { ...achievementData };
-      updated.claimedIds.push(achievementId);
-      updated.claimedPoints +=
-        achievementData.achievements[achievementId].points || 0;
-      updated.achievements[achievementId].status = 'claimed';
-      updated.achievements[achievementId].claimedAt = Date.now();
-
-      setAchievementData(updated);
-      set('chengjiu', updated);
+      if (result.data) {
+        setAchievementData(result.data);
+        set('chengjiu', result.data);
+      }
 
       JXToast('领取成功！').show();
     },

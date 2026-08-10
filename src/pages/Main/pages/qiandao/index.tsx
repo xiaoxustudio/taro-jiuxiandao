@@ -8,6 +8,16 @@ import { REALM_ORDER } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
 import { checkQiandaoAchievements } from '@/utils/chengjiuHelper';
 
+const MILESTONES: { count: number; pill: string }[] = [
+  { count: 7, pill: '筑基丹' },
+  { count: 30, pill: '结金丹' },
+  { count: 60, pill: '元婴丹' },
+  { count: 100, pill: '化神丹' },
+  { count: 150, pill: '返虚丹' },
+  { count: 200, pill: '合体丹' },
+  { count: 300, pill: '大乘丹' }
+];
+
 function QianDao() {
   const { get, set, actor } = useActorController();
   const qiandao = useMemo(
@@ -77,69 +87,21 @@ function QianDao() {
 
     // 累计签到特殊奖励（同时奖励境界缩放灵石）
     const milestoneLs = totalCount * 5 * realmScale;
-    if (totalCount === 7) {
-      chuwu.Add({ name: '筑基丹', type: CWType.DY, num: 1, isPile: true });
+    const milestone = MILESTONES.find((m) => m.count === totalCount);
+    if (milestone) {
+      chuwu.Add({
+        name: milestone.pill,
+        type: CWType.DY,
+        num: 1,
+        isPile: true
+      });
       chuwu.Add({
         name: '灵石',
         type: CWType.QT,
         isPile: true,
         num: milestoneLs
       });
-      toastMsg += `，获得筑基丹！灵石+${milestoneLs}`;
-    } else if (totalCount === 30) {
-      chuwu.Add({ name: '结金丹', type: CWType.DY, num: 1, isPile: true });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: milestoneLs
-      });
-      toastMsg += `，获得结金丹！灵石+${milestoneLs}`;
-    } else if (totalCount === 60) {
-      chuwu.Add({ name: '元婴丹', type: CWType.DY, num: 1, isPile: true });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: milestoneLs
-      });
-      toastMsg += `，获得元婴丹！灵石+${milestoneLs}`;
-    } else if (totalCount === 100) {
-      chuwu.Add({ name: '化神丹', type: CWType.DY, num: 1, isPile: true });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: milestoneLs
-      });
-      toastMsg += `，获得化神丹！灵石+${milestoneLs}`;
-    } else if (totalCount === 150) {
-      chuwu.Add({ name: '返虚丹', type: CWType.DY, num: 1, isPile: true });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: milestoneLs
-      });
-      toastMsg += `，获得返虚丹！灵石+${milestoneLs}`;
-    } else if (totalCount === 200) {
-      chuwu.Add({ name: '合体丹', type: CWType.DY, num: 1, isPile: true });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: milestoneLs
-      });
-      toastMsg += `，获得合体丹！灵石+${milestoneLs}`;
-    } else if (totalCount === 300) {
-      chuwu.Add({ name: '大乘丹', type: CWType.DY, num: 1, isPile: true });
-      chuwu.Add({
-        name: '灵石',
-        type: CWType.QT,
-        isPile: true,
-        num: milestoneLs
-      });
-      toastMsg += `，获得大乘丹！灵石+${milestoneLs}`;
+      toastMsg += `，获得${milestone.pill}！灵石+${milestoneLs}`;
     } else if (totalCount % 10 === 0 && streak >= totalCount) {
       chuwu.Add({ name: '寿元丹', type: CWType.DY, num: 1, isPile: true });
       chuwu.Add({

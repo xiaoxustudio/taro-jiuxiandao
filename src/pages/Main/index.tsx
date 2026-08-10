@@ -27,6 +27,7 @@ import { XIUXIAN_TIME_SCALE_DEFAULT } from '@/assets/const';
 import styles from './index.module.less';
 import useOfflineRecover from './useOfflineRecover';
 import { calcShengjie, calcTupo, openXiulianDialog } from './operates';
+import { OperateItem, operateOptions, operateOptions2 } from './operateConfig';
 
 function Main() {
   const { get, set, actor } = useActorController();
@@ -109,139 +110,63 @@ function Main() {
     [get, actor] //eslint-disable-line
   );
 
-  const operaterOptions: { name: string; click(): void; disabled?: boolean }[] =
-    [
-      {
-        name: '试炼',
-        click() {
-          navigateTo('Main/pages/shilian-list/index');
-        }
-      },
-      {
-        name: '炼丹',
-        click() {
-          navigateTo('Main/pages/liandan/index');
-        }
-      },
-      {
-        name: '仙缘',
-        click() {
-          navigateTo('Main/pages/xianyuan/index');
-        }
-      },
-      {
-        name: '宗门',
-        click() {
-          navigateTo('Main/pages/zongmen/index');
-        }
-      },
-      {
-        name: '飞升',
-        click() {
-          navigateTo('Main/pages/feisheng/index');
-        }
-      },
-      {
-        name: '炼器',
-        click() {
-          navigateTo('Main/pages/lianqi/index');
-        }
-      },
-      {
-        name: '法宝',
-        click() {
-          navigateTo('Main/pages/fabao/index');
-        }
-      },
-      {
-        name: '升阶',
-        click() {
-          calcShengjie(actor, get, set);
-        }
-      },
-      {
-        name: '功法',
-        click() {
-          navigateTo('Main/pages/gongfa/index');
-        }
-      },
-      {
-        name: '突破',
-        click() {
-          calcTupo(actor, get, set);
-        }
-      },
-      {
-        name: `法术(${get('fashu')})`,
-        click() {
-          const fashuTotal = getTotalAttr(get).fashu;
-          JXModal.alert({
-            title: '法术',
-            content: (
-              <JXSpace direction='vertical'>
-                <Text>法术强度：{get('fashu')}</Text>
-                <Text>加成（含装备）：{fashuTotal}</Text>
-                <Box style={{ height: 4 }} />
-                <Text size={14} bold>
-                  法术效果
-                </Text>
-                <Text>战斗中每击附加法术伤害：{fashuTotal * 0.3}</Text>
-              </JXSpace>
-            ),
-            confirmText: '知道了'
-          });
-        }
-      },
-      {
-        name: '灵兽',
-        click() {
-          navigateTo('Main/pages/lingshou/index');
-        }
-      }
-    ];
-  const operaterOptions2: {
-    name: string;
-    click(): void;
-    disabled?: boolean;
-  }[] = [
-    {
-      name: '坊市',
-      click() {
-        navigateTo('Main/pages/fangshi/index');
-      }
-    },
-    {
-      name: '储物',
-      click() {
-        navigateTo('Main/pages/chuwu/index');
-      }
-    },
-
-    {
-      name: '药园',
-      click() {
-        navigateTo('Main/pages/yaoyuan/index');
-      }
-    },
-    {
-      name: '洞府',
-      click() {
-        navigateTo('Main/pages/dongfu/index');
-      }
-    },
-    {
-      name: '成就',
-      click() {
-        navigateTo('Main/pages/chengjiu/index');
-      }
-    },
-    {
-      name: '图鉴',
-      click() {
-        setTujianVisible(true);
-      }
+  const handleOperateClick = (item: OperateItem) => {
+    if (item.page) {
+      navigateTo(item.page);
+      return;
     }
-  ];
+    switch (item.action) {
+      case 'shengjie':
+        calcShengjie(actor, get, set);
+        break;
+      case 'tupo':
+        calcTupo(actor, get, set);
+        break;
+      case 'tujian':
+        setTujianVisible(true);
+        break;
+      case 'fashu': {
+        const fashuTotal = getTotalAttr(get).fashu;
+        JXModal.alert({
+          title: '法术',
+          content: (
+            <JXSpace direction='vertical'>
+              <Text>法术强度：{get('fashu')}</Text>
+              <Text>加成（含装备）：{fashuTotal}</Text>
+              <Box style={{ height: 4 }} />
+              <Text size={14} bold>
+                法术效果
+              </Text>
+              <Text>战斗中每击附加法术伤害：{fashuTotal * 0.3}</Text>
+            </JXSpace>
+          ),
+          confirmText: '知道了'
+        });
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  const renderOptions = (options: OperateItem[]) =>
+    options.map((v) => (
+      <JXGrid.Item key={v.name} align='center'>
+        <JXButton
+          disabled={v.disabled}
+          size='mini'
+          transparent
+          onClick={() => handleOperateClick(v)}
+        >
+          <Text
+            color={canRed && v.action === 'shengjie' ? 'red' : undefined}
+            textShadow
+          >
+            {v.action === 'fashu' ? `法术(${get('fashu')})` : v.name}
+          </Text>
+        </JXButton>
+      </JXGrid.Item>
+    ));
 
   // 开始修炼
   const handleXiuLian = useCallback(() => {
@@ -369,23 +294,7 @@ function Main() {
         </JXSpace>
         {/* 操作 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
-          {operaterOptions.map((v) => (
-            <JXGrid.Item key={v.name} align='center'>
-              <JXButton
-                disabled={v.disabled}
-                size='mini'
-                transparent
-                onClick={v.click}
-              >
-                <Text
-                  color={canRed && v.name === '升阶' ? 'red' : undefined}
-                  textShadow
-                >
-                  {v.name}
-                </Text>
-              </JXButton>
-            </JXGrid.Item>
-          ))}
+          {renderOptions(operateOptions)}
         </JXGrid>
         {/* 动态 */}
         <JXSpace
@@ -406,18 +315,7 @@ function Main() {
         </JXSpace>
         {/* 操作2 */}
         <JXGrid className={styles.ContentBox} columns={4} gap={12}>
-          {operaterOptions2.map((v, index) => (
-            <JXGrid.Item key={v.name + index} align='center'>
-              <JXButton
-                disabled={v.disabled}
-                size='mini'
-                transparent
-                onClick={v.click}
-              >
-                <Text textShadow>{v.name}</Text>
-              </JXButton>
-            </JXGrid.Item>
-          ))}
+          {renderOptions(operateOptions2)}
         </JXGrid>
         {/* 修炼 */}
         <JXGrid className={styles.BottomBox} columns={4}>

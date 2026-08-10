@@ -242,10 +242,13 @@ export function useBattle(
       logs: [...v.logs, { text }].slice(-MAX_LOG_SIZE)
     }));
   }, []);
+  const endHuiheState = useCallback(() => {
+    setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+  }, []);
   const endBattle = useCallback(
     (result: 'win' | 'lose', rounds: number, ys: YaoShouZDType | null) => {
       clearInterval(timer.current!);
-      setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+      endHuiheState();
       if (isGuajiRef.current) {
         setGuajiStats((s) => ({
           totalRounds: s.totalRounds + rounds,
@@ -269,7 +272,164 @@ export function useBattle(
       });
       setActorInstance(null);
     },
-    [guardClear]
+    [endHuiheState, guardClear]
+  );
+  const syncBattleAchievements = useCallback(
+    (winStreak: number) => {
+      const currentAchievementData = get('chengjiu') || {
+        achievements: {},
+        claimedIds: [],
+        totalPoints: 0,
+        claimedPoints: 0
+      };
+      const battleCount = (get('battleCount') || 0) + 1;
+      set('battleCount', battleCount);
+      set('winStreak', winStreak);
+      const updatedAchievementData = updateAchievementProgress(
+        currentAchievementData,
+        { lv: get('lv'), jingjie: get('jingjie') },
+        { battleCount, winStreak }
+      );
+      set('chengjiu', updatedAchievementData);
+    },
+    [get, set]
+  );
+  const applyWinReward = useCallback(
+    (ys: YaoShouZDType) => {
+      const clData = {
+        name: ys.cl,
+        isPile: true,
+        type: CWType.QT,
+        num: random(1, 4)
+      } as QTItemType;
+      const seedRegistry = (get('seedRegistry') as SeedRegistryItem[]) || [];
+      const materialPool = resolveMaterialPoolByGrade({
+        get,
+        set,
+        storageGetSync: useStorageStore.getState().getSync
+      });
+      const flatPool = materialPool ? flattenMaterialPool(materialPool) : [];
+      const materialGrade =
+        flatPool.find((item) => item.name === clData.name)?.itype ||
+        seedRegistry.find((item) => item.material === clData.name)?.itype ||
+        clGrades[0];
+      const seedDropRate = seedDropRates[materialGrade] ?? 0;
+      const shouldDropSeed =
+        seedRegistry.length > 0 && Math.random() < seedDropRate;
+      let seedDrop: SeedRegistryItem | null = null;
+      const gradeSeeds = seedRegistry.filter(
+        (item) => item.itype === materialGrade
+      );
+      if (shouldDropSeed) {
+        seedDrop =
+          seedRegistry.find((item) => item.material === clData.name) ||
+          (gradeSeeds.length
+            ? gradeSeeds[random(0, gradeSeeds.length - 1)]
+            : null) ||
+          null;
+      }
+      const reward = random(
+        Math.max(1, Math.round(ys.xw * 0.7)),
+        Math.max(1, Math.round(ys.xw * 1.2))
+      );
+      const tier = TIER_MAP[ys.jingjie] || 1;
+      const lingShiDrop = random(
+        Math.max(1, tier * 15),
+        Math.max(2, tier * tier * 20)
+      );
+      const cw = get('cw');
+      const slotCount =
+        (cw?.fb?.length || 0) + (cw?.dy?.length || 0) + (cw?.qt?.length || 0);
+      const cwMax = cw?.max || 30;
+      if (slotCount >= cwMax) {
+        JXToast('储物空间已满，战利品将丢失！').show();
+      }
+      pushLog(
+        <>
+          <Text color='black' inline>
+            {renderNameWithRealmColor(ys.name)}
+          </Text>
+          倒地不起，你收剑而立，心神一清，悟得一缕斗法之理（修为+
+          <Text color='red' inline>
+            {reward}
+          </Text>
+          ）
+        </>
+      );
+      pushLog(
+        <>
+          你获得材料：{clData.name}X{clData.num}
+        </>
+      );
+      pushLog(<>获得灵石：{lingShiDrop}</>);
+      if (seedDrop) {
+        pushLog(<>获得种子：{seedDrop.name}</>);
+      }
+      pushLog(<>战斗结束</>);
+      chuwu.Add(clData);
+      chuwu.Add({
+        name: '灵石',
+        type: CWType.QT,
+        isPile: true,
+        num: lingShiDrop
+      });
+      const shengLingShiChance = 0.03 + (TIER_MAP[ys.jingjie] || 1) * 0.01;
+      if (Math.random() < shengLingShiChance) {
+        const shengLsNum = random(
+          1,
+          Math.min(3, Math.floor((TIER_MAP[ys.jingjie] || 1) / 2) + 1)
+        );
+        chuwu.Add({
+          name: '升灵石',
+          type: CWType.QT,
+          isPile: true,
+          num: shengLsNum
+        });
+      }
+      if (seedDrop) {
+        const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
+        if (currentYaoyuan) {
+          const currentSeeds = currentYaoyuan.seeds ?? [];
+          const existing = currentSeeds.find(
+            (item) => item.name === seedDrop?.name
+          );
+          const updatedSeeds = existing
+            ? currentSeeds.map((item) =>
+                item.name === seedDrop?.name
+                  ? { ...item, num: item.num + 1 }
+                  : item
+              )
+            : [...currentSeeds, { ...seedDrop, num: 1 }];
+          set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
+        }
+      }
+      set('xiuwei', Math.min(get('max_xiuwei'), get('xiuwei') + reward));
+      const currentLingShou = get('lingShou');
+      if (currentLingShou) {
+        set(
+          'lingShou',
+          addLingShouExp(currentLingShou, Math.round(reward * 0.3))
+        );
+      }
+      setSessionLoot((prev) => ({
+        ...prev,
+        [clData.name]: (prev[clData.name] || 0) + clData.num!
+      }));
+      endBattle('win', currentGuajiFightRoundsRef.current, ys);
+      const newWinStreak = (get('winStreak') || 0) + 1;
+      syncBattleAchievements(newWinStreak);
+      checkShilianAchievements(
+        get,
+        set,
+        { lv: get('lv'), jingjie: get('jingjie') },
+        df.name
+      );
+      checkLingShouAchievements(get, set, {
+        lv: get('lv'),
+        jingjie: get('jingjie')
+      });
+    },
+    [get, set, pushLog, endBattle, syncBattleAchievements, df.name]
   );
   const zhandouLogic = useCallback(
     (zd1: YaoShouZDType | ActorZDType, zd2: YaoShouZDType | ActorZDType) => {
@@ -347,201 +507,35 @@ export function useBattle(
       if (ActorInstance.qixue <= 0) {
         pushLog(<>势尽力竭，你踉跄后退终究倒下。眼前一黑，此战以败收场…</>);
         endBattle('lose', currentGuajiFightRoundsRef.current, YaoShouInstance);
-        const currentAchievementData = get('chengjiu') || {
-          achievements: {},
-          claimedIds: [],
-          totalPoints: 0,
-          claimedPoints: 0
-        };
-        const battleCount = (get('battleCount') || 0) + 1;
-        set('battleCount', battleCount);
-        set('winStreak', 0);
-        const updatedAchievementData = updateAchievementProgress(
-          currentAchievementData,
-          { lv: get('lv'), jingjie: get('jingjie') },
-          { battleCount, winStreak: 0 }
-        );
-        set('chengjiu', updatedAchievementData);
+        syncBattleAchievements(0);
         return;
       }
       if (YaoShouInstance.qixue <= 0) {
-        const clData = {
-          name: YaoShouInstance.cl,
-          isPile: true,
-          type: CWType.QT,
-          num: random(1, 4)
-        } as QTItemType;
-        const seedRegistry = (get('seedRegistry') as SeedRegistryItem[]) || [];
-        const materialPool = resolveMaterialPoolByGrade({
-          get,
-          set,
-          storageGetSync: useStorageStore.getState().getSync
-        });
-        const flatPool = materialPool ? flattenMaterialPool(materialPool) : [];
-        const materialGrade =
-          flatPool.find((item) => item.name === clData.name)?.itype ||
-          seedRegistry.find((item) => item.material === clData.name)?.itype ||
-          clGrades[0];
-        const seedDropRate = seedDropRates[materialGrade] ?? 0;
-        const shouldDropSeed =
-          seedRegistry.length > 0 && Math.random() < seedDropRate;
-        let seedDrop: SeedRegistryItem | null = null;
-        const gradeSeeds = seedRegistry.filter(
-          (item) => item.itype === materialGrade
-        );
-        if (shouldDropSeed) {
-          seedDrop =
-            seedRegistry.find((item) => item.material === clData.name) ||
-            (gradeSeeds.length
-              ? gradeSeeds[random(0, gradeSeeds.length - 1)]
-              : null) ||
-            null;
-        }
-        const reward = random(
-          Math.max(1, Math.round(YaoShouInstance.xw * 0.7)),
-          Math.max(1, Math.round(YaoShouInstance.xw * 1.2))
-        );
-        const tier = TIER_MAP[YaoShouInstance.jingjie] || 1;
-        const lingShiDrop = random(
-          Math.max(1, tier * 15),
-          Math.max(2, tier * tier * 20)
-        );
-        const cw = get('cw');
-        const slotCount =
-          (cw?.fb?.length || 0) + (cw?.dy?.length || 0) + (cw?.qt?.length || 0);
-        const cwMax = cw?.max || 30;
-        if (slotCount >= cwMax) {
-          JXToast('储物空间已满，战利品将丢失！').show();
-        }
-        pushLog(
-          <>
-            <Text color='black' inline>
-              {renderNameWithRealmColor(YaoShouInstance.name)}
-            </Text>
-            倒地不起，你收剑而立，心神一清，悟得一缕斗法之理（修为+
-            <Text color='red' inline>
-              {reward}
-            </Text>
-            ）
-          </>
-        );
-        pushLog(
-          <>
-            你获得材料：{clData.name}X{clData.num}
-          </>
-        );
-        pushLog(<>获得灵石：{lingShiDrop}</>);
-        if (seedDrop) {
-          pushLog(<>获得种子：{seedDrop.name}</>);
-        }
-        pushLog(<>战斗结束</>);
-        chuwu.Add(clData);
-        chuwu.Add({
-          name: '灵石',
-          type: CWType.QT,
-          isPile: true,
-          num: lingShiDrop
-        });
-        const shengLingShiChance =
-          0.03 + (TIER_MAP[YaoShouInstance.jingjie] || 1) * 0.01;
-        if (Math.random() < shengLingShiChance) {
-          const shengLsNum = random(
-            1,
-            Math.min(
-              3,
-              Math.floor((TIER_MAP[YaoShouInstance.jingjie] || 1) / 2) + 1
-            )
-          );
-          chuwu.Add({
-            name: '升灵石',
-            type: CWType.QT,
-            isPile: true,
-            num: shengLsNum
-          });
-        }
-        if (seedDrop) {
-          const currentYaoyuan = get('yaoyuan') as YaoyuanData | null;
-          if (currentYaoyuan) {
-            const currentSeeds = currentYaoyuan.seeds ?? [];
-            const existing = currentSeeds.find(
-              (item) => item.name === seedDrop?.name
-            );
-            const updatedSeeds = existing
-              ? currentSeeds.map((item) =>
-                  item.name === seedDrop?.name
-                    ? { ...item, num: item.num + 1 }
-                    : item
-                )
-              : [...currentSeeds, { ...seedDrop, num: 1 }];
-            set('yaoyuan', { ...currentYaoyuan, seeds: updatedSeeds });
-          }
-        }
-        set('xiuwei', Math.min(get('max_xiuwei'), get('xiuwei') + reward));
-        const currentLingShou = get('lingShou');
-        if (currentLingShou) {
-          set(
-            'lingShou',
-            addLingShouExp(currentLingShou, Math.round(reward * 0.3))
-          );
-        }
-        setSessionLoot((prev) => ({
-          ...prev,
-          [clData.name]: (prev[clData.name] || 0) + clData.num!
-        }));
-        endBattle('win', currentGuajiFightRoundsRef.current, YaoShouInstance);
-        const currentAchievementData = get('chengjiu') || {
-          achievements: {},
-          claimedIds: [],
-          totalPoints: 0,
-          claimedPoints: 0
-        };
-        const battleCount = (get('battleCount') || 0) + 1;
-        set('battleCount', battleCount);
-        const currentWinStreak = get('winStreak') || 0;
-        const newWinStreak = currentWinStreak + 1;
-        set('winStreak', newWinStreak);
-        const updatedAchievementData = updateAchievementProgress(
-          currentAchievementData,
-          { lv: get('lv'), jingjie: get('jingjie') },
-          { battleCount, winStreak: newWinStreak }
-        );
-        set('chengjiu', updatedAchievementData);
-        checkShilianAchievements(
-          get,
-          set,
-          { lv: get('lv'), jingjie: get('jingjie') },
-          df.name
-        );
-        checkLingShouAchievements(get, set, {
-          lv: get('lv'),
-          jingjie: get('jingjie')
-        });
+        applyWinReward(YaoShouInstance);
         return;
       }
       if (!HuiheState.target) {
         const ys = zhandouLogic(ActorInstance, YaoShouInstance);
         setYaoShouInstance(ys as YaoShouZDType);
-        setHuiheState((v) => ({ ...v, target: 1 }));
+        setHuiheState((v) => ({ ...v, target: 1, huihe: v.huihe + 1 }));
       } else {
         const ac = zhandouLogic(YaoShouInstance, ActorInstance);
         setActorInstance(ac as ActorZDType);
-        setHuiheState((v) => ({ ...v, target: 0 }));
+        setHuiheState((v) => ({ ...v, target: 0, huihe: v.huihe + 1 }));
       }
       if (isGuajiRef.current) {
         currentGuajiFightRoundsRef.current += 1;
       }
-      setHuiheState((v) => ({ ...v, huihe: v.huihe + 1 }));
     }
   }, [
     ActorInstance,
     HuiheState.target,
     YaoShouInstance,
-    df.name,
-    get,
-    set,
     pushLog,
     endBattle,
-    zhandouLogic
+    zhandouLogic,
+    syncBattleAchievements,
+    applyWinReward
   ]);
 
   const handleSearchYaoShou = useCallback(() => {
@@ -634,7 +628,7 @@ export function useBattle(
         ）
       </>
     );
-    setHuiheState((v) => ({ ...v, can: false, end: true, target: 0 }));
+    endHuiheState();
     guardClear(
       fightSeqRef.current,
       () => {
@@ -654,7 +648,8 @@ export function useBattle(
     get,
     set,
     guardClear,
-    pushLog
+    pushLog,
+    endHuiheState
   ]);
 
   const handleSearchYaoShouRef = useRef(handleSearchYaoShou);

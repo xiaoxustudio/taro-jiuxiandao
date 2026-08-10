@@ -256,6 +256,12 @@ export function payLingshi(num: number): boolean {
   return true;
 }
 
+export function consumeShengLingShi(): boolean {
+  if (!Get({ name: '升灵石', type: CWType.QT })?.num) return false;
+  Remove({ name: '升灵石', type: CWType.QT, num: 1 });
+  return true;
+}
+
 export function sellItem(name: string, type: CWType, sellPrice: number): void {
   const owned = Get({ name, type });
   if (!owned) return;
@@ -282,5 +288,6 @@ export default {
   TR,
   getLingshi,
   payLingshi,
+  consumeShengLingShi,
   sellItem
 };

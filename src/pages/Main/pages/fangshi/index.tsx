@@ -262,7 +262,7 @@ export default function Fangshi() {
     }));
   }, [currentCategory, currentList, get, set]);
   const lsMemo = useMemo(
-    () => chuwu.Get({ name: '灵石', type: CWType.QT }),
+    () => chuwu.getLingshi(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [get, set, version] // 手动触发更新
   );
@@ -332,7 +332,7 @@ export default function Fangshi() {
       scroll
     >
       <PageHeader
-        left={<Text>灵石：{lsMemo?.num || 0}</Text>}
+        left={<Text>灵石：{lsMemo || 0}</Text>}
         right={<Text align='right'>刷新：{refreshLeftText}</Text>}
       />
       <JXSpace gap={10} style={{ width: '100%' }} hscroll>

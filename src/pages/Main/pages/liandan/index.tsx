@@ -90,8 +90,7 @@ export default function Liandan() {
       setDanluVisible(false);
       return;
     }
-    const curLs = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
-    if (curLs < nextLevel.costLs) {
+    if (chuwu.getLingshi() < nextLevel.costLs) {
       JXToast().show(`灵石不足，升阶需要${nextLevel.costLs}灵石`);
       return;
     }
@@ -104,7 +103,7 @@ export default function Liandan() {
       JXToast().show('升阶材料不足');
       return;
     }
-    chuwu.Remove({ name: '灵石', type: CWType.QT, num: nextLevel.costLs });
+    chuwu.payLingshi(nextLevel.costLs);
     chuwu.RemoveArr(needItems);
     set('liandan.danlu', { name: nextLevel.name, lv: nextLevel.lv });
     JXToast().show(`丹炉升阶成功：${nextLevel.name} Lv.${nextLevel.lv}`);

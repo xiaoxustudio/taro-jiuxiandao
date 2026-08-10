@@ -53,11 +53,10 @@ export default function LingShou() {
   };
 
   const handleFeed = () => {
-    if (chuwu.Has({ name: '升灵石', type: CWType.QT }) === -1) {
+    if (!chuwu.consumeShengLingShi()) {
       JXToast().show('升灵石不足');
       return;
     }
-    chuwu.Remove({ name: '升灵石', type: CWType.QT, num: 1 });
     const next = addLingShouExp(lingShou, 100);
     set('lingShou', next);
     checkLingShouAchievements(get, set, actor);

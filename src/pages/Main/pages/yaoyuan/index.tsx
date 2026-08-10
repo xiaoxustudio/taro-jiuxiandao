@@ -153,7 +153,7 @@ export default function Yaoyuan() {
     }
   }, [actor, get, set]);
 
-  const lingshi = chuwu.Get({ name: '灵石', type: CWType.QT })?.num || 0;
+  const lingshi = chuwu.getLingshi();
 
   const lv = yaoyuan?.lv || 1;
   const pjMemo = useMemo(() => `${numberToChinese(lv)}阶`, [lv]);
@@ -285,9 +285,7 @@ export default function Yaoyuan() {
     if (!yaoyuan) return;
     const needUpLingshi = lv * 2000;
     if (lv % 10 === 0) {
-      if (chuwu.Get({ name: '升灵石', type: CWType.QT })?.num) {
-        chuwu.Remove({ name: '升灵石', type: CWType.QT, num: 1 });
-      } else {
+      if (!chuwu.consumeShengLingShi()) {
         JXToast().show('升灵石不足');
         return;
       }
