@@ -8,6 +8,7 @@ import {
   JXToast,
   List,
   ListItemData,
+  PageHeader,
   Scroll,
   Text
 } from '@/components';
@@ -22,7 +23,6 @@ import chuwu from '@/utils/chuwu';
 import useActorController from '@/hooks/useActorController';
 import useContainer from '@/hooks/useContainer';
 import { clGrades, faBaoTierConfig, faBaoTypeConfig } from '@/assets/const';
-import PageHeader from '@/components/PageHeader';
 import './index.less';
 
 type CraftRule = {

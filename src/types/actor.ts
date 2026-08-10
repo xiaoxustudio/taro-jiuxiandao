@@ -177,7 +177,7 @@ export interface ActorDataConfig extends ActorDataConfigForZhanDou {
     current: GongFaType | null; // 当前功法
   }; // 功法列表
   fangshi?: FangshiSnapshot; // 坊市快照
-  danfangData?: Record<string, any>; // 丹方原始数据缓存
+  danfangData?: Record<string, unknown>; // 丹方原始数据缓存
   materialRegistry?: { name: string; itype: string }[]; // 材料注册表
   seedRegistry?: SeedRegistryItem[]; // 种子注册表
   yaoyuan?: YaoyuanData; // 药园数据

@@ -1,16 +1,29 @@
 import cloneDeep from 'lodash-es/cloneDeep';
 import useActorStore from '@/store/actor';
 import useStore from '@/store/store';
-import { BaseType, CWType, DYItemType, FBItemType, QTItemType } from '@/types';
+import {
+  ActorDataConfigForZhanDou,
+  BaseType,
+  CWType,
+  DYItemType,
+  FBItemType,
+  QTItemType
+} from '@/types';
 import danfangData from '@/assets/danfang.json';
 import type { DanfangData } from '@/types/danfang';
 import { getActor } from './actor';
 /* 角色储物相关操作 */
 
-export interface AddProps extends BaseType {
+export interface AddProps {
   name: string;
   type: CWType;
-  [k: string]: any;
+  num?: number;
+  isPile?: boolean;
+  desc?: string;
+  attr?: Partial<ActorDataConfigForZhanDou>;
+  itype?: string;
+  pj?: string;
+  lv?: number;
 }
 
 type CwArray = FBItemType[] & DYItemType[] & QTItemType[];
@@ -26,7 +39,7 @@ export interface OperaterType {
  * @param {CWType} type
  * @return {*}
  */
-function TR(type: CWType) {
+function TR(type: CWType): 'fb' | 'dy' | 'qt' {
   switch (type) {
     case CWType.FB:
       return 'fb';
@@ -44,7 +57,7 @@ function TR(type: CWType) {
  * @param {object} param1
  * @return {*}
  */
-function Has({ name, type = CWType.FB }: OperaterType) {
+function Has({ name, type = CWType.FB }: OperaterType): number {
   const acData = getActor();
   const cw = acData.cw[TR(type)];
   return (cw as BaseType[]).findIndex((v) => v.name === name);
@@ -63,7 +76,7 @@ function HasArr(items: OperaterType[]) {
  * @param {object} param1
  * @return {*}
  */
-function Get({ name, type = CWType.FB }: OperaterType) {
+function Get({ name, type = CWType.FB }: OperaterType): BaseType | undefined {
   const acData = getActor();
   const cw = acData.cw[TR(type)];
   return cw.find((v: BaseType) => v.name === name);
@@ -74,7 +87,7 @@ function Get({ name, type = CWType.FB }: OperaterType) {
  * @param {object} param1
  * @return {*}
  */
-function Remove(item: OperaterType) {
+function Remove(item: OperaterType): void {
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();
@@ -104,7 +117,7 @@ function Remove(item: OperaterType) {
  * @param {OperaterType[]} items
  * @return {*}
  */
-function RemoveArr(items: OperaterType[]) {
+function RemoveArr(items: OperaterType[]): void {
   items.forEach((element) => {
     Remove(element);
   });
@@ -121,7 +134,7 @@ function Add({
   num = 1,
   isPile = false,
   ...props
-}: AddProps) {
+}: AddProps): boolean {
   const { current } = useStore.getState();
   const acData = getActor();
   const { set } = useActorStore.getState();

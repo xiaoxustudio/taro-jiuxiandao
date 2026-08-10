@@ -20,3 +20,4 @@ export { default as Scroll } from './Scroll';
 export { default as ItemCounter } from './ItemCounter';
 export { default as JXGrid } from './Grid';
 export { default as PageHeader } from './PageHeader';
+export { default as TujianModal } from './TujianModal';

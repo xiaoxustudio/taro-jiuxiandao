@@ -5,14 +5,7 @@ export interface IUseValueNotState<T> {
   set(value: T): void;
 }
 
-export type IUseValueState<T> = [T, IUseValueNotState<T>];
-
-function useValue<T>(initialdata: T, state: true): IUseValueState<T>;
-function useValue<T>(initialdata: T, state?: false): IUseValueNotState<T>;
-function useValue<T>(
-  initialdata: T,
-  state = false
-): IUseValueNotState<T> | IUseValueState<T> {
+function useValue<T>(initialdata: T): IUseValueNotState<T> {
   const [data, setData] = useState(initialdata);
   const ref = useRef(data);
   ref.current = data;
@@ -30,7 +23,6 @@ function useValue<T>(
     []
   );
 
-  if (state) return [data, obj];
   return obj;
 }
 export default useValue;

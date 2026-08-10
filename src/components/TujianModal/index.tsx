@@ -5,20 +5,33 @@ import JXGrid from '@/components/Grid';
 import useStorageStore from '@/services/storage';
 import { clGrades, dfGrades, SeedRegistryItem } from '@/assets/const';
 import { getGradeColor } from '@/utils';
+import { ActorDataConfig, DanfangPoolByGrade } from '@/types';
+import { DanfangItem } from '@/types/danfang';
 import { GongFaType } from '@/types/gongfa';
-import { ActorDataConfig } from '@/types';
 import styles from './index.module.less';
 
 export interface TujianModalProps {
   visible: boolean;
   onClose: () => void;
-  get: (key: string, defaultValue?: any) => any;
-  set: (key: string, val: any) => void;
+  get: (key: string, defaultValue?: unknown) => unknown;
+  set: (key: string, val: unknown) => void;
   actor: ActorDataConfig;
   seeds?: SeedRegistryItem[];
 }
 
 type TujianTab = 'dy' | 'df' | 'gf';
+
+type TujianDetailItem = {
+  name: string;
+  attr?: unknown;
+  ls?: number;
+  pj?: string;
+  xl?: string;
+  lg?: string;
+  limit?: string;
+  cl?: [string, number][];
+  time?: unknown;
+};
 
 function TujianModal({
   visible,
@@ -37,20 +50,18 @@ function TujianModal({
     if (!visible || isSeeds) return;
     const { get: load } = useStorageStore.getState();
     const run = async () => {
-      const pool = get('danfangPoolByGrade') as
-        | Record<string, any[]>
-        | undefined;
+      const pool = get('danfangPoolByGrade') as DanfangPoolByGrade | undefined;
       if (!pool) {
         const keys = get('danfangPoolStorageKeysByGrade') as
           | Record<string, string>
           | undefined;
         if (keys && Object.keys(keys).length) {
-          const next: Record<string, any[]> = {};
+          const next: DanfangPoolByGrade = {};
           await Promise.all(
             Object.entries(keys).map(async ([gradeKey, key]) => {
               const loaded = await load(key);
               if (!Array.isArray(loaded)) return;
-              next[gradeKey] = loaded as any[];
+              next[gradeKey] = loaded as DanfangItem[];
             })
           );
           if (Object.keys(next).length) {
@@ -59,19 +70,19 @@ function TujianModal({
         }
       }
       const gongfaPool = get('gongfaPoolByGrade') as
-        | Record<string, any[]>
+        | Record<string, GongFaType[]>
         | undefined;
       if (!gongfaPool) {
         const gongfaKeys = get('gongfaPoolStorageKeysByGrade') as
           | Record<string, string>
           | undefined;
         if (gongfaKeys && Object.keys(gongfaKeys).length) {
-          const gongfaNext: Record<string, any[]> = {};
+          const gongfaNext: Record<string, GongFaType[]> = {};
           await Promise.all(
             Object.entries(gongfaKeys).map(async ([gradeKey, key]) => {
               const loaded = await load(key);
               if (!Array.isArray(loaded)) return;
-              gongfaNext[gradeKey] = loaded as any[];
+              gongfaNext[gradeKey] = loaded as GongFaType[];
             })
           );
           if (Object.keys(gongfaNext).length) {
@@ -84,12 +95,12 @@ function TujianModal({
   }, [get, set, visible, isSeeds]);
 
   const danfangList = useMemo(() => {
-    const pool = actor?.danfangPoolByGrade as Record<string, any[]> | undefined;
+    const pool = actor?.danfangPoolByGrade as DanfangPoolByGrade | undefined;
     if (!pool) return [];
     const map = new Map<string, { name: string; itype?: string }>();
     Object.values(pool).forEach((items) => {
-      items.forEach((item: any) => {
-        const key = item?.id || item?.name;
+      items.forEach((item: DanfangItem) => {
+        const key = item?.name;
         if (!key) return;
         if (!map.has(key)) {
           map.set(key, { name: item.name, itype: item.itype });
@@ -121,16 +132,16 @@ function TujianModal({
   }, [actor]);
 
   const gongfaList = useMemo(() => {
-    const pool = actor?.gongfaPoolByGrade as Record<string, any[]> | undefined;
+    const pool = actor?.gongfaPoolByGrade;
     if (pool && Object.keys(pool).length) {
       const map = new Map<string, { name: string; itype?: string }>();
       Object.entries(pool).forEach(([gradeKey, items]) => {
-        items.forEach((item: any) => {
+        items.forEach((item: GongFaType) => {
           const key = item?.id || item?.name;
           if (!key || map.has(key)) return;
           map.set(key, {
             name: item.name,
-            itype: item?.pj || item?.itype || gradeKey
+            itype: item?.pj || gradeKey
           });
         });
       });
@@ -188,12 +199,12 @@ function TujianModal({
       if (isSeeds) return;
       const pool = get(
         tab === 'gf' ? 'gongfaPoolByGrade' : 'danfangPoolByGrade'
-      ) as Record<string, any[]> | undefined;
+      ) as DanfangPoolByGrade | Record<string, GongFaType[]> | undefined;
       const detail =
         pool &&
         Object.values(pool)
           .flat()
-          .find((x: any) => x.name === item.name);
+          .find((x: TujianDetailItem) => x.name === item.name);
       const details: ReactNode[] = [
         <Text key='name'>名称：{item.name}</Text>,
         <Text key='grade' color={getGradeColor(item.itype) || '#888'}>

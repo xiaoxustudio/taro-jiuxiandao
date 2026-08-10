@@ -41,6 +41,7 @@ import {
   splitNameByRealm,
   getTotalAttr
 } from '@/utils';
+import useBattleTimer from './useBattleTimer';
 
 export const renderNameWithRealmColor = (name: string) => {
   const parts = splitNameByRealm(name);
@@ -72,8 +73,14 @@ export function useBattle(
   set: (key: string, val: any) => void
 ) {
   const [isGuaji, setGuaji] = useState(false);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const guajiTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const {
+    setCombatTimer,
+    setGuajiTimer,
+    setAutoBattleTimer,
+    clearCombatTimer,
+    clearGuajiTimer,
+    clearAutoBattleTimer
+  } = useBattleTimer();
   const [guajiStats, setGuajiStats] = useState<{
     totalRounds: number;
     wins: number;
@@ -206,7 +213,6 @@ export function useBattle(
   const MAX_HISTORY_SIZE = 50;
   const endRef = useRef(HuiheState.end);
   const guajiLockRef = useRef(false);
-  const autoBattleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sessionLoot, setSessionLoot] = useState<Record<string, number>>({});
   useEffect(() => () => setSessionLoot({}), []);
   const fightSeqRef = useRef(0);
@@ -247,7 +253,7 @@ export function useBattle(
   }, []);
   const endBattle = useCallback(
     (result: 'win' | 'lose', rounds: number, ys: YaoShouZDType | null) => {
-      clearInterval(timer.current!);
+      clearCombatTimer();
       endHuiheState();
       if (isGuajiRef.current) {
         setGuajiStats((s) => ({
@@ -272,7 +278,7 @@ export function useBattle(
       });
       setActorInstance(null);
     },
-    [endHuiheState, guardClear]
+    [endHuiheState, guardClear, clearCombatTimer]
   );
   const syncBattleAchievements = useCallback(
     (winStreak: number) => {
@@ -607,9 +613,7 @@ export function useBattle(
       JXToast('神识不足，无法遁逃').show();
       return;
     }
-    if (timer.current) {
-      clearInterval(timer.current);
-    }
+    clearCombatTimer();
     const baseCost = Math.max(
       2,
       Math.min(10, Math.round(((YaoShouInstance?.xw || 0) as number) / 150))
@@ -649,7 +653,8 @@ export function useBattle(
     set,
     guardClear,
     pushLog,
-    endHuiheState
+    endHuiheState,
+    clearCombatTimer
   ]);
 
   const handleSearchYaoShouRef = useRef(handleSearchYaoShou);
@@ -662,21 +667,21 @@ export function useBattle(
   }, [get]);
 
   useEffect(() => {
-    const cleanup = () => {
-      if (typeof timer.current === 'number') {
-        clearInterval(timer.current as number);
-      }
-    };
+    clearCombatTimer();
     if (HuiheState.can && ActorInstance && YaoShouInstance) {
-      cleanup();
-      timer.current = setInterval(() => {
+      setCombatTimer(() => {
         zhandou();
       }, 800);
-    } else {
-      cleanup();
     }
-    return cleanup;
-  }, [HuiheState.can, ActorInstance, YaoShouInstance, zhandou]);
+    return clearCombatTimer;
+  }, [
+    HuiheState.can,
+    ActorInstance,
+    YaoShouInstance,
+    zhandou,
+    setCombatTimer,
+    clearCombatTimer
+  ]);
 
   useEffect(() => {
     endRef.current = HuiheState.end;
@@ -692,14 +697,9 @@ export function useBattle(
   }, [ActorInstance, YaoShouInstance]);
 
   useEffect(() => {
-    const cleanup = () => {
-      if (guajiTimer.current) {
-        clearInterval(guajiTimer.current);
-      }
-    };
     if (!isGuaji) {
-      cleanup();
-      return cleanup;
+      clearGuajiTimer();
+      return clearGuajiTimer;
     }
     const run = () => {
       if (guajiLockRef.current) return;
@@ -718,9 +718,9 @@ export function useBattle(
       }, 300);
     };
     run();
-    guajiTimer.current = setInterval(run, 1500);
-    return cleanup;
-  }, [isGuaji]);
+    setGuajiTimer(run, 1500);
+    return clearGuajiTimer;
+  }, [isGuaji, clearGuajiTimer, setGuajiTimer]);
 
   useEffect(() => {
     if (
@@ -730,25 +730,20 @@ export function useBattle(
       ActorInstance &&
       YaoShouInstance
     ) {
-      if (autoBattleTimer.current) {
-        clearTimeout(autoBattleTimer.current);
-      }
-      autoBattleTimer.current = setTimeout(() => {
+      setAutoBattleTimer(() => {
         handleStartZD();
       }, 800);
     }
-    return () => {
-      if (autoBattleTimer.current) {
-        clearTimeout(autoBattleTimer.current);
-      }
-    };
+    return clearAutoBattleTimer;
   }, [
     isGuaji,
     HuiheState.can,
     HuiheState.end,
     ActorInstance,
     YaoShouInstance,
-    handleStartZD
+    handleStartZD,
+    setAutoBattleTimer,
+    clearAutoBattleTimer
   ]);
 
   return {

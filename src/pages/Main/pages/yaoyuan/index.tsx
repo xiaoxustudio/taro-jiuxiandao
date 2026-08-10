@@ -3,13 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Container,
   JXButton,
+  JXGrid,
   JXModal,
   JXSpace,
   JXToast,
-  Text
+  Text,
+  TujianModal
 } from '@/components';
-import JXGrid from '@/components/Grid';
-import TujianModal from '@/components/TujianModal';
 import useModal from '@/hooks/useModal';
 import useActorController from '@/hooks/useActorController';
 import {

@@ -7,6 +7,7 @@ import {
   JXSpace,
   JXToast,
   List,
+  PageHeader,
   Scroll,
   Text
 } from '@/components';
@@ -23,7 +24,6 @@ import useActorController from '@/hooks/useActorController';
 import useContainer from '@/hooks/useContainer';
 import { getRealmIndex } from '@/utils/fangshi';
 import { dyGrades } from '@/assets/const';
-import PageHeader from '@/components/PageHeader';
 import './index.less';
 
 const LINGGEN_OPTIONS = ['金', '木', '水', '火', '土', '风', '雷'];

@@ -6,14 +6,14 @@ import title from '@/assets/logo.png';
 import {
   Box,
   JXButton,
+  JXGrid,
   JXModal,
   JXSpace,
   JXToast,
   Paragraph,
-  Text
+  Text,
+  TujianModal
 } from '@/components';
-import JXGrid from '@/components/Grid';
-import TujianModal from '@/components/TujianModal';
 import useActorController from '@/hooks/useActorController';
 import {
   navigateTo,

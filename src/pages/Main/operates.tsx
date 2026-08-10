@@ -20,6 +20,7 @@ import {
 import TpData from '@/assets/tp.json';
 import danfangData from '@/assets/danfang.json';
 import { ActorDataConfig, CWType } from '@/types';
+import { DanfangItem } from '@/types/danfang';
 import { GongFaType } from '@/types/gongfa';
 import { dyGrades } from '@/assets/const';
 import chuwu from '@/utils/chuwu';
@@ -30,9 +31,19 @@ import {
 } from '@/utils/chengjiuHelper';
 
 interface ActorCtx {
-  get(key: string, defaultValue?: any): any;
-  set(key: string, val: any): void;
+  get: <T = any>(key: string, defaultValue?: T) => T;
+  set(key: string, val: unknown): void;
 }
+
+type TpDataEntry = {
+  add: {
+    qixue: number;
+    gongji: number;
+    fashu?: number;
+    fangyu?: number;
+    shouyuan: number;
+  };
+};
 
 export function calcShengjie(
   actor: ActorDataConfig,
@@ -129,7 +140,7 @@ export function calcTupo(
 ) {
   const jingjie = get('jingjie');
   const jingjie2 = get('jingjie2');
-  const tpdata = TpData[jingjie as keyof typeof TpData];
+  const tpdata = (TpData as Record<string, TpDataEntry>)[jingjie];
   if (jingjie2 === '大圆满') {
     if (jingjie === '大乘') {
       const count = (get('lunhuiCount') as number) || 0;
@@ -278,12 +289,10 @@ export function calcTupo(
     const matchedPill = dyList.find((p) => {
       let pGrade: string = p.itype || '';
       if (!pGrade || !(dyGrades as readonly string[]).includes(pGrade)) {
-        const entry = (danfangData as Record<string, any>)
-          ? Object.values(danfangData as Record<string, any>).find(
-              (v: any) => v.name === p.name
-            )
-          : null;
-        pGrade = (entry as any)?.itype || '';
+        const entry = Object.values(
+          danfangData as unknown as Record<string, DanfangItem>
+        ).find((v) => v.name === p.name);
+        pGrade = entry?.itype || '';
       }
       const pIdx = (dyGrades as readonly string[]).indexOf(pGrade);
       return pIdx >= needGradeIdx;
@@ -326,8 +335,7 @@ export function calcTupo(
           get('fashu') * (1 + 0.08 * lv1) + (tpdata.add.fashu ?? 0) * 0.5
         );
         const calcFangyu = Math.round(
-          get('fangyu') * (1 + 0.08 * lv1) +
-            ((tpdata as any).add.fangyu || 0) * 0.5
+          get('fangyu') * (1 + 0.08 * lv1) + (tpdata.add.fangyu || 0) * 0.5
         );
         const calcBaoji = Math.min(
           80,

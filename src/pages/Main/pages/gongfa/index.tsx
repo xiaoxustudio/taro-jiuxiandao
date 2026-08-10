@@ -72,7 +72,7 @@ function XiuXiContent({ select }: { select: IUseValueNotState<string> }) {
 
 export default function Gongfa() {
   const { get, set, actor } = useActorController();
-  const [, select] = useValue('', true);
+  const select = useValue('');
   const linggen = (actor?.linggen as string) || '';
   const current = useMemo<GongFaType | null>(
     () => actor?.gongfa?.current ?? null,
